@@ -1,0 +1,92 @@
+{% extends 'adminlte/base.html' %}
+{% load static %}
+
+{% block title %}Đăng nhập{% endblock %}
+
+{% block body_class %}login-page{% endblock body_class %}
+
+{% block body %}
+<div class="login-page">
+    <div class="login-wrapper">
+        <div class="login-left">
+            <div class="login-overlay"></div>
+            <div class="login-content">
+                <div class="login-logo">
+                    <img src="{% static 'img/logo-white.png' %}" alt="OVNC Logo" class="brand-image">
+                    <h1><b>OVNC</b> Inventory</h1>
+                </div>
+                <div class="login-description">
+                    <h2>Hệ Thống Quản Lý Kho Chuyên Nghiệp</h2>
+                    <p>Tối ưu hóa hoạt động kho hàng với giải pháp quản lý toàn diện</p>
+                    <div class="login-features">
+                        <div class="feature-item">
+                            <i class="fas fa-boxes"></i>
+                            <span>Quản lý hàng tồn kho</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-truck"></i>
+                            <span>Theo dõi nhà cung cấp</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Báo cáo thống kê</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="login-right">
+            <div class="login-form-container">
+                <div class="login-header">
+                    <h3>Đăng Nhập</h3>
+                    <p>Đăng nhập để bắt đầu phiên làm việc</p>
+                </div>
+
+                <form method="post" class="login-form">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <div class="input-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        {{ form.username }}
+                    </div>
+                    <div class="input-group">
+                        <div class="input-icon">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        {{ form.password }}
+                    </div>
+
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle"></i> Tên đăng nhập hoặc mật khẩu không đúng. Vui lòng thử lại.
+                    </div>
+                    {% endif %}
+
+                    <div class="login-options">
+                        <div class="remember-me">
+                            <input type="checkbox" id="remember">
+                            <label for="remember">Nhớ mật khẩu</label>
+                        </div>
+                        <a href="{% url 'password_reset' %}" class="forgot-password">Quên mật khẩu?</a>
+                    </div>
+
+                    <button type="submit" class="login-button">
+                        <span>Đăng Nhập</span>
+                        <i class="fas fa-sign-in-alt"></i>
+                    </button>
+                </form>
+
+                <div class="login-footer">
+                    <p>© 2025 OVNC Inventory Management System</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="{% static 'admin-lte/plugins/fontawesome-free/css/all.min.css' %}">
+<link rel="stylesheet" href="{% static 'admin-lte/dist/css/adminlte.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+{% endblock %}

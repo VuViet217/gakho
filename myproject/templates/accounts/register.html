@@ -1,0 +1,43 @@
+{% extends 'adminlte/login.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Đăng ký{% endblock %}
+
+{% block body_class %}register-page{% endblock body_class %}
+
+{% block stylesheet %}
+<link rel="stylesheet" href="{% static 'css/custom.css' %}">
+{% endblock %}
+
+{% block logo_text %}
+<b>OVNC</b> Inventory
+{% endblock %}
+
+{% block login_box_title %}
+Đăng ký tài khoản mới
+{% endblock %}
+
+{% block login_box_social %}
+{% endblock %}
+
+{% block login_box_msg %}
+Nhập thông tin đăng ký của bạn
+{% endblock %}
+
+{% block login_form %}
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <div class="row mt-4">
+        <div class="col-8">
+            <a href="{% url 'login' %}" class="text-center">Tôi đã có tài khoản</a>
+        </div>
+        <div class="col-4">
+            <button type="submit" class="btn btn-primary btn-block">Đăng ký</button>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block login_form_end %}{% endblock %}

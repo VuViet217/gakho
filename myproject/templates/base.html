@@ -1,0 +1,8 @@
+{% extends 'adminlte/base.html' %}
+{% load static %}
+
+{% block title %}{{ title|default:"OVNC Inventory Management" }}{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/custom.css' %}">
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends 'adminlte/login.html' %}
+{% load static %}
+
+{% block title %}Đăng nhập{% endblock %}
+
+{% block body_class %}login-page{% endblock body_class %}
+
+{% block stylesheet %}
+<link rel="stylesheet" href="{% static 'css/custom.css' %}">
+{% endblock %}
+
+{% block logo_text %}
+<b>OVNC</b> Inventory
+{% endblock %}
+
+{% block login_message %}
+Đăng nhập để bắt đầu phiên làm việc
+{% endblock %}
+
+{% block login_box_title %}
+Đăng nhập
+{% endblock %}
+
+{% block login_box_social %}
+{% endblock %}
+
+{% block login_box_msg %}
+Nhập thông tin đăng nhập của bạn
+{% endblock %}
+
+{% block login_form %}
+<form method="post">
+    {% csrf_token %}
+    <div class="input-group mb-3">
+        {{ form.username }}
+        <div class="input-group-append">
+            <div class="input-group-text">
+                <span class="fas fa-user"></span>
+            </div>
+        </div>
+    </div>
+    <div class="input-group mb-3">
+        {{ form.password }}
+        <div class="input-group-append">
+            <div class="input-group-text">
+                <span class="fas fa-lock"></span>
+            </div>
+        </div>
+    </div>
+    {% if form.errors %}
+        <div class="alert alert-danger">
+            Tên đăng nhập hoặc mật khẩu không đúng. Vui lòng thử lại.
+        </div>
+    {% endif %}
+    <div class="row">
+        <div class="col-8">
+            <div class="icheck-primary">
+                <input type="checkbox" id="remember">
+                <label for="remember">
+                    Nhớ mật khẩu
+                </label>
+            </div>
+        </div>
+        <div class="col-4">
+            <button type="submit" class="btn btn-primary btn-block">Đăng nhập</button>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block login_form_end %}
+<p class="mb-1">
+    <a href="{% url 'password_reset' %}" class="forgot-password">Quên mật khẩu?</a>
+</p>
+{% if allow_register %}
+<p class="mb-0">
+    <a href="{% url 'register' %}" class="register-link text-center">Đăng ký tài khoản mới</a>
+</p>
+{% endif %}
+{% endblock %}

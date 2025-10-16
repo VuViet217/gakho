@@ -1,0 +1,194 @@
+.login-page {
+    background-image: linear-gradient(135deg, #0072ff 0%, #00c6ff 100%);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.login-box {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 10px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.login-logo {
+    font-weight: bold;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.login-card-body {
+    border-radius: 8px;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    transition: all 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #0069d9;
+    border-color: #0062cc;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 105, 217, 0.4);
+}
+
+.login-box-msg {
+    font-weight: 500;
+}
+
+.form-control {
+    border-radius: 4px;
+    border: 1px solid #ced4da;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.input-group-text {
+    background-color: #f8f9fa;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+}
+
+.forgot-password {
+    color: #6c757d;
+    transition: all 0.3s;
+}
+
+.forgot-password:hover {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.register-link {
+    font-weight: 500;
+}
+
+/* Animation */
+.login-box {
+    animation: fadeIn 0.8s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Dashboard Styles */
+body {
+    overflow-x: hidden;
+}
+
+.layout-fixed .wrapper .content-wrapper {
+    margin-left: 250px !important;
+    padding-left: 0 !important;
+}
+
+/* Đảm bảo sidebar có chiều rộng cố định */
+.main-sidebar, .main-sidebar::before {
+    width: 250px !important;
+    left: 0;
+    box-shadow: 0 14px 28px rgba(0,0,0,.25), 0 10px 10px rgba(0,0,0,.22);
+}
+
+.layout-fixed .main-sidebar {
+    bottom: 0;
+    float: none;
+    left: 0;
+    position: fixed;
+    top: 0;
+}
+
+/* Responsive */
+@media (max-width: 767.98px) {
+    .layout-fixed .wrapper .content-wrapper {
+        margin-left: 0 !important;
+    }
+    .main-sidebar, .main-sidebar::before {
+        box-shadow: none;
+    }
+}
+
+/* Fix khi sidebar thu gọn */
+.sidebar-mini.sidebar-collapse .content-wrapper {
+    margin-left: 4.6rem !important;
+}
+
+.sidebar-mini.sidebar-collapse .main-sidebar, .sidebar-mini.sidebar-collapse .main-sidebar::before {
+    width: 4.6rem !important;
+}
+
+.info-box {
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    border-radius: 5px;
+    transition: transform 0.3s ease;
+}
+
+.info-box:hover {
+    transform: translateY(-5px);
+}
+
+.card {
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+.card-header {
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    background-color: rgba(0,0,0,0.03);
+}
+
+.btn-tool {
+    color: #6c757d;
+}
+
+.table-responsive {
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.nav-sidebar .nav-header {
+    color: #6c757d;
+    font-weight: bold;
+    padding: 0.7rem 1rem 0.5rem;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.nav-sidebar .nav-item .nav-link {
+    padding: 0.7rem 1rem;
+}
+
+.nav-sidebar .nav-item .nav-link:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+
+.description-block {
+    border-right-color: #dee2e6 !important;
+}
+
+.progress-sm {
+    height: 0.5rem;
+}
+
+.dropdown-item:hover {
+    background-color: #f1f5fb;
+}

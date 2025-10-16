@@ -1,0 +1,103 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">Thông tin cá nhân</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Trang chủ</a></li>
+                        <li class="breadcrumb-item active">Thông tin cá nhân</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-4">
+                    <!-- Profile Image -->
+                    <div class="card card-primary card-outline">
+                        <div class="card-body box-profile">
+                            <div class="text-center">
+                                {% if user.profile_image %}
+                                <img class="profile-user-img img-fluid img-circle" 
+                                     src="{{ user.profile_image.url }}" 
+                                     alt="User profile picture">
+                                {% else %}
+                                <img class="profile-user-img img-fluid img-circle" 
+                                     src="{% static 'adminlte/img/user2-160x160.jpg' %}" 
+                                     alt="User profile picture">
+                                {% endif %}
+                            </div>
+
+                            <h3 class="profile-username text-center">{{ user.get_full_name|default:user.username }}</h3>
+
+                            <p class="text-muted text-center">{{ user.get_role_display }}</p>
+
+                            <ul class="list-group list-group-unbordered mb-3">
+                                <li class="list-group-item">
+                                    <b>Username</b> <a class="float-right">{{ user.username }}</a>
+                                </li>
+                                <li class="list-group-item">
+                                    <b>Email</b> <a class="float-right">{{ user.email }}</a>
+                                </li>
+                                <li class="list-group-item">
+                                    <b>Phòng ban</b> <a class="float-right">{{ user.department|default:"Chưa cập nhật" }}</a>
+                                </li>
+                                <li class="list-group-item">
+                                    <b>Số điện thoại</b> <a class="float-right">{{ user.phone|default:"Chưa cập nhật" }}</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                    <!-- /.card -->
+                </div>
+                <!-- /.col -->
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header p-2">
+                            <ul class="nav nav-pills">
+                                <li class="nav-item"><a class="nav-link active" href="#settings" data-toggle="tab">Cập nhật thông tin</a></li>
+                            </ul>
+                        </div><!-- /.card-header -->
+                        <div class="card-body">
+                            <div class="tab-content">
+                                <div class="active tab-pane" id="settings">
+                                    <form class="form-horizontal" method="post" enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                        {{ form|crispy }}
+                                        <div class="form-group row">
+                                            <div class="offset-sm-2 col-sm-10">
+                                                <button type="submit" class="btn btn-primary">Cập nhật</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <!-- /.tab-pane -->
+                            </div>
+                            <!-- /.tab-content -->
+                        </div><!-- /.card-body -->
+                    </div>
+                    <!-- /.card -->
+                </div>
+                <!-- /.col -->
+            </div>
+            <!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+</div>
+{% endblock %}
