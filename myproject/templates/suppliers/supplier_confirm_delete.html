@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header bg-danger">
+            <h3 class="card-title text-white">{{ title }}</h3>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-warning">
+                <h5><i class="icon fas fa-exclamation-triangle"></i> Cảnh báo!</h5>
+                <p>Bạn có chắc chắn muốn xóa nhà cung cấp <strong>{{ supplier.name }}</strong> (Mã: {{ supplier.code }})?</p>
+                {% if supplier.purchase_orders.count > 0 %}
+                <p class="text-danger">Nhà cung cấp này đang có <strong>{{ supplier.purchase_orders.count }}</strong> đơn đặt hàng. Việc xóa nhà cung cấp có thể ảnh hưởng đến dữ liệu đơn hàng.</p>
+                {% endif %}
+                <p>Hành động này không thể hoàn tác!</p>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th style="width: 150px;">Mã nhà cung cấp:</th>
+                            <td>{{ supplier.code }}</td>
+                        </tr>
+                        <tr>
+                            <th>Tên nhà cung cấp:</th>
+                            <td>{{ supplier.name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Người liên hệ:</th>
+                            <td>{{ supplier.contact_name }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Xác nhận xóa
+                </button>
+                <a href="{% url 'supplier_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Hủy bỏ
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

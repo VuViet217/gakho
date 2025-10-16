@@ -1,493 +1,7 @@
-<!DOCTYPE html>
+{% extends 'base.html' %}
 {% load static %}
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>OVNC Inventory | Dashboard</title>
 
-  <!-- Google Font: Source Sans Pro -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="/static/admin-lte/plugins/fontawesome-free/css/all.min.css">
-  <!-- Theme style -->
-  <link rel="stylesheet" href="/static/admin-lte/dist/css/adminlte.min.css">
-  <link rel="stylesheet" href="{% static 'css/custom.css' %}">>
-</head>
-<body class="hold-transition sidebar-mini">
-<!-- Site wrapper -->
-<div class="wrapper">
-  <!-- Navbar -->
-  <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-    <!-- Left navbar links -->
-    <ul class="navbar-nav">
-      <li class="nav-item">
-        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-      </li>
-      <li class="nav-item d-none d-sm-inline-block">
-        <a href="{% url 'main_dashboard' %}" class="nav-link">Trang chủ</a>
-      </li>
-    </ul>
-
-    <!-- Right navbar links -->
-    <ul class="navbar-nav ml-auto">
-      <li class="nav-item dropdown">
-        <a class="nav-link" data-toggle="dropdown" href="#">
-            <i class="far fa-user"></i> {{ user.get_full_name|default:user.username }}
-        </a>
-        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-            <a href="{% url 'profile' %}" class="dropdown-item">
-                <i class="fas fa-user mr-2"></i> Thông tin cá nhân
-            </a>
-            <div class="dropdown-divider"></div>
-            <a href="{% url 'logout' %}" class="dropdown-item">
-                <i class="fas fa-sign-out-alt mr-2"></i> Đăng xuất
-            </a>
-        </div>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" data-widget="fullscreen" href="#" role="button">
-          <i class="fas fa-expand-arrows-alt"></i>
-        </a>
-      </li>
-    </ul>
-  </nav>
-  <!-- /.navbar -->
-
-  <!-- Main Sidebar Container -->
-  <aside class="main-sidebar sidebar-dark-primary elevation-4">
-    <!-- Brand Logo -->
-    <a href="{% url 'main_dashboard' %}" class="brand-link">
-      <img src="/static/admin-lte/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">OVNC Inventory</span>
-    </a>
-
-    <!-- Sidebar -->
-    <div class="sidebar">
-      <!-- Sidebar user (optional) -->
-      <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-        <div class="image">
-          {% if user.profile_image %}
-          <img src="{{ user.profile_image.url }}" class="img-circle elevation-2" alt="User Image">
-          {% else %}
-          <img src="/static/admin-lte/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
-          {% endif %}
-        </div>
-        <div class="info">
-          <a href="{% url 'profile' %}" class="d-block">{{ user.get_full_name|default:user.username }}</a>
-        </div>
-      </div>
-
-      <!-- Sidebar Menu -->
-      <nav class="mt-2">
-        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-          <li class="nav-item">
-            <a href="{% url 'main_dashboard' %}" class="nav-link active">
-              <i class="nav-icon fas fa-tachometer-alt"></i>
-              <p>
-                Dashboard
-                <span class="right badge badge-danger">New</span>
-              </p>
-            </a>
-          </li>
-          
-          <li class="nav-header">NHÂN SỰ</li>
-          <li class="nav-item has-treeview">
-            <a href="#" class="nav-link">
-              <i class="nav-icon fas fa-users"></i>
-              <p>
-                Quản lý nhân viên
-                <i class="right fas fa-angle-left"></i>
-              </p>
-            </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="{% url 'employee_list' %}" class="nav-link">
-                  <i class="fas fa-user-friends nav-icon"></i>
-                  <p>Danh sách nhân viên</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="{% url 'department_list' %}" class="nav-link">
-                  <i class="fas fa-building nav-icon"></i>
-                  <p>Danh sách bộ phận</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="{% url 'import_employees' %}" class="nav-link">
-                  <i class="fas fa-file-import nav-icon"></i>
-                  <p>Nhập xuất dữ liệu</p>
-                </a>
-              </li>
-            </ul>
-          </li>
-          
-          <li class="nav-header">QUẢN LÝ KHO</li>
-          <li class="nav-item">
-            <a href="#" class="nav-link">
-              <i class="nav-icon fas fa-boxes"></i>
-              <p>
-                Sản phẩm
-                <i class="right fas fa-angle-left"></i>
-              </p>
-            </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Danh sách sản phẩm</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Thêm sản phẩm</p>
-                </a>
-              </li>
-            </ul>
-          </li>
-          
-          <li class="nav-item">
-            <a href="#" class="nav-link">
-              <i class="nav-icon fas fa-truck"></i>
-              <p>
-                Nhà cung cấp
-                <i class="right fas fa-angle-left"></i>
-              </p>
-            </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="fas fa-list nav-icon"></i>
-                  <p>Danh sách nhà cung cấp</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="fas fa-plus-circle nav-icon"></i>
-                  <p>Thêm nhà cung cấp</p>
-                </a>
-              </li>
-            </ul>
-          </li>
-          
-          <li class="nav-header">QUẢN LÝ ĐƠN HÀNG</li>
-          <li class="nav-item">
-            <a href="#" class="nav-link">
-              <i class="nav-icon fas fa-file-invoice"></i>
-              <p>
-                Đơn đặt hàng (PO)
-                <i class="right fas fa-angle-left"></i>
-              </p>
-            </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="fas fa-list nav-icon"></i>
-                  <p>Danh sách PO</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="fas fa-plus-circle nav-icon"></i>
-                  <p>Tạo PO mới</p>
-                </a>
-              </li>
-            </ul>
-          </li>
-        </ul>
-      </nav>
-      <!-- /.sidebar-menu -->
-    </div>
-    <!-- /.sidebar -->
-  </aside>
-
-  <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper">
-    <!-- Content Header (Page header) -->
-    <section class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1>Dashboard</h1>
-          </div>
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="{% url 'main_dashboard' %}">Trang chủ</a></li>
-              <li class="breadcrumb-item active">Dashboard</li>
-            </ol>
-          </div>
-        </div>
-      </div><!-- /.container-fluid -->
-    </section>
-
-    <!-- Main content -->
-    <section class="content">
-
-      <!-- Default box -->
-      <div class="container-fluid">
-          <!-- Info boxes -->
-          <div class="row">
-              <div class="col-12 col-sm-6 col-md-3">
-                  <div class="info-box">
-                      <span class="info-box-icon bg-info elevation-1"><i class="fas fa-boxes"></i></span>
-                      <div class="info-box-content">
-                          <span class="info-box-text">Sản phẩm</span>
-                          <span class="info-box-number">
-                              {{ products_count }}
-                          </span>
-                      </div>
-                  </div>
-              </div>
-              <div class="col-12 col-sm-6 col-md-3">
-                  <div class="info-box mb-3">
-                      <span class="info-box-icon bg-success elevation-1"><i class="fas fa-file-invoice"></i></span>
-                      <div class="info-box-content">
-                          <span class="info-box-text">Đơn đặt hàng (PO)</span>
-                          <span class="info-box-number">{{ purchase_orders_count }}</span>
-                      </div>
-                  </div>
-              </div>
-              <div class="clearfix hidden-md-up"></div>
-              <div class="col-12 col-sm-6 col-md-3">
-                  <div class="info-box mb-3">
-                      <span class="info-box-icon bg-warning elevation-1"><i class="fas fa-truck"></i></span>
-                      <div class="info-box-content">
-                          <span class="info-box-text">Nhà cung cấp</span>
-                          <span class="info-box-number">{{ suppliers_count }}</span>
-                      </div>
-                  </div>
-              </div>
-              <div class="col-12 col-sm-6 col-md-3">
-                  <div class="info-box mb-3">
-                      <span class="info-box-icon bg-danger elevation-1"><i class="fas fa-exclamation-triangle"></i></span>
-                      <div class="info-box-content">
-                          <span class="info-box-text">Sản phẩm sắp hết</span>
-                          <span class="info-box-number">{{ low_stock_count }}</span>
-                      </div>
-                  </div>
-              </div>
-          </div>
-
-          <div class="row">
-              <div class="col-lg-8">
-                  <div class="card">
-                      <div class="card-header border-0">
-                          <div class="d-flex justify-content-between">
-                              <h3 class="card-title">Thống kê nhập xuất kho theo tháng</h3>
-                          </div>
-                      </div>
-                      <div class="card-body">
-                          <div class="position-relative mb-4">
-                              <canvas id="inventory-chart" height="350"></canvas>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-
-              <div class="col-lg-4">
-                  <div class="card">
-                      <div class="card-header border-0">
-                          <h3 class="card-title">Mục tiêu hoàn thành</h3>
-                      </div>
-                      <div class="card-body">
-                          <div class="progress-group">
-                              Nhập kho từ PO
-                              <span class="float-right"><b>0</b>/100</span>
-                              <div class="progress progress-sm">
-                                  <div class="progress-bar bg-primary" style="width: 0%"></div>
-                              </div>
-                          </div>
-
-                          <div class="progress-group">
-                              Xuất kho thiết bị
-                              <span class="float-right"><b>0</b>/100</span>
-                              <div class="progress progress-sm">
-                                  <div class="progress-bar bg-danger" style="width: 0%"></div>
-                              </div>
-                          </div>
-
-                          <div class="progress-group">
-                              <span class="progress-text">Sản phẩm đạt ngưỡng tồi thiểu</span>
-                              <span class="float-right"><b>0</b>/100</span>
-                              <div class="progress progress-sm">
-                                  <div class="progress-bar bg-success" style="width: 0%"></div>
-                              </div>
-                          </div>
-
-                          <div class="progress-group">
-                              Tổng tồn kho
-                              <span class="float-right"><b>0</b>/100</span>
-                              <div class="progress progress-sm">
-                                  <div class="progress-bar bg-warning" style="width: 0%"></div>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-                  
-                  <div class="card">
-                      <div class="card-header border-0">
-                          <h3 class="card-title">Nhập/Xuất: 1 Tháng 1, 2025 - 31 Tháng 10, 2025</h3>
-                      </div>
-                      <div class="card-body table-responsive p-0">
-                          <table class="table table-striped table-valign-middle">
-                              <thead>
-                                  <tr>
-                                      <th>Loại</th>
-                                      <th>Số lượng</th>
-                                      <th>Tổng giá trị</th>
-                                  </tr>
-                              </thead>
-                              <tbody>
-                                  <tr>
-                                      <td>Nhập kho</td>
-                                      <td>0</td>
-                                      <td>0 VNĐ</td>
-                                  </tr>
-                                  <tr>
-                                      <td>Xuất kho</td>
-                                      <td>0</td>
-                                      <td>0 VNĐ</td>
-                                  </tr>
-                              </tbody>
-                          </table>
-                      </div>
-                  </div>
-              </div>
-          </div>
-
-          <div class="row">
-              <div class="col-md-8">
-                  <div class="card">
-                      <div class="card-header">
-                          <h3 class="card-title">PO gần đây</h3>
-                      </div>
-                      <div class="card-body table-responsive p-0">
-                          <table class="table table-hover text-nowrap">
-                              <thead>
-                                  <tr>
-                                      <th>Mã PO</th>
-                                      <th>Nhà cung cấp</th>
-                                      <th>Ngày tạo</th>
-                                      <th>Tổng tiền</th>
-                                      <th>Trạng thái</th>
-                                  </tr>
-                              </thead>
-                              <tbody>
-                                  <tr>
-                                      <td colspan="5" class="text-center">Chưa có đơn đặt hàng nào</td>
-                                  </tr>
-                              </tbody>
-                          </table>
-                      </div>
-                  </div>
-              </div>
-              
-              <div class="col-md-4">
-                  <div class="card">
-                      <div class="card-header">
-                          <h3 class="card-title">Sản phẩm sắp hết hàng</h3>
-                      </div>
-                      <div class="card-body p-0">
-                          <ul class="products-list product-list-in-card pl-2 pr-2">
-                              <li class="item">
-                                  <div class="product-info">
-                                      <span class="product-title">Chưa có sản phẩm nào sắp hết hàng</span>
-                                  </div>
-                              </li>
-                          </ul>
-                      </div>
-                      <div class="card-footer text-center">
-                          <a href="javascript:void(0)" class="uppercase">Xem tất cả sản phẩm</a>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </div>
-    </section>
-    <!-- /.content -->
-  </div>
-  <!-- /.content-wrapper -->
-
-  <footer class="main-footer">
-    <div class="float-right d-none d-sm-block">
-      <b>Version</b> 3.2.0
-    </div>
-    <strong>Copyright &copy; 2025 <a href="#">OVNC Inventory</a>.</strong> All rights reserved.
-  </footer>
-
-  <!-- Control Sidebar -->
-  <aside class="control-sidebar control-sidebar-dark">
-    <!-- Control sidebar content goes here -->
-  </aside>
-  <!-- /.control-sidebar -->
-</div>
-<!-- ./wrapper -->
-
-<!-- jQuery -->
-<script src="/static/admin-lte/plugins/jquery/jquery.min.js"></script>
-<!-- Bootstrap 4 -->
-<script src="/static/admin-lte/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-<!-- AdminLTE App -->
-<script src="/static/admin-lte/dist/js/adminlte.min.js"></script>
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Chart setup
-        const ctx = document.getElementById('inventory-chart').getContext('2d');
-        const inventoryChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10'],
-                datasets: [
-                    {
-                        label: 'Nhập kho',
-                        data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                        borderColor: '#28a745',
-                        backgroundColor: 'rgba(40, 167, 69, 0.1)',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.4
-                    },
-                    {
-                        label: 'Xuất kho',
-                        data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                        borderColor: '#dc3545',
-                        backgroundColor: 'rgba(220, 53, 69, 0.1)',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.4
-                    }
-                ]
-            },
-            options: {
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            drawBorder: false
-                        }
-                    },
-                    x: {
-                        grid: {
-                            display: false
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top'
-                    }
-                }
-            }
-        });
-    });
-</script>
-</body>
-</html>
+{% block title %}Dashboard{% endblock %}
 
 {% block content %}
 <div class="container-fluid">
@@ -621,6 +135,82 @@
         </div>
     </div>
 
+    <!-- Truy cập nhanh -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary">
+                    <h3 class="card-title">Quản lý nhân sự</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <a href="{% url 'employee_list' %}" class="btn btn-block btn-outline-primary btn-lg mb-3">
+                                <i class="fas fa-user-friends fa-2x mb-2"></i><br>
+                                Danh sách nhân viên
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="{% url 'department_list' %}" class="btn btn-block btn-outline-primary btn-lg mb-3">
+                                <i class="fas fa-building fa-2x mb-2"></i><br>
+                                Danh sách bộ phận
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="{% url 'employee_create' %}" class="btn btn-block btn-outline-success btn-lg mb-3">
+                                <i class="fas fa-user-plus fa-2x mb-2"></i><br>
+                                Thêm nhân viên
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="{% url 'import_employees' %}" class="btn btn-block btn-outline-info btn-lg mb-3">
+                                <i class="fas fa-file-import fa-2x mb-2"></i><br>
+                                Nhập xuất dữ liệu
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success">
+                    <h3 class="card-title">Quản lý nhà cung cấp</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <a href="{% url 'supplier_list' %}" class="btn btn-block btn-outline-success btn-lg mb-3">
+                                <i class="fas fa-truck fa-2x mb-2"></i><br>
+                                Danh sách nhà cung cấp
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="{% url 'supplier_create' %}" class="btn btn-block btn-outline-success btn-lg mb-3">
+                                <i class="fas fa-plus-circle fa-2x mb-2"></i><br>
+                                Thêm nhà cung cấp
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="{% url 'po_list' %}" class="btn btn-block btn-outline-warning btn-lg mb-3">
+                                <i class="fas fa-file-invoice fa-2x mb-2"></i><br>
+                                Danh sách đơn hàng
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="{% url 'po_create' %}" class="btn btn-block btn-outline-warning btn-lg mb-3">
+                                <i class="fas fa-plus-square fa-2x mb-2"></i><br>
+                                Tạo đơn hàng mới
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dữ liệu gần đây -->
     <div class="row">
         <div class="col-md-8">
             <div class="card">
@@ -672,6 +262,7 @@
 {% endblock %}
 
 {% block extra_js %}
+<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {

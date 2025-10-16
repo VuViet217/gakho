@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <h3 class="card-title">{{ title }}</h3>
+                <div>
+                    <a href="{% url 'po_update' purchase_order.id %}" class="btn btn-primary">
+                        <i class="fas fa-edit"></i> Chỉnh sửa
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th style="width: 150px;">Mã đơn hàng:</th>
+                            <td>{{ purchase_order.po_number }}</td>
+                        </tr>
+                        <tr>
+                            <th>Nhà cung cấp:</th>
+                            <td><a href="{% url 'supplier_detail' purchase_order.supplier.id %}">{{ purchase_order.supplier.name }}</a></td>
+                        </tr>
+                        <tr>
+                            <th>Ngày đặt hàng:</th>
+                            <td>{{ purchase_order.order_date }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th style="width: 150px;">Trạng thái:</th>
+                            <td>
+                                {% if purchase_order.status == 'pending' %}
+                                <span class="badge badge-warning">Chờ duyệt</span>
+                                {% elif purchase_order.status == 'approved' %}
+                                <span class="badge badge-success">Đã duyệt</span>
+                                {% elif purchase_order.status == 'rejected' %}
+                                <span class="badge badge-danger">Từ chối</span>
+                                {% elif purchase_order.status == 'completed' %}
+                                <span class="badge badge-info">Hoàn thành</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Ngày tạo:</th>
+                            <td>{{ purchase_order.created_at }}</td>
+                        </tr>
+                        <tr>
+                            <th>Ngày cập nhật:</th>
+                            <td>{{ purchase_order.updated_at }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card card-outline card-info">
+                        <div class="card-header">
+                            <h3 class="card-title">Mô tả</h3>
+                        </div>
+                        <div class="card-body">
+                            {{ purchase_order.description|linebreaks|default:"Không có mô tả" }}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card card-outline card-info">
+                        <div class="card-header">
+                            <h3 class="card-title">Hình ảnh</h3>
+                        </div>
+                        <div class="card-body text-center">
+                            {% if purchase_order.po_image %}
+                            <a href="{{ purchase_order.po_image.url }}" target="_blank">
+                                <img src="{{ purchase_order.po_image.url }}" alt="Hình ảnh PO" class="img-fluid" style="max-height: 300px;">
+                            </a>
+                            {% else %}
+                            <p class="text-muted">Không có hình ảnh</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <a href="{% url 'po_list' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Quay lại danh sách
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

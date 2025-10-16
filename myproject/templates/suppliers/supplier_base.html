@@ -1,0 +1,18 @@
+{% extends 'base_bootstrap.html' %}
+{% load static %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">{{ title|default:"Quản lý nhà cung cấp" }}</h5>
+            <div class="card-tools">
+                {% block actions %}{% endblock %}
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        {% block supplier_content %}{% endblock %}
+    </div>
+</div>
+{% endblock %}

@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'accounts',
     'main_dashboard',
     'employees',
+    'suppliers',
     'import_export',
     'crispy_forms',
     'crispy_bootstrap4',
@@ -69,9 +70,11 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'myproject.context_processors.menu_context',
             ],
         },
     },

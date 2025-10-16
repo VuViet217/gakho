@@ -1,0 +1,135 @@
+<!-- Main Sidebar Container -->
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+  <!-- Brand Logo -->
+  <a href="{% url 'main_dashboard' %}" class="brand-link">
+    <img src="/static/admin-lte/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+    <span class="brand-text font-weight-light">OVNC Inventory</span>
+  </a>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <!-- Sidebar user (optional) -->
+    <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+      <div class="image">
+        {% if user.profile_image %}
+        <img src="{{ user.profile_image.url }}" class="img-circle elevation-2" alt="User Image">
+        {% else %}
+        <img src="/static/admin-lte/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+        {% endif %}
+      </div>
+      <div class="info">
+        <a href="{% url 'profile' %}" class="d-block">{{ user.get_full_name|default:user.username }}</a>
+      </div>
+    </div>
+
+    <!-- Sidebar Menu -->
+    <nav class="mt-2">
+      <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+        <li class="nav-item">
+          <a href="{% url 'main_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'main_dashboard' %}active{% endif %}">
+            <i class="nav-icon fas fa-tachometer-alt"></i>
+            <p>
+              Dashboard
+              <span class="right badge badge-danger">New</span>
+            </p>
+          </a>
+        </li>
+        
+        <li class="nav-header">NHÂN SỰ</li>
+        <li class="nav-item has-treeview {% if 'employee' in request.path or 'department' in request.path %}menu-open{% endif %}">
+          <a href="#" class="nav-link {% if 'employee' in request.path or 'department' in request.path %}active{% endif %}">
+            <i class="nav-icon fas fa-users"></i>
+            <p>
+              Quản lý nhân viên
+              <i class="right fas fa-angle-left"></i>
+            </p>
+          </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="{% url 'employee_list' %}" class="nav-link {% if request.resolver_match.url_name == 'employee_list' %}active{% endif %}">
+                <i class="fas fa-user-friends nav-icon"></i>
+                <p>Danh sách nhân viên</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'department_list' %}" class="nav-link {% if request.resolver_match.url_name == 'department_list' %}active{% endif %}">
+                <i class="fas fa-building nav-icon"></i>
+                <p>Danh sách bộ phận</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'import_employees' %}" class="nav-link {% if request.resolver_match.url_name == 'import_employees' %}active{% endif %}">
+                <i class="fas fa-file-import nav-icon"></i>
+                <p>Nhập xuất dữ liệu</p>
+              </a>
+            </li>
+          </ul>
+        </li>
+        
+        <li class="nav-header">QUẢN LÝ NHÀ CUNG CẤP</li>
+        <li class="nav-item has-treeview {% if 'procurement/supplier' in request.path or 'procurement/purchase-order' in request.path %}menu-open{% endif %}">
+          <a href="#" class="nav-link {% if 'procurement/supplier' in request.path or 'procurement/purchase-order' in request.path %}active{% endif %}">
+            <i class="nav-icon fas fa-truck"></i>
+            <p>
+              Quản lý nhà cung cấp
+              <i class="right fas fa-angle-left"></i>
+            </p>
+          </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="{% url 'supplier_list' %}" class="nav-link {% if request.resolver_match.url_name == 'supplier_list' %}active{% endif %}">
+                <i class="fas fa-list nav-icon"></i>
+                <p>Danh sách nhà cung cấp</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'supplier_create' %}" class="nav-link {% if request.resolver_match.url_name == 'supplier_create' %}active{% endif %}">
+                <i class="fas fa-plus-circle nav-icon"></i>
+                <p>Thêm nhà cung cấp</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'po_list' %}" class="nav-link {% if request.resolver_match.url_name == 'po_list' %}active{% endif %}">
+                <i class="fas fa-file-invoice nav-icon"></i>
+                <p>Danh sách đơn hàng</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'po_create' %}" class="nav-link {% if request.resolver_match.url_name == 'po_create' %}active{% endif %}">
+                <i class="fas fa-plus-square nav-icon"></i>
+                <p>Tạo đơn hàng mới</p>
+              </a>
+            </li>
+          </ul>
+        </li>
+        
+        <li class="nav-header">QUẢN LÝ KHO</li>
+        <li class="nav-item">
+          <a href="#" class="nav-link">
+            <i class="nav-icon fas fa-boxes"></i>
+            <p>
+              Sản phẩm
+              <i class="right fas fa-angle-left"></i>
+            </p>
+          </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Danh sách sản phẩm</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Thêm sản phẩm</p>
+              </a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+    <!-- /.sidebar-menu -->
+  </div>
+  <!-- /.sidebar -->
+</aside>
