@@ -1,0 +1,26 @@
+{% extends 'inventory/base.html' %}
+{% load static %}
+
+{% block title %}Xóa sản phẩm: {{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header bg-danger text-white">
+            <h3 class="card-title">Xác nhận xóa</h3>
+        </div>
+        <div class="card-body">
+            <h5>Bạn có chắc chắn muốn xóa sản phẩm "{{ product.name }}" ({{ product.product_code }}) không?</h5>
+            <p class="text-muted">Hành động này không thể khôi phục lại.</p>
+            
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <button type="submit" class="btn btn-danger">Xác nhận xóa</button>
+                    <a href="{% url 'product_list' %}" class="btn btn-secondary">Hủy bỏ</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

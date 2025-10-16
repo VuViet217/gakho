@@ -1,0 +1,82 @@
+{% extends 'inventory/base.html' %}
+{% load static %}
+
+{% block title %}Đơn vị tính{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3 class="card-title">Đơn vị tính</h3>
+                </div>
+                <div class="col-md-6 text-right">
+                    <a href="{% url 'unit_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Thêm đơn vị tính
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered table-hover datatable">
+                <thead>
+                    <tr>
+                        <th>Tên đơn vị</th>
+                        <th>Viết tắt</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for unit in units %}
+                    <tr>
+                        <td>{{ unit.name }}</td>
+                        <td>{{ unit.abbreviation }}</td>
+                        <td>
+                            <a href="{% url 'unit_detail' unit.id %}" class="btn btn-sm btn-info" title="Xem chi tiết">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{% url 'unit_update' unit.id %}" class="btn btn-sm btn-primary" title="Sửa">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'unit_delete' unit.id %}" class="btn btn-sm btn-danger" title="Xóa">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" class="text-center">Không có đơn vị tính nào</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    $(document).ready(function() {
+        $('.datatable').DataTable({
+            "responsive": true,
+            "autoWidth": false,
+            "language": {
+                "lengthMenu": "Hiển thị _MENU_ dòng mỗi trang",
+                "zeroRecords": "Không tìm thấy dữ liệu",
+                "info": "Trang _PAGE_ / _PAGES_",
+                "infoEmpty": "Không có dữ liệu",
+                "infoFiltered": "(lọc từ _MAX_ dòng)",
+                "search": "Tìm kiếm:",
+                "paginate": {
+                    "first": "Đầu",
+                    "last": "Cuối",
+                    "next": "Tiếp",
+                    "previous": "Trước"
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

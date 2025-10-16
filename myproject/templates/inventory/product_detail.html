@@ -1,0 +1,125 @@
+{% extends 'inventory/base.html' %}
+{% load static %}
+
+{% block title %}Chi tiết sản phẩm: {{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3 class="card-title">Chi tiết sản phẩm</h3>
+                </div>
+                <div class="col-md-6 text-right">
+                    <a href="{% url 'product_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Quay lại danh sách
+                    </a>
+                    <a href="{% url 'product_update' product.id %}" class="btn btn-primary">
+                        <i class="fas fa-edit"></i> Sửa
+                    </a>
+                    <a href="{% url 'product_delete' product.id %}" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Xóa
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title mb-0">Thông tin cơ bản</h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-bordered">
+                                <tr>
+                                    <th style="width: 40%">Mã sản phẩm</th>
+                                    <td>{{ product.product_code }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Tên sản phẩm</th>
+                                    <td>{{ product.name }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Danh mục</th>
+                                    <td>{{ product.category.name|default:"Chưa phân loại" }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Đơn vị tính</th>
+                                    <td>{{ product.unit.name|default:"-" }} {% if product.unit %}({{ product.unit.abbreviation }}){% endif %}</td>
+                                </tr>
+                                <tr>
+                                    <th>Số lượng hiện tại</th>
+                                    <td>
+                                        {% if product.is_low_stock %}
+                                        <span class="badge badge-danger">{{ product.current_quantity }}</span>
+                                        {% else %}
+                                        <span class="badge badge-success">{{ product.current_quantity }}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Số lượng tối thiểu</th>
+                                    <td>{{ product.minimum_quantity }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Mô tả</th>
+                                    <td>{{ product.description|default:"Không có mô tả"|linebreaks }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="card-title mb-0">Thông tin khác</h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-bordered">
+                                <tr>
+                                    <th style="width: 40%">Đơn hàng</th>
+                                    <td>
+                                        {% if product.purchase_order %}
+                                        <a href="{% url 'po_detail' product.purchase_order.id %}">
+                                            {{ product.purchase_order.po_number }}
+                                        </a>
+                                        {% else %}
+                                        Không có thông tin
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Nhà cung cấp</th>
+                                    <td>
+                                        {% if product.purchase_order.supplier %}
+                                        <a href="{% url 'supplier_detail' product.purchase_order.supplier.id %}">
+                                            {{ product.purchase_order.supplier.name }}
+                                        </a>
+                                        {% else %}
+                                        Không có thông tin
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Vị trí kho</th>
+                                    <td>{{ product.warehouse_location }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Ngày tạo</th>
+                                    <td>{{ product.created_at|date:"d/m/Y H:i" }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Cập nhật lần cuối</th>
+                                    <td>{{ product.updated_at|date:"d/m/Y H:i" }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

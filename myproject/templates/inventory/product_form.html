@@ -1,0 +1,27 @@
+{% extends 'inventory/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% if form.instance.pk %}Sửa sản phẩm: {{ form.instance.name }}{% else %}Thêm sản phẩm mới{% endif %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3 class="card-title">{% if form.instance.pk %}Sửa sản phẩm{% else %}Thêm sản phẩm mới{% endif %}</h3>
+                </div>
+                <div class="col-md-6 text-right">
+                    <a href="{% url 'product_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Quay lại danh sách
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            {% crispy form %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -28,6 +28,7 @@ urlpatterns = [
     path('dashboard/', include('main_dashboard.urls')),
     path('hr/', include('employees.urls')),
     path('procurement/', include('suppliers.urls')),
+    path('inventory/', include('inventory.urls')),
     path('logout/', LogoutView.as_view(), name='logout'),
 ]
 

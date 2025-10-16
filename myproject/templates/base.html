@@ -140,18 +140,18 @@
             </ul>
           </li>
           
-          <!-- Products -->
+          <!-- Inventory -->
           <li class="nav-header">QUẢN LÝ KHO</li>
-          <li class="nav-item has-treeview {% if menu.products.open %}menu-open{% endif %}">
-            <a href="#" class="nav-link {% if menu.products.active %}active{% endif %}">
-              <i class="{{ menu.products.icon }} nav-icon"></i>
+          <li class="nav-item has-treeview {% if menu.inventory.open %}menu-open{% endif %}">
+            <a href="#" class="nav-link {% if menu.inventory.active %}active{% endif %}">
+              <i class="{{ menu.inventory.icon }} nav-icon"></i>
               <p>
-                {{ menu.products.name }}
+                {{ menu.inventory.name }}
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
             <ul class="nav nav-treeview">
-              {% for item in menu.products.items %}
+              {% for item in menu.inventory.items %}
               <li class="nav-item">
                 <a href="{% if item.url != '#' %}{% url item.url %}{% else %}#{% endif %}" class="nav-link {% if item.active %}active{% endif %}">
                   <i class="{{ item.icon }} nav-icon"></i>

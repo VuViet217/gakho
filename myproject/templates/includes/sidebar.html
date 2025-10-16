@@ -104,25 +104,61 @@
         </li>
         
         <li class="nav-header">QUẢN LÝ KHO</li>
-        <li class="nav-item">
-          <a href="#" class="nav-link">
-            <i class="nav-icon fas fa-boxes"></i>
+        <li class="nav-item has-treeview {% if 'inventory/' in request.path %}menu-open{% endif %}">
+          <a href="#" class="nav-link {% if 'inventory/' in request.path %}active{% endif %}">
+            <i class="nav-icon fas fa-warehouse"></i>
             <p>
-              Sản phẩm
+              Quản lý kho
               <i class="right fas fa-angle-left"></i>
             </p>
           </a>
           <ul class="nav nav-treeview">
             <li class="nav-item">
-              <a href="#" class="nav-link">
-                <i class="far fa-circle nav-icon"></i>
+              <a href="{% url 'product_list' %}" class="nav-link {% if request.resolver_match.url_name == 'product_list' %}active{% endif %}">
+                <i class="fas fa-boxes nav-icon"></i>
                 <p>Danh sách sản phẩm</p>
               </a>
             </li>
             <li class="nav-item">
-              <a href="#" class="nav-link">
-                <i class="far fa-circle nav-icon"></i>
+              <a href="{% url 'product_create' %}" class="nav-link {% if request.resolver_match.url_name == 'product_create' %}active{% endif %}">
+                <i class="fas fa-plus-circle nav-icon"></i>
                 <p>Thêm sản phẩm</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'low_stock_products' %}" class="nav-link {% if request.resolver_match.url_name == 'low_stock_products' %}active{% endif %}">
+                <i class="fas fa-exclamation-triangle nav-icon"></i>
+                <p>Sản phẩm sắp hết</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'category_list' %}" class="nav-link {% if request.resolver_match.url_name == 'category_list' %}active{% endif %}">
+                <i class="fas fa-tags nav-icon"></i>
+                <p>Danh mục</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'unit_list' %}" class="nav-link {% if request.resolver_match.url_name == 'unit_list' %}active{% endif %}">
+                <i class="fas fa-balance-scale nav-icon"></i>
+                <p>Đơn vị tính</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'warehouse_list' %}" class="nav-link {% if request.resolver_match.url_name == 'warehouse_list' %}active{% endif %}">
+                <i class="fas fa-warehouse nav-icon"></i>
+                <p>Quản lý kho</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'warehouse_row_list' %}" class="nav-link {% if request.resolver_match.url_name == 'warehouse_row_list' %}active{% endif %}">
+                <i class="fas fa-th-list nav-icon"></i>
+                <p>Vị trí dãy</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'warehouse_column_list' %}" class="nav-link {% if request.resolver_match.url_name == 'warehouse_column_list' %}active{% endif %}">
+                <i class="fas fa-columns nav-icon"></i>
+                <p>Vị trí cột</p>
               </a>
             </li>
           </ul>

@@ -1,0 +1,94 @@
+{% extends 'inventory/base.html' %}
+{% load static %}
+
+{% block title %}Danh sách kho{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3 class="card-title">Danh sách kho</h3>
+                </div>
+                <div class="col-md-6 text-right">
+                    <a href="{% url 'warehouse_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Thêm kho mới
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered table-hover datatable">
+                <thead>
+                    <tr>
+                        <th>Tên kho</th>
+                        <th>Địa điểm</th>
+                        <th>Trạng thái</th>
+                        <th>Số dãy</th>
+                        <th>Ngày tạo</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for warehouse in warehouses %}
+                    <tr>
+                        <td>{{ warehouse.name }}</td>
+                        <td>{{ warehouse.location|default:"-" }}</td>
+                        <td>
+                            {% if warehouse.active %}
+                                <span class="badge badge-success">Hoạt động</span>
+                            {% else %}
+                                <span class="badge badge-secondary">Ngưng hoạt động</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ warehouse.rows.count }}</td>
+                        <td>{{ warehouse.created_at|date:"d/m/Y" }}</td>
+                        <td>
+                            <a href="{% url 'warehouse_detail' warehouse.id %}" class="btn btn-sm btn-info" title="Xem chi tiết">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{% url 'warehouse_update' warehouse.id %}" class="btn btn-sm btn-primary" title="Sửa">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'warehouse_delete' warehouse.id %}" class="btn btn-sm btn-danger" title="Xóa">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center">Không có kho nào</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    $(document).ready(function() {
+        $('.datatable').DataTable({
+            "responsive": true,
+            "autoWidth": false,
+            "language": {
+                "lengthMenu": "Hiển thị _MENU_ dòng mỗi trang",
+                "zeroRecords": "Không tìm thấy dữ liệu",
+                "info": "Trang _PAGE_ / _PAGES_",
+                "infoEmpty": "Không có dữ liệu",
+                "infoFiltered": "(lọc từ _MAX_ dòng)",
+                "search": "Tìm kiếm:",
+                "paginate": {
+                    "first": "Đầu",
+                    "last": "Cuối",
+                    "next": "Tiếp",
+                    "previous": "Trước"
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
