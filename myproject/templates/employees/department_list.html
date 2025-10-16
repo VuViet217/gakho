@@ -1,0 +1,130 @@
+{% extends 'employee_base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <h3 class="card-title">Danh sách bộ phận</h3>
+                <div>
+                    <a href="{% url 'department_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Thêm bộ phận
+                    </a>
+                    <div class="btn-group ml-2">
+                        <a href="{% url 'export_departments' %}?format=xlsx" class="btn btn-success">
+                            <i class="fas fa-file-excel"></i> Xuất Excel
+                        </a>
+                        <button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="sr-only">Toggle Dropdown</span>
+                        </button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="{% url 'export_departments' %}?format=xlsx">XLSX</a>
+                            <a class="dropdown-item" href="{% url 'export_departments' %}?format=csv">CSV</a>
+                        </div>
+                    </div>
+                    <a href="{% url 'import_departments' %}" class="btn btn-info ml-2">
+                        <i class="fas fa-file-import"></i> Nhập dữ liệu
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <form action="{% url 'department_list' %}" method="GET" class="form-inline">
+                        <div class="input-group">
+                            <input type="text" name="search" class="form-control" placeholder="Tìm kiếm bộ phận..." value="{{ search_query }}">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" type="submit">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                                {% if search_query %}
+                                <a href="{% url 'department_list' %}" class="btn btn-outline-danger">
+                                    <i class="fas fa-times"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover table-striped">
+                    <thead>
+                        <tr>
+                            <th>Mã bộ phận</th>
+                            <th>Tên bộ phận</th>
+                            <th>Mô tả</th>
+                            <th>Số lượng nhân viên</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for department in page_obj %}
+                        <tr>
+                            <td>{{ department.code }}</td>
+                            <td>{{ department.name }}</td>
+                            <td>{{ department.description|default:"-" }}</td>
+                            <td>{{ department.employee_set.count }}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{% url 'department_update' department.id %}" class="btn btn-sm btn-primary" title="Chỉnh sửa">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'department_delete' department.id %}" class="btn btn-sm btn-danger" title="Xóa">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center">Không có bộ phận nào.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            {% if page_obj.paginator.num_pages > 1 %}
+            <div class="pagination justify-content-center mt-4">
+                <ul class="pagination">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}">&laquo; Đầu</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">Trước</a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <a class="page-link" href="#">{{ num }}</a>
+                    </li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">Tiếp</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}">Cuối &raquo;</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

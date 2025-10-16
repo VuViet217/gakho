@@ -30,17 +30,17 @@ class Employee(models.Model):
     full_name = models.CharField(max_length=100, verbose_name="Họ và tên", blank=True)
     department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, related_name="employees", verbose_name="Bộ phận")
     
-    # Thông tin cá nhân
+    # Thông tin cá nhân - tất cả đều optional
     date_of_birth = models.DateField(null=True, blank=True, verbose_name="Ngày sinh")
-    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, default='M', verbose_name="Giới tính")
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, default='M', null=True, blank=True, verbose_name="Giới tính")
     id_card = models.CharField(max_length=20, blank=True, null=True, verbose_name="Số CMND/CCCD")
     phone_number = models.CharField(max_length=20, blank=True, null=True, verbose_name="Số điện thoại")
     email = models.EmailField(blank=True, null=True, verbose_name="Email")
     address = models.TextField(blank=True, null=True, verbose_name="Địa chỉ")
     
-    # Thông tin công việc
+    # Thông tin công việc - tất cả đều optional
     position = models.CharField(max_length=100, blank=True, null=True, verbose_name="Chức vụ")
-    join_date = models.DateField(default=timezone.now, verbose_name="Ngày vào làm")
+    join_date = models.DateField(null=True, blank=True, verbose_name="Ngày vào làm")
     status = models.BooleanField(default=True, verbose_name="Đang làm việc")
     
     # Thông tin hệ thống

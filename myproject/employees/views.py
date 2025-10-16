@@ -5,9 +5,11 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from import_export.formats import base_formats
 from tablib import Dataset
+from django import forms
 from .models import Department, Employee
 from .forms import DepartmentForm, EmployeeForm, ImportForm
 from .admin import DepartmentResource, EmployeeResource
+from .views_new import employee_list_new
 
 
 # Department Views
@@ -139,14 +141,19 @@ def employee_list(request):
 
 @login_required
 def employee_create(request):
+    class SimpleEmployeeForm(forms.ModelForm):
+        class Meta:
+            model = Employee
+            fields = ['employee_id', 'first_name', 'last_name', 'department']
+    
     if request.method == 'POST':
-        form = EmployeeForm(request.POST)
+        form = SimpleEmployeeForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, 'Nhân viên đã được tạo thành công!')
             return redirect('employee_list')
     else:
-        form = EmployeeForm()
+        form = SimpleEmployeeForm()
     
     return render(request, 'employees/employee_form.html', {
         'form': form,
@@ -158,14 +165,19 @@ def employee_create(request):
 def employee_update(request, pk):
     employee = get_object_or_404(Employee, pk=pk)
     
+    class SimpleEmployeeForm(forms.ModelForm):
+        class Meta:
+            model = Employee
+            fields = ['employee_id', 'first_name', 'last_name', 'department']
+    
     if request.method == 'POST':
-        form = EmployeeForm(request.POST, instance=employee)
+        form = SimpleEmployeeForm(request.POST, instance=employee)
         if form.is_valid():
             form.save()
             messages.success(request, 'Nhân viên đã được cập nhật thành công!')
             return redirect('employee_list')
     else:
-        form = EmployeeForm(instance=employee)
+        form = SimpleEmployeeForm(instance=employee)
     
     return render(request, 'employees/employee_form.html', {
         'form': form,

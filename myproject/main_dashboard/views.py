@@ -18,3 +18,7 @@ class MainDashboardView(TemplateView):
         context['low_stock_count'] = 0
         
         return context
+        
+@method_decorator(login_required, name='dispatch')
+class TestDashboardView(TemplateView):
+    template_name = 'main_dashboard/test_dashboard.html'

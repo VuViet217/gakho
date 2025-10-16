@@ -25,9 +25,7 @@ class EmployeeForm(forms.ModelForm):
     class Meta:
         model = Employee
         fields = [
-            'employee_id', 'last_name', 'first_name', 'department',
-            'date_of_birth', 'gender', 'id_card', 'phone_number',
-            'email', 'address', 'position', 'join_date', 'status'
+            'employee_id', 'last_name', 'first_name', 'department'
         ]
         widgets = {
             'employee_id': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nhập mã nhân viên'}),

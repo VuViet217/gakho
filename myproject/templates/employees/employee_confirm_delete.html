@@ -1,0 +1,61 @@
+{% extends 'employee_base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header bg-danger">
+            <h3 class="card-title text-white">{{ title }}</h3>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-warning">
+                <h5><i class="icon fas fa-exclamation-triangle"></i> Cảnh báo!</h5>
+                <p>Bạn có chắc chắn muốn xóa nhân viên <strong>{{ employee.full_name }}</strong> (Mã nhân viên: {{ employee.employee_id }})?</p>
+                <p>Hành động này không thể hoàn tác!</p>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th style="width: 150px;">Mã nhân viên:</th>
+                            <td>{{ employee.employee_id }}</td>
+                        </tr>
+                        <tr>
+                            <th>Họ và tên:</th>
+                            <td>{{ employee.full_name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Bộ phận:</th>
+                            <td>{{ employee.department.name }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th style="width: 150px;">Số điện thoại:</th>
+                            <td>{{ employee.phone_number }}</td>
+                        </tr>
+                        <tr>
+                            <th>Email:</th>
+                            <td>{{ employee.email }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Xác nhận xóa
+                </button>
+                <a href="{% url 'employee_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Hủy bỏ
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

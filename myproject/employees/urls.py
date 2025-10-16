@@ -15,6 +15,9 @@ urlpatterns = [
     path('employees/<int:pk>/detail/', views.employee_detail, name='employee_detail'),
     path('employees/<int:pk>/delete/', views.employee_delete, name='employee_delete'),
     
+    # Giao diện mới
+    path('employees/new/', views.employee_list_new, name='employee_list_new'),
+    
     # Import/Export URLs
     path('employees/import/', views.import_employees, name='import_employees'),
     path('employees/export/', views.export_employees, name='export_employees'),
