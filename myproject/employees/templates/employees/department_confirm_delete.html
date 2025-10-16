@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">{{ title }}</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="{% url 'main_dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'department_list' %}">Danh sách bộ phận</a></li>
+                    <li class="breadcrumb-item active">{{ title }}</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="card card-danger">
+            <div class="card-header">
+                <h3 class="card-title">Xác nhận xóa bộ phận</h3>
+            </div>
+            <div class="card-body">
+                <p class="text-danger"><i class="fas fa-exclamation-triangle"></i> Bạn có chắc chắn muốn xóa bộ phận này không?</p>
+                <p>
+                    <strong>Mã bộ phận:</strong> {{ department.code }}<br>
+                    <strong>Tên bộ phận:</strong> {{ department.name }}<br>
+                    <strong>Mô tả:</strong> {{ department.description|default:"Không có mô tả" }}
+                </p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-info-circle"></i> Lưu ý: Nếu đã có nhân viên trong bộ phận này, hành động này có thể gây ra lỗi hoặc dữ liệu không nhất quán.
+                </div>
+            </div>
+            <div class="card-footer">
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Xác nhận xóa
+                    </button>
+                    <a href="{% url 'department_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Hủy
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

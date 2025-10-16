@@ -278,9 +278,21 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
+                            <a href="{% url 'department_list' %}" class="nav-link {% if '/hr/departments/' in request.path %}active{% endif %}">
+                                <i class="fas fa-building nav-icon"></i>
+                                <p>Quản lý bộ phận</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'employee_list' %}" class="nav-link {% if '/hr/employees/' in request.path %}active{% endif %}">
                                 <i class="fas fa-user-friends nav-icon"></i>
                                 <p>Danh sách nhân viên</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'import_employees' %}" class="nav-link {% if '/hr/employees/import/' in request.path %}active{% endif %}">
+                                <i class="fas fa-file-import nav-icon"></i>
+                                <p>Import nhân viên</p>
                             </a>
                         </li>
                         <li class="nav-item">

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">{{ title }}</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="{% url 'main_dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">{{ title }}</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title">{{ title }}</h3>
+            </div>
+            <form method="post" enctype="multipart/form-data" novalidate>
+                {% csrf_token %}
+                <div class="card-body">
+                    {{ form|crispy }}
+                    
+                    <div class="alert alert-info">
+                        <h5><i class="icon fas fa-info"></i> Hướng dẫn nhập dữ liệu:</h5>
+                        <ul>
+                            <li>File nhập phải có định dạng .xlsx, .xls hoặc .csv.</li>
+                            <li>Các cột bắt buộc: Mã bộ phận/nhân viên, tên bộ phận/nhân viên.</li>
+                            <li>Đối với nhân viên, cột department phải chứa mã bộ phận hợp lệ đã có trong hệ thống.</li>
+                            <li>Dữ liệu sẽ được kiểm tra trước khi nhập vào hệ thống.</li>
+                            <li>Mẫu file nhập: <a href="#" class="text-primary">Tải mẫu Excel</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-file-upload"></i> Nhập dữ liệu
+                    </button>
+                    <a href="javascript:history.back()" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Hủy
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

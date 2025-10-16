@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">{{ title }}</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="{% url 'main_dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'employee_list' %}">Danh sách nhân viên</a></li>
+                    <li class="breadcrumb-item active">{{ employee.employee_id }}</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card card-primary card-outline">
+                    <div class="card-body box-profile">
+                        <div class="text-center">
+                            <img class="profile-user-img img-fluid img-circle" src="{% static 'img/default-avatar.png' %}" alt="Ảnh nhân viên">
+                        </div>
+                        <h3 class="profile-username text-center">{{ employee.full_name }}</h3>
+                        <p class="text-muted text-center">{{ employee.position|default:"Chưa có chức vụ" }}</p>
+                        
+                        <ul class="list-group list-group-unbordered mb-3">
+                            <li class="list-group-item">
+                                <b>Mã nhân viên</b> <span class="float-right">{{ employee.employee_id }}</span>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Bộ phận</b> <span class="float-right">{{ employee.department.name|default:"Chưa phân bộ phận" }}</span>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Ngày vào làm</b> <span class="float-right">{{ employee.join_date|date:"d/m/Y" }}</span>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Trạng thái</b> 
+                                <span class="float-right">
+                                    {% if employee.status %}
+                                    <span class="badge badge-success">Đang làm việc</span>
+                                    {% else %}
+                                    <span class="badge badge-danger">Không làm việc</span>
+                                    {% endif %}
+                                </span>
+                            </li>
+                        </ul>
+                        
+                        <div class="btn-group w-100">
+                            <a href="{% url 'employee_update' employee.pk %}" class="btn btn-primary">
+                                <i class="fas fa-edit"></i> Sửa
+                            </a>
+                            <a href="{% url 'employee_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Quay lại
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header p-2">
+                        <ul class="nav nav-pills">
+                            <li class="nav-item"><a class="nav-link active" href="#personal" data-toggle="tab">Thông tin cá nhân</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#work" data-toggle="tab">Thông tin công việc</a></li>
+                        </ul>
+                    </div>
+                    <div class="card-body">
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="personal">
+                                <table class="table">
+                                    <tr>
+                                        <th style="width: 30%">Họ và tên</th>
+                                        <td>{{ employee.full_name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Ngày sinh</th>
+                                        <td>{{ employee.date_of_birth|date:"d/m/Y"|default:"Chưa có thông tin" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Giới tính</th>
+                                        <td>
+                                            {% if employee.gender == 'M' %}Nam
+                                            {% elif employee.gender == 'F' %}Nữ
+                                            {% else %}Khác{% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>CMND/CCCD</th>
+                                        <td>{{ employee.id_card|default:"Chưa có thông tin" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Số điện thoại</th>
+                                        <td>{{ employee.phone_number|default:"Chưa có thông tin" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Email</th>
+                                        <td>{{ employee.email|default:"Chưa có thông tin" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Địa chỉ</th>
+                                        <td>{{ employee.address|default:"Chưa có thông tin" }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            
+                            <div class="tab-pane" id="work">
+                                <table class="table">
+                                    <tr>
+                                        <th style="width: 30%">Bộ phận</th>
+                                        <td>{{ employee.department.name|default:"Chưa phân bộ phận" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Mã bộ phận</th>
+                                        <td>{{ employee.department.code|default:"Không có" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Chức vụ</th>
+                                        <td>{{ employee.position|default:"Chưa có thông tin" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Ngày vào làm</th>
+                                        <td>{{ employee.join_date|date:"d/m/Y" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Trạng thái</th>
+                                        <td>
+                                            {% if employee.status %}
+                                            <span class="badge badge-success">Đang làm việc</span>
+                                            {% else %}
+                                            <span class="badge badge-danger">Không làm việc</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Ngày tạo</th>
+                                        <td>{{ employee.created_at|date:"d/m/Y H:i" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Cập nhật lần cuối</th>
+                                        <td>{{ employee.updated_at|date:"d/m/Y H:i" }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
