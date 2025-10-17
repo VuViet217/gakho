@@ -1,0 +1,188 @@
+{% extends 'inventory/base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3 class="card-title">{{ title }}</h3>
+                </div>
+                <div class="col-md-6 text-right">
+                    <a href="{% url 'stock_receipt_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Quay lại danh sách
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            {% if messages %}
+            <div class="row">
+                <div class="col-12">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Thông tin phiếu nhập kho -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title mb-0">Thông tin phiếu nhập</h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-bordered">
+                                <tr>
+                                    <th style="width: 40%">Mã phiếu nhập:</th>
+                                    <td><strong>{{ receipt.receipt_number }}</strong></td>
+                                </tr>
+                                <tr>
+                                    <th>Đơn đặt hàng:</th>
+                                    <td>
+                                        <a href="{% url 'po_detail' receipt.purchase_order.id %}">
+                                            {{ receipt.purchase_order.po_number }}
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Nhà cung cấp:</th>
+                                    <td>
+                                        <a href="{% url 'supplier_detail' receipt.purchase_order.supplier.id %}">
+                                            {{ receipt.purchase_order.supplier.name }}
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Ngày nhập kho:</th>
+                                    <td>{{ receipt.receipt_date }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="card-title mb-0">Thông tin khác</h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-bordered">
+                                <tr>
+                                    <th style="width: 40%">Người tạo:</th>
+                                    <td>{{ receipt.created_by.get_full_name|default:receipt.created_by.username }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Ngày tạo:</th>
+                                    <td>{{ receipt.created_at|date:"d/m/Y H:i" }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Cập nhật lần cuối:</th>
+                                    <td>{{ receipt.updated_at|date:"d/m/Y H:i" }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Ghi chú:</th>
+                                    <td>{{ receipt.notes|linebreaks|default:"Không có ghi chú" }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Danh sách sản phẩm -->
+            <div class="card mt-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">Danh sách sản phẩm nhập kho</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover" id="products-table">
+                            <thead>
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Mã sản phẩm</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th>Đơn vị</th>
+                                    <th>Số lượng nhập</th>
+                                    <th>Ghi chú</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in items %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ item.product.product_code }}</td>
+                                    <td>
+                                        <a href="{% url 'product_detail' item.product.id %}">
+                                            {{ item.product.name }}
+                                        </a>
+                                    </td>
+                                    <td>{{ item.product.unit.name|default:"-" }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>{{ item.notes|default:"-" }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center">Không có sản phẩm nào</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="4" class="text-right">Tổng cộng:</th>
+                                    <th colspan="2">{{ receipt.total_quantity }} sản phẩm</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <a href="{% url 'stock_receipt_list' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Quay lại danh sách
+            </a>
+            <a href="{% url 'stock_receipt_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Tạo phiếu nhập mới
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        $('#products-table').DataTable({
+            "paging": true,
+            "lengthChange": false,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": true,
+            "language": {
+                "search": "Tìm kiếm:",
+                "paginate": {
+                    "first": "Đầu",
+                    "last": "Cuối",
+                    "next": "Tiếp",
+                    "previous": "Trước"
+                },
+                "info": "Hiển thị _START_ đến _END_ của _TOTAL_ mục",
+                "infoEmpty": "Hiển thị 0 đến 0 của 0 mục",
+                "zeroRecords": "Không tìm thấy kết quả phù hợp",
+                "emptyTable": "Không có dữ liệu"
+            }
+        });
+    });
+</script>
+{% endblock %}

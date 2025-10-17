@@ -15,4 +15,8 @@ urlpatterns = [
     path('purchase-orders/<int:pk>/', views.po_detail, name='po_detail'),
     path('purchase-orders/<int:pk>/update/', views.po_update, name='po_update'),
     path('purchase-orders/<int:pk>/delete/', views.po_delete, name='po_delete'),
+    
+    # Purchase Order Item URLs
+    path('purchase-orders/items/<int:pk>/delete/', views.po_item_delete, name='po_item_delete'),
+    path('purchase-orders/items/<int:pk>/update/', views.po_item_update, name='po_item_update'),
 ]

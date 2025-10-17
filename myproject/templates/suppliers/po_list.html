@@ -61,26 +61,26 @@
                             <th>Nhà cung cấp</th>
                             <th>Ngày đặt hàng</th>
                             <th>Trạng thái</th>
+                            <th>Sản phẩm</th>
+                            <th>Số lượng</th>
+                            <th>Tổng tiền</th>
                             <th>Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for po in page_obj %}
                         <tr>
-                            <td>{{ po.po_number }}</td>
+                            <td><a href="{% url 'po_detail' po.id %}">{{ po.po_number }}</a></td>
                             <td><a href="{% url 'supplier_detail' po.supplier.id %}">{{ po.supplier.name }}</a></td>
                             <td>{{ po.order_date }}</td>
                             <td>
-                                {% if po.status == 'pending' %}
-                                <span class="badge badge-warning">Chờ duyệt</span>
-                                {% elif po.status == 'approved' %}
-                                <span class="badge badge-success">Đã duyệt</span>
-                                {% elif po.status == 'rejected' %}
-                                <span class="badge badge-danger">Từ chối</span>
-                                {% elif po.status == 'completed' %}
-                                <span class="badge badge-info">Hoàn thành</span>
-                                {% endif %}
+                                <span class="badge badge-{{ po.get_status_display_class }}">
+                                    {{ po.get_status_display }}
+                                </span>
                             </td>
+                            <td>{{ po.product_count }}</td>
+                            <td>{{ po.total_quantity }}</td>
+                            <td>{{ po.total_amount|floatformat:2 }}</td>
                             <td>
                                 <div class="btn-group">
                                     <a href="{% url 'po_detail' po.id %}" class="btn btn-sm btn-info" title="Xem chi tiết">
@@ -97,7 +97,7 @@
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="5" class="text-center">Không có đơn đặt hàng nào.</td>
+                            <td colspan="8" class="text-center">Không có đơn đặt hàng nào.</td>
                         </tr>
                         {% endfor %}
                     </tbody>

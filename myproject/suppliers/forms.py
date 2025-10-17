@@ -1,6 +1,7 @@
 from django import forms
-from .models import Supplier, PurchaseOrder
+from .models import Supplier, PurchaseOrder, PurchaseOrderItem
 from django.core.exceptions import ValidationError
+from inventory.models import Product
 
 class SupplierForm(forms.ModelForm):
     class Meta:
@@ -42,3 +43,18 @@ class PurchaseOrderForm(forms.ModelForm):
             # Chuyển mã thành chữ in hoa và loại bỏ khoảng trắng
             return po_number.strip().upper()
         return po_number
+
+
+class PurchaseOrderItemForm(forms.ModelForm):
+    class Meta:
+        model = PurchaseOrderItem
+        fields = ['product', 'quantity', 'unit_price']
+        widgets = {
+            'product': forms.Select(attrs={'class': 'form-control select2', 'placeholder': 'Chọn sản phẩm'}),
+            'quantity': forms.NumberInput(attrs={'class': 'form-control', 'min': '1', 'placeholder': 'Nhập số lượng'}),
+            'unit_price': forms.NumberInput(attrs={'class': 'form-control', 'min': '0', 'step': '0.01', 'placeholder': 'Nhập đơn giá'}),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['product'].queryset = Product.objects.all().order_by('name')

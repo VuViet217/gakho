@@ -1,6 +1,5 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from suppliers.models import PurchaseOrder
 from django.urls import reverse
 
 class Category(models.Model):
@@ -121,13 +120,6 @@ class Product(models.Model):
         verbose_name=_("Đơn vị tính"),
         null=True
     )
-    purchase_order = models.ForeignKey(
-        PurchaseOrder, 
-        on_delete=models.SET_NULL, 
-        related_name="products", 
-        verbose_name=_("Đơn đặt hàng"),
-        null=True
-    )
     column = models.ForeignKey(
         WarehouseColumn, 
         on_delete=models.SET_NULL, 
@@ -163,3 +155,30 @@ class Product(models.Model):
         if self.column:
             return f"{self.column}"
         return "Chưa xác định"
+        
+    @property
+    def purchase_orders(self):
+        """Trả về danh sách các đơn đặt hàng chứa sản phẩm này"""
+        from suppliers.models import PurchaseOrder
+        return PurchaseOrder.objects.filter(items__product=self).distinct()
+        
+    @property
+    def latest_purchase_order(self):
+        """Trả về đơn đặt hàng gần đây nhất của sản phẩm"""
+        from suppliers.models import PurchaseOrder
+        orders = PurchaseOrder.objects.filter(items__product=self).order_by('-order_date')
+        return orders.first() if orders.exists() else None
+        
+    @property
+    def latest_purchase_price(self):
+        """Trả về giá mua gần đây nhất của sản phẩm"""
+        from suppliers.models import PurchaseOrderItem
+        items = PurchaseOrderItem.objects.filter(product=self).order_by('-created_at')
+        return items.first().unit_price if items.exists() else None
+        
+    @property
+    def total_purchased_quantity(self):
+        """Trả về tổng số lượng đã mua của sản phẩm"""
+        from suppliers.models import PurchaseOrderItem
+        items = PurchaseOrderItem.objects.filter(product=self)
+        return sum(item.quantity for item in items)

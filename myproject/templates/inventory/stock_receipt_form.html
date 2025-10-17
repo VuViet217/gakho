@@ -1,0 +1,807 @@
+{% extends 'inventory/base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <form method="post" id="receiptForm">
+        {% csrf_token %}
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">{{ title }}</h3>
+            </div>
+            <div class="card-body">
+                <!-- Thông tin đơn đặt hàng -->
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="{{ form.purchase_order.id_for_label }}">Đơn đặt hàng <span class="text-danger">*</span></label>
+                            {{ form.purchase_order }}
+                            {% if form.purchase_order.errors %}
+                            <div class="text-danger">
+                                {{ form.purchase_order.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="{{ form.receipt_date.id_for_label }}">Ngày nhập kho <span class="text-danger">*</span></label>
+                            {{ form.receipt_date }}
+                            {% if form.receipt_date.errors %}
+                            <div class="text-danger">
+                                {{ form.receipt_date.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Nhà cung cấp</label>
+                            <input type="text" class="form-control" id="supplier_display" name="supplier_display" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="{{ form.notes.id_for_label }}">Ghi chú</label>
+                            {{ form.notes }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thông tin sản phẩm nhập kho -->
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="card-title">Danh sách sản phẩm nhập kho</h3>
+                    </div>
+                    <div class="card-body">
+                        {{ formset.management_form }}
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="items-table">
+                                <thead>
+                                    <tr>
+                                        <th>Sản phẩm</th>
+                                        <th width="100px">SL hiện tại</th>
+                                        <th width="150px">SL nhập</th>
+                                        <th width="200px">Ghi chú</th>
+                                        <th width="80px">Xóa</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="item-rows">
+                                    {% for form in formset %}
+                                    <tr class="item-row">
+                                        <td>
+                                            {{ form.product }}
+                                            {% if form.product.errors %}
+                                            <div class="text-danger">
+                                                {{ form.product.errors }}
+                                            </div>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {{ form.current_quantity }}
+                                        </td>
+                                        <td>
+                                            {{ form.quantity }}
+                                            {% if form.quantity.errors %}
+                                            <div class="text-danger">
+                                                {{ form.quantity.errors }}
+                                            </div>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {{ form.notes }}
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-danger btn-sm remove-row"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="text-center mt-3">
+                            <button type="button" class="btn btn-info" id="add-row">
+                                <i class="fas fa-plus"></i> Thêm sản phẩm
+                            </button>
+                            <button type="button" class="btn btn-secondary ml-2" id="refresh-products">
+                                <i class="fas fa-sync-alt"></i> Làm mới danh sách sản phẩm
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thông báo lỗi FormSet -->
+                {% if formset.non_form_errors %}
+                <div class="alert alert-danger">
+                    {% for error in formset.non_form_errors %}
+                    {{ error }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <div class="card-footer">
+                <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Lưu phiếu nhập kho</button>
+                <a href="{% url 'stock_receipt_list' %}" class="btn btn-secondary"><i class="fas fa-times"></i> Hủy</a>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        console.log("=== Trang đã được tải xong ===");
+        
+        // FIX CHO NÚT THÊM SẢN PHẨM
+        // Định nghĩa hàm thêm sản phẩm mới trực tiếp trong trang
+        function addNewProductRow() {
+            console.log("Thêm sản phẩm mới vào phiếu nhập kho - TRỰC TIẾP");
+            alert("Đang thêm dòng mới...");
+
+            // Lấy formCount hiện tại từ TOTAL_FORMS
+            let formCount = parseInt($('#id_items-TOTAL_FORMS').val() || '0');
+            console.log("Số lượng form hiện tại:", formCount);
+
+            // Clone dòng đầu tiên thay vì tạo mới để đảm bảo cấu trúc giống nhau
+            var firstRow = $('.item-row:first');
+            var newRow = firstRow.clone(true);
+            
+            // Cập nhật ID và name cho tất cả các input trong dòng mới
+            newRow.find(':input').each(function() {
+                var name = $(this).attr('name');
+                if (name) {
+                    name = name.replace(/items-\d+/, 'items-' + formCount);
+                    var id = 'id_' + name;
+                    $(this).attr({'name': name, 'id': id});
+                    
+                    // Xóa giá trị cũ
+                    if ($(this).is('select')) {
+                        $(this).val('').trigger('change');
+                    } else if ($(this).is('input[type="text"]')) {
+                        $(this).val('');
+                    } else if ($(this).is('input[type="number"]')) {
+                        $(this).val(1);
+                    }
+                }
+            });
+            
+            // Thêm dòng mới vào bảng
+            $('#item-rows').append(newRow);
+            alert("Đã thêm dòng mới!");
+            
+            // Cập nhật formCount
+            formCount++;
+            $('#id_items-TOTAL_FORMS').val(formCount);
+            console.log("Đã cập nhật TOTAL_FORMS:", formCount);
+            
+            // Khởi tạo lại select2 cho dropdown mới
+            newRow.find('.select2').each(function() {
+                if ($(this).hasClass('select2-hidden-accessible')) {
+                    $(this).select2('destroy');
+                }
+                $(this).select2({
+                    theme: 'bootstrap4',
+                    width: '100%'
+                });
+            });
+            
+            return newRow;
+        }
+        
+        // Thay thế sự kiện click cho nút "Thêm sản phẩm"
+        $('#add-row').off('click').on('click', function(e) {
+            e.preventDefault();
+            console.log("Nút thêm sản phẩm được nhấn");
+            alert("Bạn đã nhấn nút Thêm sản phẩm!");
+            addNewProductRow();
+        });
+        
+        // Thêm nút thêm sản phẩm mới ở cuối trang để có lựa chọn thay thế
+        $('.card-footer').prepend(`
+            <button type="button" class="btn btn-warning mb-3" id="alternative-add-row" style="font-weight: bold; font-size: 16px;">
+                <i class="fas fa-plus-circle"></i> THÊM SẢN PHẨM MỚI
+            </button>
+        `);
+        
+        // Gắn sự kiện cho nút thêm sản phẩm thay thế
+        $('#alternative-add-row').on('click', function() {
+            console.log("Nút thêm sản phẩm thay thế được nhấn");
+            addNewProductRow();
+        });
+        
+        // Khởi tạo select2
+        try {
+            $('.select2').select2({
+                theme: 'bootstrap4',
+                width: '100%'
+            });
+            
+            console.log("Đã khởi tạo Select2");
+            
+            // Kiểm tra tình trạng dropdown PO
+            const poSelect = $('#id_purchase_order');
+            console.log("Giá trị PO hiện tại:", poSelect.val());
+            console.log("Text PO hiện tại:", poSelect.find('option:selected').text());
+            
+            // Kiểm tra tình trạng dropdown sản phẩm
+            const productSelects = $('.product-select');
+            console.log("Số lượng dropdown sản phẩm:", productSelects.length);
+            productSelects.each(function(index) {
+                const id = $(this).attr('id') || `product-select-${index}`;
+                console.log(`Dropdown sản phẩm #${index} (${id}):`, {
+                    options: $(this).find('option').length,
+                    selectedValue: $(this).val(),
+                    selectedText: $(this).find('option:selected').text()
+                });
+            });
+            
+            // Thêm hướng dẫn sử dụng
+            const instructions = $(`
+                <div class="alert alert-info mb-3">
+                    <strong>Hướng dẫn:</strong> 
+                    <ol>
+                        <li>Chọn đơn đặt hàng (chỉ để liên kết với đơn hàng)</li>
+                        <li>Chọn sản phẩm từ danh sách sản phẩm có trong kho</li>
+                        <li>Nhập số lượng cần nhập kho</li>
+                        <li>Nhấn "Thêm sản phẩm" để thêm nhiều sản phẩm khác</li>
+                        <li>Nhấn "Lưu phiếu nhập kho" khi hoàn tất</li>
+                    </ol>
+                    <div class="text-success mt-2">
+                        <strong>Lưu ý:</strong> Bạn có thể chọn bất kỳ sản phẩm nào có trong hệ thống mà không phụ thuộc vào đơn đặt hàng.
+                    </div>
+                </div>
+            `);
+            $('.card-body').prepend(instructions);
+        } catch (e) {
+            console.error("Lỗi khi khởi tạo trang:", e);
+        }
+
+        // Xử lý khi chọn đơn đặt hàng
+        $('#id_purchase_order').on('change', function() {
+            const poId = $(this).val();
+            console.log("Đã chọn PO ID:", poId);
+            
+            // Xóa thông báo cũ
+            $('.alert-warning, .alert-danger').not('.alert-info').remove();
+            
+            if (poId) {
+                // Hiển thị nhà cung cấp
+                const selectedText = $('#id_purchase_order option:selected').text().trim();
+                console.log("Văn bản đã chọn:", selectedText);
+                
+                // Lấy phần nhà cung cấp sau dấu " - " (nếu có)
+                let supplierName = '';
+                if (selectedText.includes(' - ')) {
+                    supplierName = selectedText.split(' - ')[1];
+                    console.log("Tách được tên nhà cung cấp:", supplierName);
+                } else {
+                    console.log("Không tìm thấy dấu ' - ' trong văn bản đã chọn");
+                }
+                
+                // Cập nhật trường hiển thị nhà cung cấp
+                $('#supplier_display').val(supplierName);
+                console.log("Đã cập nhật trường nhà cung cấp:", supplierName);
+
+                // KHÔNG xóa các dòng sản phẩm hiện tại khi thay đổi đơn đặt hàng
+                
+                // Hiển thị thông báo đang tải
+                $('.alert#loading-msg').remove(); // Xóa thông báo đang tải cũ nếu có
+                const loadingMsg = $('<div class="alert alert-info" id="loading-msg">Đang tải danh sách sản phẩm...</div>');
+                $('#item-rows').before(loadingMsg);
+                
+                // Thực hiện lấy dữ liệu từ API với tham số thời gian để tránh cache
+                $.ajax({
+                    url: `/inventory/api/purchase-order-items/`,
+                    data: { 
+                        po_id: poId,
+                        _t: new Date().getTime() // Thêm tham số để tránh cache
+                    },
+                    dataType: 'json',
+                    cache: false, // Không sử dụng cache
+                    success: function(data) {
+                        console.log("Nhận được dữ liệu từ API:", data);
+                        $('#loading-msg').remove();
+                        
+                        // Kiểm tra và xóa thông báo lỗi cũ
+                        $('.alert-warning, .alert-danger').not('.alert-info').remove();
+                        
+                        if (data.items && Array.isArray(data.items)) {
+                            console.log("Số lượng sản phẩm nhận được:", data.items.length);
+                            
+                            if (data.items.length > 0) {
+                                // Hiển thị thông tin chi tiết về từng sản phẩm nhận được
+                                data.items.forEach(function(item, index) {
+                                    console.log(`Sản phẩm ${index + 1}:`, item);
+                                });
+                                
+                                // Cập nhật dropdown sản phẩm
+                                updateProductDropdowns(data.items);
+                                console.log("Đã cập nhật dropdown sản phẩm với", data.items.length, "sản phẩm");
+                                
+                                // Hiển thị thông báo thành công
+                                const successMsg = $(`<div class="alert alert-success mb-3">Đã tìm thấy ${data.items.length} sản phẩm có thể nhập kho.</div>`);
+                                $('#item-rows').before(successMsg);
+                                setTimeout(() => successMsg.fadeOut(1000), 3000);
+                            } else {
+                                console.log("Không có sản phẩm nào được trả về từ API (mảng rỗng)");
+                                const msgText = data.message || 'Không có sản phẩm nào trong hệ thống. Vui lòng thêm sản phẩm trước.';
+                                $('#item-rows').before(`<div class="alert alert-warning">${msgText}</div>`);
+                                
+                                // Đặt dropdown thành rỗng
+                                updateProductDropdowns([]);
+                            }
+                        } else {
+                            console.log("Dữ liệu trả về không có mảng items hoặc không hợp lệ:", data);
+                            const msgText = data.message || data.error || 'Không tìm thấy sản phẩm nào trong hệ thống.';
+                            $('#item-rows').before(`<div class="alert alert-warning">${msgText}</div>`);
+                            
+                            // Đặt dropdown thành rỗng
+                            updateProductDropdowns([]);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        $('#loading-msg').remove();
+                        console.error("Lỗi khi gọi API:", status, error);
+                        console.log("Thông tin chi tiết lỗi:", xhr);
+                        
+                        const errorMsg = xhr.responseJSON?.error || 'Có lỗi xảy ra khi tải danh sách sản phẩm.';
+                        $('#item-rows').before(`<div class="alert alert-danger">
+                            <strong>Lỗi:</strong> ${errorMsg}<br>
+                            <small>Chi tiết: ${error}</small>
+                        </div>`);
+                        
+                        // Đặt dropdown thành rỗng
+                        updateProductDropdowns([]);
+                    }
+                });
+            } else {
+                $('#supplier_display').val('');
+            }
+        });
+        
+        // Tải sản phẩm ngay khi trang được tải xong, không cần đợi chọn đơn đặt hàng
+        setTimeout(function() {
+            loadAllProducts();
+        }, 500);
+
+        // Cập nhật form khi chọn sản phẩm
+        $(document).on('change', '.product-select', function() {
+            const row = $(this).closest('tr');
+            const selectedOption = $(this).find('option:selected');
+            console.log("Đã chọn sản phẩm:", selectedOption.text());
+            
+            if (selectedOption.val()) {
+                try {
+                    // Lấy thông tin số lượng hiện tại
+                    const currentQty = selectedOption.data('current-quantity') || 0;
+                    
+                    console.log("Thông tin sản phẩm:", {
+                        "SL hiện tại": currentQty
+                    });
+                    
+                    // Cập nhật trường số lượng hiện tại
+                    row.find('input[name$="-current_quantity"]').val(currentQty);
+                    
+                    // Đặt giá trị mặc định cho số lượng nhập là 1
+                    const quantityInput = row.find('input[name$="-quantity"]');
+                    quantityInput.val(1).attr('min', 1);
+                    quantityInput.focus();
+                    
+                } catch (e) {
+                    console.error("Lỗi khi cập nhật thông tin sản phẩm:", e);
+                }
+            } else {
+                row.find('input[name$="-current_quantity"]').val('');
+                row.find('input[name$="-quantity"]').val('');
+            }
+            
+            // Cập nhật danh sách sản phẩm đã chọn
+            updateExcludedOptions();
+        });
+
+        // Thêm dòng sản phẩm mới
+        $('#add-row').click(function() {
+            console.log("Bắt đầu thêm dòng sản phẩm mới");
+            
+            // Kiểm tra xem có sản phẩm nào trong hệ thống không
+            const firstRowSelect = $('.item-row:first').find('select.product-select');
+            if (firstRowSelect.find('option').length <= 1) { // Chỉ có option mặc định
+                alert('Không có sản phẩm nào để thêm. Vui lòng thêm sản phẩm vào hệ thống trước.');
+                return;
+            }
+            
+            const formCount = parseInt($('#id_items-TOTAL_FORMS').val());
+            console.log("Số lượng form hiện tại:", formCount);
+            
+            try {
+                // Lấy cấu trúc bảng từ thead để đảm bảo tạo dòng mới đúng với cấu trúc bảng
+                const colCount = $('#items-table thead th').length;
+                console.log("Số lượng cột trong bảng:", colCount);
+                
+                // Tạo một dòng mới hoàn toàn
+                const newRow = $('<tr class="item-row"></tr>');
+                
+                // Ô 1: Sản phẩm
+                const productCell = $('<td></td>');
+                const productSelect = $('<select class="form-control select2 product-select"></select>');
+                productSelect.attr({
+                    'name': `items-${formCount}-product`,
+                    'id': `id_items-${formCount}-product`
+                });
+                productCell.append(productSelect);
+                newRow.append(productCell);
+                
+                // Ô 2: SL hiện tại
+                const currentQtyCell = $('<td></td>');
+                const currentQtyInput = $('<input type="text" class="form-control" readonly>');
+                currentQtyInput.attr({
+                    'name': `items-${formCount}-current_quantity`,
+                    'id': `id_items-${formCount}-current_quantity`
+                });
+                currentQtyCell.append(currentQtyInput);
+                newRow.append(currentQtyCell);
+                
+                // Ô 3: SL nhập
+                const qtyCell = $('<td></td>');
+                const qtyInput = $('<input type="number" class="form-control" min="1">');
+                qtyInput.attr({
+                    'name': `items-${formCount}-quantity`,
+                    'id': `id_items-${formCount}-quantity`
+                });
+                qtyCell.append(qtyInput);
+                newRow.append(qtyCell);
+                
+                // Ô 4: Ghi chú
+                const notesCell = $('<td></td>');
+                const notesInput = $('<input type="text" class="form-control">');
+                notesInput.attr({
+                    'name': `items-${formCount}-notes`,
+                    'id': `id_items-${formCount}-notes`
+                });
+                notesCell.append(notesInput);
+                newRow.append(notesCell);
+                
+                // Ô 5: Xóa
+                const deleteCell = $('<td></td>');
+                const deleteBtn = $('<button type="button" class="btn btn-danger btn-sm remove-row"><i class="fas fa-trash"></i></button>');
+                deleteCell.append(deleteBtn);
+                newRow.append(deleteCell);
+                
+                // Thêm dòng mới vào bảng
+                $('#item-rows').append(newRow);
+                console.log("Đã thêm dòng mới vào bảng với", newRow.children().length, "ô");
+                
+                // Cập nhật form count
+                $('#id_items-TOTAL_FORMS').val(formCount + 1);
+                console.log("Đã cập nhật TOTAL_FORMS:", formCount + 1);
+                
+                // Sao chép các option từ dropdown đầu tiên
+                const options = firstRowSelect.find('option').clone();
+                productSelect.append(options);
+                console.log("Đã sao chép", options.length, "option vào dropdown mới");
+                
+                // Khởi tạo Select2 cho dropdown mới
+                productSelect.select2({
+                    theme: 'bootstrap4',
+                    width: '100%',
+                    dropdownParent: productSelect.parent()
+                });
+                
+                console.log("Đã khởi tạo select2 cho dòng mới");
+                
+                // Cập nhật các lựa chọn đã được chọn
+                updateExcludedOptions();
+                
+                // Cho phép người dùng chọn sản phẩm ngay
+                setTimeout(function() {
+                    productSelect.select2('open');
+                }, 100);
+                
+            } catch (e) {
+                console.error("Lỗi khi thêm dòng sản phẩm mới:", e);
+                alert('Có lỗi xảy ra khi thêm sản phẩm. Vui lòng thử lại.');
+            }
+        });
+
+        // Xóa dòng sản phẩm
+        $(document).on('click', '.remove-row', function() {
+            const itemRows = $('.item-row');
+            if (itemRows.length > 1) {
+                $(this).closest('tr').remove();
+                updateFormIndexes();
+                updateExcludedOptions();
+            } else {
+                alert('Phải có ít nhất một sản phẩm trong phiếu nhập kho');
+            }
+        });
+
+        // Cập nhật lại index khi xóa dòng
+        function updateFormIndexes() {
+            $('#item-rows tr').each(function(index) {
+                $(this).find(':input').each(function() {
+                    const name = $(this).attr('name').replace(/-\d+-/, `-${index}-`);
+                    const id = 'id_' + name;
+                    $(this).attr({'name': name, 'id': id});
+                });
+            });
+            
+            // Cập nhật form count
+            $('#id_items-TOTAL_FORMS').val($('#item-rows tr').length);
+        }
+
+        // Cập nhật danh sách sản phẩm trong dropdown
+        function updateProductDropdowns(items) {
+            const dropdowns = $('.product-select');
+            console.log("Cập nhật dropdown sản phẩm. Số lượng dropdown:", dropdowns.length);
+            console.log("Dữ liệu sản phẩm nhận được:", items);
+            
+            if (dropdowns.length === 0) {
+                console.error("Không tìm thấy dropdown sản phẩm nào!");
+                return;
+            }
+            
+            if (!items || items.length === 0) {
+                console.warn("Không có sản phẩm nào để hiển thị!");
+                dropdowns.each(function() {
+                    const select = $(this);
+                    // Hủy Select2 trước khi cập nhật
+                    if (select.hasClass('select2-hidden-accessible')) {
+                        select.select2('destroy');
+                    }
+                    
+                    // Xóa tất cả các lựa chọn hiện tại
+                    select.empty().append('<option value="">-- Không có sản phẩm --</option>');
+                    
+                    // Khởi tạo lại select2
+                    select.select2({
+                        theme: 'bootstrap4',
+                        width: '100%',
+                        dropdownParent: select.parent()
+                    });
+                });
+                return;
+            }
+            
+            dropdowns.each(function() {
+                const select = $(this);
+                const selectId = this.id || 'unknown';
+                console.log("Xử lý dropdown:", selectId);
+                
+                try {
+                    // Hủy Select2 trước khi cập nhật
+                    if (select.hasClass('select2-hidden-accessible')) {
+                        select.select2('destroy');
+                    }
+                    
+                    // Xóa tất cả các lựa chọn hiện tại
+                    select.empty().append('<option value="">-- Chọn sản phẩm --</option>');
+                    
+                    // Thêm các sản phẩm mới vào dropdown
+                    items.forEach(function(item, index) {
+                        console.log(`Xử lý sản phẩm #${index}:`, item);
+                        
+                        // Kiểm tra xem sản phẩm có đủ thông tin không
+                        if (!item.product_name || !item.product_code) {
+                            console.warn("Sản phẩm không đủ thông tin:", item);
+                            return;
+                        }
+                        
+                        // Hiển thị thông tin sản phẩm với số lượng hiện tại
+                        const displayName = `${item.product_name} (${item.product_code}) - SL hiện tại: ${item.current_quantity || 0}`;
+                        console.log(`Thêm sản phẩm vào ${selectId}:`, displayName);
+                        
+                        // Tạo option mới
+                        const option = document.createElement('option');
+                        option.value = item.product_id;
+                        option.text = displayName;
+                        
+                        // Thêm dữ liệu vào thuộc tính data
+                        $(option).data('current-quantity', item.current_quantity || 0);
+                        
+                        // Thêm vào select
+                        select.append(option);
+                    });
+                    
+                    // Khởi tạo lại select2
+                    select.select2({
+                        theme: 'bootstrap4',
+                        width: '100%',
+                        dropdownParent: select.parent()
+                    });
+                    
+                    console.log(`Đã cập nhật dropdown ${selectId} với ${items.length} sản phẩm`);
+                } catch (e) {
+                    console.error("Lỗi khi cập nhật dropdown:", e);
+                }
+            });
+        }
+
+        // Cập nhật lựa chọn đã được chọn
+        function updateExcludedOptions() {
+            const selectedProducts = [];
+            
+            // Lấy danh sách sản phẩm đã chọn
+            $('.product-select').each(function() {
+                const val = $(this).val();
+                if (val) {
+                    selectedProducts.push(val);
+                }
+            });
+            
+            // Cập nhật các lựa chọn trong dropdown
+            $('.product-select').each(function() {
+                const currentVal = $(this).val();
+                $(this).find('option').each(function() {
+                    const optionVal = $(this).val();
+                    if (optionVal && optionVal !== currentVal && selectedProducts.includes(optionVal)) {
+                        $(this).prop('disabled', true);
+                    } else {
+                        $(this).prop('disabled', false);
+                    }
+                });
+            });
+        }
+
+        // Cập nhật sự kiện khi form được submit
+        $('#receiptForm').submit(function() {
+            // Kiểm tra xem có sản phẩm nào được chọn không
+            let hasProduct = false;
+            $('.product-select').each(function() {
+                if ($(this).val()) {
+                    hasProduct = true;
+                    return false; // break loop
+                }
+            });
+            
+            if (!hasProduct) {
+                alert('Vui lòng chọn ít nhất một sản phẩm để nhập kho');
+                return false;
+            }
+            
+            // Kiểm tra xem đã chọn đơn đặt hàng chưa
+            if (!$('#id_purchase_order').val()) {
+                alert('Vui lòng chọn đơn đặt hàng');
+                return false;
+            }
+            
+            return true;
+        });
+
+        // Xử lý sự kiện làm mới danh sách sản phẩm
+        $('#refresh-products').click(function() {
+            const poId = $('#id_purchase_order').val();
+            if (!poId) {
+                alert('Vui lòng chọn đơn đặt hàng trước khi làm mới danh sách sản phẩm');
+                return;
+            }
+            $('#id_purchase_order').trigger('change');
+        });
+
+        // Trigger change event nếu đã có đơn đặt hàng được chọn
+        setTimeout(function() {
+            const poSelect = $('#id_purchase_order');
+            const poValue = poSelect.val();
+            
+            if (poValue) {
+                console.log("Có giá trị PO được chọn khi tải trang:", poValue);
+                console.log("Văn bản PO được chọn:", poSelect.find('option:selected').text());
+                
+                // Thêm thông báo debug
+                $('#item-rows').before(`
+                    <div class="alert alert-info mb-3" id="loading-init">
+                        <span class="spinner-border spinner-border-sm"></span> 
+                        Đang tải thông tin sản phẩm từ đơn đặt hàng...
+                    </div>
+                `);
+                
+                // Kích hoạt sự kiện change
+                poSelect.trigger('change');
+                
+                // Để chắc chắn, trực tiếp cập nhật trường nhà cung cấp
+                const selectedText = poSelect.find('option:selected').text().trim();
+                const supplierName = selectedText.includes(' - ') ? selectedText.split(' - ')[1] : '';
+                $('#supplier_display').val(supplierName);
+                
+                console.log("Đã kích hoạt sự kiện change và cập nhật trực tiếp nhà cung cấp:", supplierName);
+                
+                // Xóa thông báo sau 5 giây để tránh trường hợp bị treo
+                setTimeout(() => {
+                    $('#loading-init').fadeOut(500, function() {
+                        $(this).remove();
+                    });
+                }, 5000);
+            } else {
+                console.log("Không có PO được chọn khi tải trang");
+            }
+        }, 1000);
+        
+        // Thêm nút làm mới trang và quản lý đơn đặt hàng
+        $('.card-footer').append(`
+            <button type="button" class="btn btn-info ml-2" id="refresh-page">
+                <i class="fas fa-sync"></i> Làm mới trang
+            </button>
+            <a href="/suppliers/purchase-orders/" class="btn btn-secondary ml-2">
+                <i class="fas fa-list"></i> Quản lý đơn đặt hàng
+            </a>
+            <a href="/suppliers/purchase-orders/create/" class="btn btn-primary ml-2">
+                <i class="fas fa-plus"></i> Thêm đơn đặt hàng mới
+            </a>
+        `);
+        
+        // Xử lý sự kiện làm mới trang
+        $('#refresh-page').on('click', function() {
+            location.reload();
+        });
+        
+        // Tải tất cả sản phẩm
+        function loadAllProducts() {
+            console.log("Đang tải tất cả sản phẩm trong hệ thống...");
+            
+            // Hiển thị thông báo đang tải
+            $('.alert#loading-msg').remove(); // Xóa thông báo đang tải cũ nếu có
+            const loadingMsg = $('<div class="alert alert-info" id="loading-msg">Đang tải danh sách tất cả sản phẩm...</div>');
+            $('#item-rows').before(loadingMsg);
+            
+            // Lấy id đơn hàng nếu có
+            const poId = $('#id_purchase_order').val() || '0';
+            
+            // Gọi API để lấy tất cả sản phẩm
+            $.ajax({
+                url: `/inventory/api/purchase-order-items/`,
+                data: { 
+                    po_id: poId,
+                    _t: new Date().getTime() // Thêm tham số để tránh cache
+                },
+                dataType: 'json',
+                cache: false, // Không sử dụng cache
+                success: function(data) {
+                    console.log("Nhận được dữ liệu sản phẩm từ API:", data);
+                    $('#loading-msg').remove();
+                    
+                    if (data.items && Array.isArray(data.items)) {
+                        console.log("Số lượng sản phẩm nhận được:", data.items.length);
+                        
+                        if (data.items.length > 0) {
+                            // Cập nhật dropdown sản phẩm
+                            updateProductDropdowns(data.items);
+                            console.log("Đã cập nhật dropdown sản phẩm với", data.items.length, "sản phẩm");
+                            
+                            // Hiển thị thông báo thành công
+                            const successMsg = $(`<div class="alert alert-success mb-3">Đã tải ${data.items.length} sản phẩm từ hệ thống.</div>`);
+                            $('#item-rows').before(successMsg);
+                            setTimeout(() => successMsg.fadeOut(1000), 3000);
+                        } else {
+                            console.log("Không có sản phẩm nào trong hệ thống");
+                            $('#item-rows').before(`<div class="alert alert-warning">Không có sản phẩm nào trong hệ thống. Vui lòng thêm sản phẩm trước.</div>`);
+                        }
+                    } else {
+                        console.log("Dữ liệu trả về không có mảng items hoặc không hợp lệ:", data);
+                        const msgText = data.message || data.error || 'Không tìm thấy sản phẩm nào trong hệ thống.';
+                        $('#item-rows').before(`<div class="alert alert-warning">${msgText}</div>`);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $('#loading-msg').remove();
+                    console.error("Lỗi khi tải sản phẩm:", status, error);
+                    
+                    $('#item-rows').before(`<div class="alert alert-danger">
+                        <strong>Lỗi:</strong> Không thể tải danh sách sản phẩm.<br>
+                        <small>Chi tiết: ${error}</small>
+                    </div>`);
+                }
+            });
+        }
+        
+        // Sự kiện làm mới danh sách sản phẩm
+        $('#refresh-products').on('click', function() {
+            loadAllProducts();
+        });
+    });
+</script>
+{% endblock %}

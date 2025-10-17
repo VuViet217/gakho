@@ -1,0 +1,167 @@
+{% extends 'inventory/base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3 class="card-title">{{ title }}</h3>
+                </div>
+                <div class="col-md-6 text-right">
+                    <a href="{% url 'stock_receipt_create' %}" class="btn btn-success">
+                        <i class="fas fa-plus-circle"></i> Tạo phiếu nhập kho
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <form method="get" class="form-inline">
+                        <div class="input-group mr-2">
+                            <input type="text" name="search" class="form-control" placeholder="Tìm kiếm phiếu nhập..." value="{{ search_query|default:'' }}">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" type="submit">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="input-group mr-2">
+                            <input type="text" name="po_number" class="form-control" placeholder="Mã đơn hàng" value="{{ po_number|default:'' }}">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Lọc</button>
+                        <a href="{% url 'stock_receipt_list' %}" class="btn btn-outline-secondary ml-2">Xóa bộ lọc</a>
+                    </form>
+                </div>
+            </div>
+            
+            {% if messages %}
+            <div class="row">
+                <div class="col-12">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover datatable">
+                    <thead>
+                        <tr>
+                            <th>Mã phiếu nhập</th>
+                            <th>Đơn đặt hàng</th>
+                            <th>Nhà cung cấp</th>
+                            <th>Ngày nhập kho</th>
+                            <th>Số mặt hàng</th>
+                            <th>Tổng số lượng</th>
+                            <th>Người tạo</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for receipt in page_obj %}
+                        <tr>
+                            <td>{{ receipt.receipt_number }}</td>
+                            <td>
+                                <a href="{% url 'po_detail' receipt.purchase_order.id %}">
+                                    {{ receipt.purchase_order.po_number }}
+                                </a>
+                            </td>
+                            <td>{{ receipt.purchase_order.supplier.name }}</td>
+                            <td>{{ receipt.receipt_date }}</td>
+                            <td>{{ receipt.total_items }}</td>
+                            <td>{{ receipt.total_quantity }}</td>
+                            <td>{{ receipt.created_by.get_full_name|default:receipt.created_by.username }}</td>
+                            <td>
+                                <a href="{% url 'stock_receipt_detail' receipt.id %}" class="btn btn-sm btn-info" title="Xem chi tiết">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center">Không có phiếu nhập kho nào</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Phân trang -->
+            {% if page_obj.has_other_pages %}
+            <div class="row mt-3">
+                <div class="col-md-12">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if po_number %}&po_number={{ po_number }}{% endif %}" aria-label="First">
+                                    <span aria-hidden="true">&laquo;&laquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if po_number %}&po_number={{ po_number }}{% endif %}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            {% endif %}
+                            
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if po_number %}&po_number={{ po_number }}{% endif %}">{{ num }}</a>
+                                </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if po_number %}&po_number={{ po_number }}{% endif %}" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if po_number %}&po_number={{ po_number }}{% endif %}" aria-label="Last">
+                                    <span aria-hidden="true">&raquo;&raquo;</span>
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        $('.datatable').DataTable({
+            "paging": false,
+            "ordering": true,
+            "info": false,
+            "searching": false,
+            "language": {
+                "emptyTable": "Không có dữ liệu",
+                "info": "Hiển thị _START_ đến _END_ của _TOTAL_ bản ghi",
+                "infoEmpty": "Hiển thị 0 đến 0 của 0 bản ghi",
+                "lengthMenu": "Hiển thị _MENU_ bản ghi",
+                "search": "Tìm kiếm:",
+                "zeroRecords": "Không tìm thấy bản ghi phù hợp"
+            }
+        });
+    });
+</script>
+{% endblock %}

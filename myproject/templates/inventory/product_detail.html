@@ -79,11 +79,11 @@
                         <div class="card-body">
                             <table class="table table-bordered">
                                 <tr>
-                                    <th style="width: 40%">Đơn hàng</th>
+                                    <th style="width: 40%">Đơn hàng gần đây</th>
                                     <td>
-                                        {% if product.purchase_order %}
-                                        <a href="{% url 'po_detail' product.purchase_order.id %}">
-                                            {{ product.purchase_order.po_number }}
+                                        {% if product.latest_purchase_order %}
+                                        <a href="{% url 'po_detail' product.latest_purchase_order.id %}">
+                                            {{ product.latest_purchase_order.po_number }}
                                         </a>
                                         {% else %}
                                         Không có thông tin
@@ -93,14 +93,22 @@
                                 <tr>
                                     <th>Nhà cung cấp</th>
                                     <td>
-                                        {% if product.purchase_order.supplier %}
-                                        <a href="{% url 'supplier_detail' product.purchase_order.supplier.id %}">
-                                            {{ product.purchase_order.supplier.name }}
+                                        {% if product.latest_purchase_order.supplier %}
+                                        <a href="{% url 'supplier_detail' product.latest_purchase_order.supplier.id %}">
+                                            {{ product.latest_purchase_order.supplier.name }}
                                         </a>
                                         {% else %}
                                         Không có thông tin
                                         {% endif %}
                                     </td>
+                                </tr>
+                                <tr>
+                                    <th>Tổng SL đã mua</th>
+                                    <td>{{ product.total_purchased_quantity }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Giá mua gần đây</th>
+                                    <td>{{ product.latest_purchase_price|default:"Chưa có" }}</td>
                                 </tr>
                                 <tr>
                                     <th>Vị trí kho</th>
@@ -115,6 +123,61 @@
                                     <td>{{ product.updated_at|date:"d/m/Y H:i" }}</td>
                                 </tr>
                             </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Danh sách đơn đặt hàng -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="card-title mb-0">Lịch sử đặt hàng</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Mã đơn hàng</th>
+                                            <th>Nhà cung cấp</th>
+                                            <th>Ngày đặt</th>
+                                            <th>Trạng thái</th>
+                                            <th>Số lượng</th>
+                                            <th>Đơn giá</th>
+                                            <th>Thành tiền</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for po in product.purchase_orders %}
+                                        {% for item in po.items.all %}
+                                        {% if item.product.id == product.id %}
+                                        <tr>
+                                            <td>
+                                                <a href="{% url 'po_detail' po.id %}">{{ po.po_number }}</a>
+                                            </td>
+                                            <td>{{ po.supplier.name }}</td>
+                                            <td>{{ po.order_date }}</td>
+                                            <td>
+                                                <span class="badge badge-{{ po.get_status_display_class }}">
+                                                    {{ po.get_status_display }}
+                                                </span>
+                                            </td>
+                                            <td class="text-center">{{ item.quantity }}</td>
+                                            <td class="text-right">{{ item.unit_price|floatformat:2 }}</td>
+                                            <td class="text-right">{{ item.total_price|floatformat:2 }}</td>
+                                        </tr>
+                                        {% endif %}
+                                        {% endfor %}
+                                        {% empty %}
+                                        <tr>
+                                            <td colspan="7" class="text-center">Không có lịch sử đặt hàng</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>

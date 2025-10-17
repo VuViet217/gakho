@@ -37,24 +37,18 @@
                         <tr>
                             <th style="width: 150px;">Trạng thái:</th>
                             <td>
-                                {% if purchase_order.status == 'pending' %}
-                                <span class="badge badge-warning">Chờ duyệt</span>
-                                {% elif purchase_order.status == 'approved' %}
-                                <span class="badge badge-success">Đã duyệt</span>
-                                {% elif purchase_order.status == 'rejected' %}
-                                <span class="badge badge-danger">Từ chối</span>
-                                {% elif purchase_order.status == 'completed' %}
-                                <span class="badge badge-info">Hoàn thành</span>
-                                {% endif %}
+                                <span class="badge badge-{{ purchase_order.get_status_display_class }}">
+                                    {{ purchase_order.get_status_display }}
+                                </span>
                             </td>
                         </tr>
                         <tr>
-                            <th>Ngày tạo:</th>
-                            <td>{{ purchase_order.created_at }}</td>
+                            <th>Tổng tiền:</th>
+                            <td>{{ purchase_order.total_amount|floatformat:2 }}</td>
                         </tr>
                         <tr>
-                            <th>Ngày cập nhật:</th>
-                            <td>{{ purchase_order.updated_at }}</td>
+                            <th>Số lượng:</th>
+                            <td>{{ purchase_order.total_quantity }} ({{ purchase_order.product_count }} sản phẩm)</td>
                         </tr>
                     </table>
                 </div>
@@ -88,6 +82,102 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Danh sách sản phẩm trong đơn hàng -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="card-title">Danh sách sản phẩm</h3>
+                        <div>
+                            <a href="{% url 'stock_receipt_create' %}?po_id={{ purchase_order.id }}" class="btn btn-success">
+                                <i class="fas fa-download"></i> Nhập kho
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped" id="products-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;">STT</th>
+                                    <th>Sản phẩm</th>
+                                    <th>Mã sản phẩm</th>
+                                    <th>Đơn vị</th>
+                                    <th style="width: 100px;">Số lượng</th>
+                                    <th style="width: 150px;">Đơn giá</th>
+                                    <th style="width: 150px;">Thành tiền</th>
+                                    <th style="width: 120px;">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in items %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>
+                                        <a href="{% url 'product_detail' item.product.id %}">
+                                            {{ item.product.name }}
+                                        </a>
+                                    </td>
+                                    <td>{{ item.product.product_code }}</td>
+                                    <td>{{ item.product.unit.name }}</td>
+                                    <td class="text-center">{{ item.quantity }}</td>
+                                    <td class="text-right">{{ item.unit_price|floatformat:2 }}</td>
+                                    <td class="text-right">{{ item.total_price|floatformat:2 }}</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="{% url 'po_item_update' item.id %}" class="btn btn-sm btn-info">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deleteItem{{ item.id }}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+
+                                        <!-- Modal xóa sản phẩm -->
+                                        <div class="modal fade" id="deleteItem{{ item.id }}" tabindex="-1" role="dialog">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Xác nhận xóa</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p>Bạn có chắc chắn muốn xóa sản phẩm <strong>{{ item.product.name }}</strong> khỏi đơn hàng này?</p>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <form action="{% url 'po_item_delete' item.id %}" method="post">
+                                                            {% csrf_token %}
+                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                                                            <button type="submit" class="btn btn-danger">Xóa</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="8" class="text-center">Chưa có sản phẩm nào trong đơn hàng</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="4" class="text-right">Tổng cộng:</th>
+                                    <th class="text-center">{{ purchase_order.total_quantity }}</th>
+                                    <th></th>
+                                    <th class="text-right">{{ purchase_order.total_amount|floatformat:2 }}</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="card-footer">
             <a href="{% url 'po_list' %}" class="btn btn-secondary">
@@ -96,4 +186,33 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        $('#products-table').DataTable({
+            "paging": true,
+            "lengthChange": false,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": true,
+            "language": {
+                "search": "Tìm kiếm:",
+                "paginate": {
+                    "first": "Đầu",
+                    "last": "Cuối",
+                    "next": "Tiếp",
+                    "previous": "Trước"
+                },
+                "info": "Hiển thị _START_ đến _END_ của _TOTAL_ mục",
+                "infoEmpty": "Hiển thị 0 đến 0 của 0 mục",
+                "zeroRecords": "Không tìm thấy kết quả phù hợp",
+                "emptyTable": "Không có dữ liệu"
+            }
+        });
+    });
+</script>
 {% endblock %}

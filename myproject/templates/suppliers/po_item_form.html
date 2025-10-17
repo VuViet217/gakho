@@ -1,0 +1,139 @@
+{% extends 'suppliers/base.html' %}{% extends 'base.html' %}
+
+{% load static %}{% load static %}
+
+
+
+{% block content %}{% block content %}
+
+<div class="container-fluid"><div class="container-fluid">
+
+    <div class="card">    <div class="card">
+
+        <div class="card-header">        <div class="card-header">
+
+            <h3 class="card-title">{{ title }}</h3>            <h3 class="card-title">{{ title }}</h3>
+
+        </div>        </div>
+
+        <form method="post">        <form method="post">
+
+            {% csrf_token %}            <div class="card-body">
+
+            <div class="card-body">                {% csrf_token %}
+
+                {% if messages %}                
+
+                <div class="row">                <div class="alert alert-info">
+
+                    <div class="col-12">                    <p class="mb-0">Cập nhật chi tiết đơn hàng <strong>{{ purchase_order.po_number }}</strong> cho sản phẩm <strong>{{ item.product.name }}</strong></p>
+
+                        {% for message in messages %}                </div>
+
+                        <div class="alert alert-{{ message.tags }}">                
+
+                            {{ message }}                <div class="form-group">
+
+                        </div>                    <label for="{{ form.product.id_for_label }}">Sản phẩm</label>
+
+                        {% endfor %}                    {{ form.product }}
+
+                    </div>                </div>
+
+                </div>                <div class="form-group">
+
+                {% endif %}                    <label for="{{ form.quantity.id_for_label }}">Số lượng</label>
+
+                    {{ form.quantity }}
+
+                <div class="row">                </div>
+
+                    <div class="col-md-6">                <div class="form-group">
+
+                        <div class="form-group">                    <label for="{{ form.unit_price.id_for_label }}">Đơn giá</label>
+
+                            <label for="id_purchase_order">Đơn đặt hàng:</label>                    {{ form.unit_price }}
+
+                            <input type="text" class="form-control" value="{{ purchase_order.po_number }} - {{ purchase_order.supplier.name }}" disabled>                </div>
+
+                        </div>            </div>
+
+                    </div>            <div class="card-footer">
+
+                    <div class="col-md-6">                <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+
+                        <div class="form-group">                <a href="{% url 'po_detail' purchase_order.id %}" class="btn btn-secondary">Hủy</a>
+
+                            <label for="{{ form.product.id_for_label }}">{{ form.product.label }}</label>            </div>
+
+                            {{ form.product }}        </form>
+
+                            {% if form.product.errors %}    </div>
+
+                            <div class="invalid-feedback d-block"></div>
+
+                                {{ form.product.errors }}{% endblock %}
+
+                            </div>
+
+                            {% endif %}{% block scripts %}
+
+                        </div><script>
+
+                    </div>    $(document).ready(function() {
+
+                </div>        // Kích hoạt Select2 cho trường sản phẩm
+
+        $('.select2').select2({
+
+                <div class="row">            theme: 'bootstrap4',
+
+                    <div class="col-md-6">            placeholder: "Chọn sản phẩm"
+
+                        <div class="form-group">        });
+
+                            <label for="{{ form.quantity.id_for_label }}">{{ form.quantity.label }}</label>    });
+
+                            {{ form.quantity }}</script>
+
+                            {% if form.quantity.errors %}{% endblock %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.quantity.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.unit_price.id_for_label }}">{{ form.unit_price.label }}</label>
+                            {{ form.unit_price }}
+                            {% if form.unit_price.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.unit_price.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Lưu thay đổi
+                </button>
+                <a href="{% url 'po_detail' purchase_order.id %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Quay lại
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        // Initialize select2 for product dropdown
+        $('.select2').select2();
+    });
+</script>
+{% endblock %}

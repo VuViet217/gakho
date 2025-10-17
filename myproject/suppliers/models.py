@@ -43,3 +43,63 @@ class PurchaseOrder(models.Model):
     
     def __str__(self):
         return f"{self.po_number} - {self.supplier.name}"
+        
+    @property
+    def total_amount(self):
+        """Tính tổng giá trị của đơn đặt hàng"""
+        return sum(item.total_price for item in self.items.all())
+        
+    @property
+    def total_quantity(self):
+        """Tính tổng số lượng sản phẩm trong đơn đặt hàng"""
+        return sum(item.quantity for item in self.items.all())
+        
+    @property
+    def product_count(self):
+        """Trả về số lượng sản phẩm khác nhau trong đơn đặt hàng"""
+        return self.items.count()
+        
+    def get_status_display_class(self):
+        """Trả về lớp CSS cho trạng thái đơn hàng"""
+        status_classes = {
+            'pending': 'warning',
+            'approved': 'info',
+            'rejected': 'danger',
+            'completed': 'success',
+        }
+        return status_classes.get(self.status, 'secondary')
+
+class PurchaseOrderItem(models.Model):
+    """
+    Model trung gian để thiết lập mối quan hệ nhiều-nhiều giữa PurchaseOrder và Product
+    với các thông tin bổ sung như số lượng, đơn giá...
+    """
+    purchase_order = models.ForeignKey(
+        PurchaseOrder, 
+        on_delete=models.CASCADE, 
+        related_name="items", 
+        verbose_name="Đơn đặt hàng"
+    )
+    # product sẽ được import động để tránh circular import
+    product = models.ForeignKey(
+        'inventory.Product',
+        on_delete=models.CASCADE,
+        related_name='purchase_items',
+        verbose_name="Sản phẩm"
+    )
+    quantity = models.PositiveIntegerField(default=1, verbose_name="Số lượng") 
+    unit_price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Đơn giá")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Ngày tạo")
+    
+    class Meta:
+        verbose_name = "Chi tiết đơn hàng"
+        verbose_name_plural = "Chi tiết đơn hàng"
+        ordering = ['purchase_order', 'product']
+        
+    def __str__(self):
+        return f"{self.purchase_order.po_number} - {self.product.name} ({self.quantity})"
+        
+    @property
+    def total_price(self):
+        """Tính tổng giá trị của mục đơn hàng"""
+        return self.quantity * self.unit_price

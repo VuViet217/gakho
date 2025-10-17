@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from . import stock_views
 
 urlpatterns = [
     # Category URLs
@@ -46,4 +47,10 @@ urlpatterns = [
     
     # Other URLs
     path('products/low-stock/', views.LowStockProductsView.as_view(), name='low_stock_products'),
+    
+    # Stock Receipt URLs
+    path('stock-receipts/', stock_views.stock_receipt_list, name='stock_receipt_list'),
+    path('stock-receipts/create/', stock_views.stock_receipt_create, name='stock_receipt_create'),
+    path('stock-receipts/<int:pk>/', stock_views.stock_receipt_detail, name='stock_receipt_detail'),
+    path('api/purchase-order-items/', stock_views.get_purchase_order_items, name='get_purchase_order_items'),
 ]

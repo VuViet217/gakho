@@ -3,8 +3,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q
-from .models import Supplier, PurchaseOrder
-from .forms import SupplierForm, PurchaseOrderForm
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from .models import Supplier, PurchaseOrder, PurchaseOrderItem
+from .forms import SupplierForm, PurchaseOrderForm, PurchaseOrderItemForm
 
 # Supplier Views
 @login_required
@@ -207,8 +209,59 @@ def po_delete(request, pk):
 @login_required
 def po_detail(request, pk):
     purchase_order = get_object_or_404(PurchaseOrder, pk=pk)
+    items = purchase_order.items.all()
     
+    if request.method == 'POST':
+        form = PurchaseOrderItemForm(request.POST)
+        if form.is_valid():
+            item = form.save(commit=False)
+            item.purchase_order = purchase_order
+            item.save()
+            messages.success(request, 'Sản phẩm đã được thêm vào đơn hàng!')
+            return redirect('po_detail', pk=purchase_order.pk)
+    else:
+        form = PurchaseOrderItemForm()
+
     return render(request, 'suppliers/po_detail.html', {
         'purchase_order': purchase_order,
+        'items': items,
+        'form': form,
         'title': f'Chi tiết đơn đặt hàng: {purchase_order.po_number}'
+    })
+
+
+@login_required
+@require_POST
+def po_item_delete(request, pk):
+    item = get_object_or_404(PurchaseOrderItem, pk=pk)
+    po_id = item.purchase_order.id
+    
+    try:
+        item.delete()
+        messages.success(request, 'Sản phẩm đã được xóa khỏi đơn hàng!')
+    except Exception as e:
+        messages.error(request, f'Không thể xóa sản phẩm khỏi đơn hàng. Lỗi: {str(e)}')
+    
+    return redirect('po_detail', pk=po_id)
+
+
+@login_required
+def po_item_update(request, pk):
+    item = get_object_or_404(PurchaseOrderItem, pk=pk)
+    po_id = item.purchase_order.id
+    
+    if request.method == 'POST':
+        form = PurchaseOrderItemForm(request.POST, instance=item)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Chi tiết đơn hàng đã được cập nhật!')
+            return redirect('po_detail', pk=po_id)
+    else:
+        form = PurchaseOrderItemForm(instance=item)
+    
+    return render(request, 'suppliers/po_item_form.html', {
+        'form': form,
+        'item': item,
+        'purchase_order': item.purchase_order,
+        'title': 'Cập nhật chi tiết đơn hàng'
     })

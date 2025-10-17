@@ -43,6 +43,8 @@ def menu_context(request):
                 {'name': 'Sản phẩm', 'url': 'product_list', 'icon': 'fas fa-boxes', 'active': False},
                 {'name': 'Thêm sản phẩm', 'url': 'product_create', 'icon': 'fas fa-plus-circle', 'active': False},
                 {'name': 'Sản phẩm sắp hết', 'url': 'low_stock_products', 'icon': 'fas fa-exclamation-triangle', 'active': False},
+                {'name': 'Phiếu nhập kho', 'url': 'stock_receipt_list', 'icon': 'fas fa-dolly-flatbed', 'active': False},
+                {'name': 'Tạo phiếu nhập kho', 'url': 'stock_receipt_create', 'icon': 'fas fa-file-import', 'active': False},
                 {'name': 'Danh mục', 'url': 'category_list', 'icon': 'fas fa-tags', 'active': False},
                 {'name': 'Đơn vị tính', 'url': 'unit_list', 'icon': 'fas fa-balance-scale', 'active': False},
                 {'name': 'Quản lý kho', 'url': 'warehouse_list', 'icon': 'fas fa-warehouse', 'active': False},
@@ -96,16 +98,20 @@ def menu_context(request):
             menu['inventory']['items'][1]['active'] = True
         elif 'low_stock_products' in path or 'low-stock' in path:
             menu['inventory']['items'][2]['active'] = True
-        elif 'category_list' in path or 'categories/' in path:
+        elif 'stock_receipt_list' in path or 'stock-receipts/' in path and 'create' not in path:
             menu['inventory']['items'][3]['active'] = True
-        elif 'unit_list' in path or 'units/' in path:
+        elif 'stock_receipt_create' in path or 'stock-receipts/create' in path:
             menu['inventory']['items'][4]['active'] = True
-        elif 'warehouse_list' in path or 'warehouses/' in path:
+        elif 'category_list' in path or 'categories/' in path:
             menu['inventory']['items'][5]['active'] = True
-        elif 'warehouse_row_list' in path or 'warehouse-rows/' in path:
+        elif 'unit_list' in path or 'units/' in path:
             menu['inventory']['items'][6]['active'] = True
-        elif 'warehouse_column_list' in path or 'warehouse-columns/' in path:
+        elif 'warehouse_list' in path or 'warehouses/' in path:
             menu['inventory']['items'][7]['active'] = True
+        elif 'warehouse_row_list' in path or 'warehouse-rows/' in path:
+            menu['inventory']['items'][8]['active'] = True
+        elif 'warehouse_column_list' in path or 'warehouse-columns/' in path:
+            menu['inventory']['items'][9]['active'] = True
     
     return {
         'menu': menu

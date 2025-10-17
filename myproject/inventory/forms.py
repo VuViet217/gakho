@@ -118,8 +118,8 @@ class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
         fields = [
-            'product_code', 'name', 'category', 'unit', 
-            'purchase_order', 'column', 'current_quantity', 
+            'product_code', 'name', 'category', 'unit',
+            'column', 'current_quantity', 
             'minimum_quantity', 'description'
         ]
         
@@ -134,9 +134,8 @@ class ProductForm(forms.ModelForm):
                 css_class='form-row'
             ),
             Row(
-                Column('category', css_class='form-group col-md-4 mb-0'),
-                Column('unit', css_class='form-group col-md-4 mb-0'),
-                Column('purchase_order', css_class='form-group col-md-4 mb-0'),
+                Column('category', css_class='form-group col-md-6 mb-0'),      
+                Column('unit', css_class='form-group col-md-6 mb-0'),
                 css_class='form-row'
             ),
             Row(

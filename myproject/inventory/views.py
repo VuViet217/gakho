@@ -229,7 +229,7 @@ class ProductListView(LoginRequiredMixin, ListView):
         if low_stock:
             queryset = queryset.filter(current_quantity__lte=F('minimum_quantity'))
             
-        return queryset.select_related('category', 'unit', 'purchase_order', 'column__row__warehouse')
+        return queryset.select_related('category', 'unit', 'column__row__warehouse')
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -242,7 +242,7 @@ class ProductDetailView(LoginRequiredMixin, DetailView):
     
     def get_queryset(self):
         return super().get_queryset().select_related(
-            'category', 'unit', 'purchase_order', 'column__row__warehouse'
+            'category', 'unit', 'column__row__warehouse'
         )
 
 class ProductCreateView(LoginRequiredMixin, CreateView):
