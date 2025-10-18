@@ -235,7 +235,7 @@ class Command(BaseCommand):
                             </td>
                             <td>
                                 <strong>{{ item.product.name }}</strong><br>
-                                <small style="color: #777;">Mã: {{ item.product.code }}</small>
+                                <small style="color: #777;">Mã: {{ item.product.product_code }}</small>
                             </td>
                             <td class="text-right"><strong>{{ item.quantity }}</strong></td>
                             <td>{{ item.notes|default:"—" }}</td>
