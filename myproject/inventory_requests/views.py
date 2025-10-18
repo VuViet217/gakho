@@ -29,20 +29,21 @@ User = get_user_model()
 
 @login_required
 def inventory_request_list(request):
-    """Danh sách tất cả các yêu cầu cấp phát (cho admin/quản lý)"""
+    """Danh sách tất cả các yêu cầu cấp phát (không bao gồm bản nháp)"""
     
-    # Lọc theo quyền người dùng
+    # Lọc theo quyền người dùng và loại bỏ bản nháp
     if request.user.is_superuser or request.user.role in ['sm', 'admin']:
-        requests = InventoryRequest.objects.all()
+        # Admin/SM thấy tất cả yêu cầu (trừ draft)
+        requests = InventoryRequest.objects.exclude(status='draft')
     elif request.user.role == 'manager':
-        # Quản lý thấy yêu cầu của nhân viên mình quản lý + của chính mình
+        # Quản lý thấy yêu cầu của nhân viên mình quản lý + của chính mình (trừ draft)
         subordinates = request.user.subordinates.all()
         requests = InventoryRequest.objects.filter(
             Q(requester__in=subordinates) | Q(requester=request.user)
-        )
+        ).exclude(status='draft')
     else:
-        # Nhân viên chỉ thấy yêu cầu của mình
-        requests = InventoryRequest.objects.filter(requester=request.user)
+        # Nhân viên thấy yêu cầu của mình (trừ draft)
+        requests = InventoryRequest.objects.filter(requester=request.user).exclude(status='draft')
     
     # Sắp xếp và phân trang
     requests = requests.order_by('-created_at')
