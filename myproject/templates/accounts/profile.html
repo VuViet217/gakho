@@ -60,15 +60,6 @@
                 </div>
                 <!-- /.col -->
                 <div class="col-md-8">
-                    {% if messages %}
-                    {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
-                        {{ message }}
-                        <button type="button" class="close" data-dismiss="alert">&times;</button>
-                    </div>
-                    {% endfor %}
-                    {% endif %}
-                    
                     <div class="card">
                         <div class="card-header p-2">
                             <ul class="nav nav-pills">
