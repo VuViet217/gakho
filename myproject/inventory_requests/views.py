@@ -183,6 +183,7 @@ def inventory_request_create(request):
                             'request': request_obj,
                             'user': request.user,
                             'manager': request.user.manager,
+                            'employee_products': request_obj.employee_products.all(),
                         }
                     )
                     
