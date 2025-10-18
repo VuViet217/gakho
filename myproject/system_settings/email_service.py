@@ -100,13 +100,17 @@ def send_system_email(recipient_list, subject, message, html_message=None, attac
     """
     config = get_email_configuration()
     if not config:
+        logger.warning("Không tìm thấy cấu hình email - email sẽ không được gửi")
         return False, "Không tìm thấy cấu hình email nào đang hoạt động"
     
     try:
         # Import get_connection để tạo kết nối SMTP với cấu hình từ database
         from django.core.mail import get_connection
         
-        # Tạo kết nối SMTP với cấu hình từ database
+        logger.info(f"Đang kết nối đến SMTP server: {config.smtp_host}:{config.smtp_port}")
+        logger.info(f"Gửi email từ: {config.from_email} đến: {recipient_list}")
+        
+        # Tạo kết nối SMTP với cấu hình từ database - tăng timeout lên 120 giây
         connection = get_connection(
             backend='django.core.mail.backends.smtp.EmailBackend',
             host=config.smtp_host,
@@ -115,7 +119,7 @@ def send_system_email(recipient_list, subject, message, html_message=None, attac
             password=config.smtp_password if config.auth_method == 'normal' else None,
             use_tls=config.use_tls,
             use_ssl=config.use_ssl,
-            timeout=config.smtp_timeout / 1000 if config.smtp_timeout else 60,
+            timeout=120,  # Tăng timeout lên 120 giây
         )
         
         email = EmailMessage(
@@ -132,10 +136,32 @@ def send_system_email(recipient_list, subject, message, html_message=None, attac
         if attachments:
             for attachment in attachments:
                 email.attach_file(attachment)
-                
+        
+        logger.info("Đang gửi email...")
         email.send(fail_silently=False)
+        logger.info("Email đã được gửi thành công!")
         return True, "Gửi email thành công"
+        
+    except ConnectionRefusedError as e:
+        error_message = f"SMTP server từ chối kết nối. Kiểm tra host/port: {config.smtp_host}:{config.smtp_port}"
+        logger.error(f"ConnectionRefusedError: {error_message}")
+        return False, error_message
+        
+    except TimeoutError as e:
+        error_message = f"Timeout khi kết nối đến SMTP server {config.smtp_host}:{config.smtp_port}. Server không phản hồi."
+        logger.error(f"TimeoutError: {error_message}")
+        return False, error_message
+        
+    except OSError as e:
+        if "10060" in str(e):
+            error_message = f"Không thể kết nối đến SMTP server {config.smtp_host}:{config.smtp_port}. Kiểm tra firewall hoặc network."
+            logger.error(f"WinError 10060: {error_message}")
+        else:
+            error_message = f"Lỗi network: {str(e)}"
+            logger.error(f"OSError: {error_message}")
+        return False, error_message
+        
     except Exception as e:
         error_message = str(e)
-        logger.error(f"Lỗi khi gửi email hệ thống: {error_message}")
+        logger.error(f"Lỗi không xác định khi gửi email: {error_message}", exc_info=True)
         return False, f"Lỗi khi gửi email: {error_message}"

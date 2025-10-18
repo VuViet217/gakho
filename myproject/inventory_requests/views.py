@@ -8,9 +8,12 @@ from django.utils.translation import gettext_lazy as _
 from django.db.models import Q
 from django.db import transaction
 from django.core.paginator import Paginator
+import logging
 
 from myproject.decorators import role_required
 from system_settings.template_email_service import send_template_email
+
+logger = logging.getLogger(__name__)
 
 from .models import InventoryRequest, RequestEmployee, RequestItem, EmployeeProductRequest
 from .forms import (
@@ -164,28 +167,34 @@ def inventory_request_create(request):
                     # Chuyển trạng thái thành chờ phê duyệt và gửi email
                     request_obj.mark_as_pending()
                     
-                    # Gửi email thông báo cho người tạo yêu cầu
-                    send_template_email(
-                        recipient_list=[request.user.email],
-                        template_code='request_created',
-                        context_data={
-                            'request': request_obj,
-                            'user': request.user,
-                            'employee_products': request_obj.employee_products.all(),
-                        }
-                    )
+                    # Gửi email thông báo cho người tạo yêu cầu (không làm gián đoạn nếu lỗi)
+                    try:
+                        send_template_email(
+                            recipient_list=[request.user.email],
+                            template_code='request_created',
+                            context_data={
+                                'request': request_obj,
+                                'user': request.user,
+                                'employee_products': request_obj.employee_products.all(),
+                            }
+                        )
+                    except Exception as e:
+                        logger.error(f"Không thể gửi email thông báo cho người tạo yêu cầu: {str(e)}")
                     
-                    # Gửi email cho người quản lý để phê duyệt
-                    send_template_email(
-                        recipient_list=[request.user.manager.email],
-                        template_code='pending_approval',
-                        context_data={
-                            'request': request_obj,
-                            'user': request.user,
-                            'manager': request.user.manager,
-                            'employee_products': request_obj.employee_products.all(),
-                        }
-                    )
+                    # Gửi email cho người quản lý để phê duyệt (không làm gián đoạn nếu lỗi)
+                    try:
+                        send_template_email(
+                            recipient_list=[request.user.manager.email],
+                            template_code='pending_approval',
+                            context_data={
+                                'request': request_obj,
+                                'user': request.user,
+                                'manager': request.user.manager,
+                                'employee_products': request_obj.employee_products.all(),
+                            }
+                        )
+                    except Exception as e:
+                        logger.error(f"Không thể gửi email cho người quản lý: {str(e)}")
                     
                     messages.success(request, f'Yêu cầu cấp phát đã được gửi đến người quản lý {request.user.manager.get_full_name()} để phê duyệt.')
                     return redirect('inventory_requests:my_requests')
