@@ -181,9 +181,11 @@
     $(function() {
         // Hide/show rejection reason based on decision
         function toggleRejectionReason() {
-            let decision = $('#id_decision').val();
+            let decision = $('input[name="decision"]:checked').val();
             if (decision === 'reject') {
                 $('#rejectionReasonField').show();
+                // Thêm gợi ý: có thể dùng ghi chú làm lý do từ chối
+                $('#rejectionReasonField label').html('Lý do từ chối <small class="text-muted">(hoặc nhập vào Ghi chú bên dưới)</small>');
             } else {
                 $('#rejectionReasonField').hide();
             }
@@ -193,7 +195,7 @@
         toggleRejectionReason();
         
         // On change
-        $('#id_decision').change(toggleRejectionReason);
+        $('input[name="decision"]').change(toggleRejectionReason);
     });
 </script>
 {% endblock %}

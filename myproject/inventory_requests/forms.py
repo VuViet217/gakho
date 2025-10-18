@@ -114,9 +114,15 @@ class RequestApprovalForm(forms.Form):
         cleaned_data = super().clean()
         decision = cleaned_data.get('decision')
         rejection_reason = cleaned_data.get('rejection_reason')
+        note = cleaned_data.get('note')
         
-        if decision == 'reject' and not rejection_reason:
-            self.add_error('rejection_reason', _('Vui lòng nhập lý do từ chối.'))
+        if decision == 'reject':
+            # Nếu không nhập lý do từ chối, sử dụng ghi chú làm lý do
+            if not rejection_reason and not note:
+                self.add_error('rejection_reason', _('Vui lòng nhập lý do từ chối hoặc ghi chú.'))
+            elif not rejection_reason and note:
+                # Tự động sử dụng ghi chú làm lý do từ chối
+                cleaned_data['rejection_reason'] = note
         
         return cleaned_data
 
