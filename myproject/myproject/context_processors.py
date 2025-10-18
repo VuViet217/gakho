@@ -16,6 +16,7 @@ def menu_context(request):
             'icon': 'fas fa-cogs',
             'active': False,
             'open': False,
+            'roles': ['manager', 'sm', 'admin'],
             'items': [
                 {'name': 'Cấu hình Email', 'url': 'email_settings', 'icon': 'fas fa-envelope', 'active': False},
                 {'name': 'Email mẫu', 'url': 'email_template_list', 'icon': 'fas fa-file-alt', 'active': False},
@@ -26,6 +27,7 @@ def menu_context(request):
             'icon': 'fas fa-users',
             'active': False,
             'open': False,
+            'roles': ['manager', 'sm', 'admin'],
             'items': [
                 {'name': 'Danh sách nhân viên', 'url': 'employee_list', 'icon': 'fas fa-user-friends', 'active': False},
                 {'name': 'Danh sách bộ phận', 'url': 'department_list', 'icon': 'fas fa-building', 'active': False},
@@ -37,6 +39,7 @@ def menu_context(request):
             'icon': 'fas fa-truck',
             'active': False,
             'open': False,
+            'roles': ['manager', 'sm', 'admin'],
             'items': [
                 {'name': 'Danh sách nhà cung cấp', 'url': 'supplier_list', 'icon': 'fas fa-list', 'active': False},
                 {'name': 'Thêm nhà cung cấp', 'url': 'supplier_create', 'icon': 'fas fa-plus-circle', 'active': False},
@@ -63,6 +66,7 @@ def menu_context(request):
             'icon': 'fas fa-warehouse',
             'active': False,
             'open': False,
+            'roles': ['manager', 'sm', 'admin'],
             'items': [
                 {'name': 'Sản phẩm', 'url': 'product_list', 'icon': 'fas fa-boxes', 'active': False},
                 {'name': 'Thêm sản phẩm', 'url': 'product_create', 'icon': 'fas fa-plus-circle', 'active': False},
@@ -81,6 +85,7 @@ def menu_context(request):
             'icon': 'fas fa-users-cog',
             'active': False,
             'open': False,
+            'roles': ['manager', 'sm', 'admin'],
             'items': [
                 {'name': 'Danh sách người dùng', 'url': 'user_list', 'icon': 'fas fa-users', 'active': False},
                 {'name': 'Thêm người dùng', 'url': 'user_create', 'icon': 'fas fa-user-plus', 'active': False},
