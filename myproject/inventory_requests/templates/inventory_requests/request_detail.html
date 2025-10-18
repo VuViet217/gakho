@@ -32,19 +32,19 @@
                         </h3>
                         <div class="card-tools">
                             {% if request.status == 'draft' and request.created_by == user %}
-                            <a href="{% url 'inventory_requests:request_edit' request.id %}" class="btn btn-primary btn-sm">
+                            <a href="{% url 'inventory_requests:inventory_request_edit' request.id %}" class="btn btn-primary btn-sm">
                                 <i class="fas fa-edit"></i> Sửa
                             </a>
-                            <a href="{% url 'inventory_requests:request_submit' request.id %}" class="btn btn-success btn-sm">
+                            <a href="{% url 'inventory_requests:inventory_request_submit' request.id %}" class="btn btn-success btn-sm">
                                 <i class="fas fa-paper-plane"></i> Gửi
                             </a>
-                            <a href="{% url 'inventory_requests:request_delete' request.id %}" class="btn btn-danger btn-sm">
+                            <a href="{% url 'inventory_requests:inventory_request_delete' request.id %}" class="btn btn-danger btn-sm">
                                 <i class="fas fa-trash"></i> Xóa
                             </a>
                             {% endif %}
                             
                             {% if request.status == 'pending' and is_approver %}
-                            <a href="{% url 'inventory_requests:request_approve' request.id %}" class="btn btn-success btn-sm">
+                            <a href="{% url 'inventory_requests:inventory_request_approve' request.id %}" class="btn btn-success btn-sm">
                                 <i class="fas fa-check"></i> Phê duyệt
                             </a>
                             <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#rejectModal">
@@ -59,7 +59,7 @@
                             {% endif %}
                             
                             {% if request.status == 'scheduled' and is_warehouse_manager %}
-                            <a href="{% url 'inventory_requests:request_complete' request.id %}" class="btn btn-success btn-sm">
+                            <a href="{% url 'inventory_requests:inventory_request_complete' request.id %}" class="btn btn-success btn-sm">
                                 <i class="fas fa-check-circle"></i> Hoàn thành
                             </a>
                             {% endif %}
@@ -394,7 +394,7 @@
     <div class="modal fade" id="scheduleModal" tabindex="-1" role="dialog" aria-labelledby="scheduleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
-                <form action="{% url 'inventory_requests:request_schedule' request.id %}" method="post">
+                <form action="{% url 'inventory_requests:inventory_request_schedule' request.id %}" method="post">
                     {% csrf_token %}
                     <div class="modal-header">
                         <h5 class="modal-title" id="scheduleModalLabel">Lên lịch cấp phát</h5>

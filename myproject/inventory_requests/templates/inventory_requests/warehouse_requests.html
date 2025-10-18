@@ -58,7 +58,7 @@
                             </td>
                             <td>{{ request.approval_date|date:"d/m/Y H:i" }}</td>
                             <td>
-                                <a href="{% url 'inventory_requests:request_detail' request.id %}" class="btn btn-info btn-sm">
+                                <a href="{% url 'inventory_requests:inventory_request_detail' request.id %}" class="btn btn-info btn-sm">
                                     <i class="fas fa-eye"></i>
                                 </a>
                                 {% if request.status == 'approved' %}
@@ -69,7 +69,7 @@
                                 <div class="modal fade" id="scheduleModal-{{ request.id }}" tabindex="-1" role="dialog" aria-labelledby="scheduleModalLabel" aria-hidden="true">
                                     <div class="modal-dialog" role="document">
                                         <div class="modal-content">
-                                            <form action="{% url 'inventory_requests:request_schedule' request.id %}" method="post">
+                                            <form action="{% url 'inventory_requests:inventory_request_schedule' request.id %}" method="post">
                                                 {% csrf_token %}
                                                 <div class="modal-header">
                                                     <h5 class="modal-title" id="scheduleModalLabel">Lên lịch cấp phát</h5>
@@ -96,7 +96,7 @@
                                     </div>
                                 </div>
                                 {% elif request.status == 'scheduled' %}
-                                <a href="{% url 'inventory_requests:request_complete' request.id %}" class="btn btn-success btn-sm">
+                                <a href="{% url 'inventory_requests:inventory_request_complete' request.id %}" class="btn btn-success btn-sm">
                                     <i class="fas fa-check-circle"></i> Hoàn thành
                                 </a>
                                 {% endif %}

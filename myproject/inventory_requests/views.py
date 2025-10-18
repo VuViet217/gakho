@@ -113,72 +113,86 @@ def inventory_request_create(request):
         form = InventoryRequestForm(request.POST)
         
         if form.is_valid():
-            with transaction.atomic():
-                # Lưu yêu cầu cơ bản
-                request_obj = form.save(commit=False)
-                request_obj.requester = request.user
-                request_obj.status = InventoryRequest.STATUS_DRAFT
-                request_obj.save()
-                
-                # Xử lý formset nhân viên
-                employee_formset = RequestEmployeeFormSet(request.POST, instance=request_obj)
-                if employee_formset.is_valid():
-                    employee_formset.save()
-                else:
-                    for error in employee_formset.errors:
-                        messages.error(request, error)
-                    
-                # Xử lý formset sản phẩm
-                item_formset = RequestItemFormSet(request.POST, instance=request_obj)
-                if item_formset.is_valid():
-                    item_formset.save()
-                else:
-                    for error in item_formset.errors:
-                        messages.error(request, error)
-                
-                # Xử lý formset phân bổ sản phẩm cho nhân viên
-                employee_product_formset = EmployeeProductFormSet(request.POST, instance=request_obj)
-                if employee_product_formset.is_valid():
-                    employee_product_formset.save()
-                else:
-                    for error in employee_product_formset.errors:
-                        messages.error(request, error)
+            # Tạo request object nhưng chưa lưu vào DB
+            request_obj = form.save(commit=False)
+            request_obj.requester = request.user
+            request_obj.status = InventoryRequest.STATUS_DRAFT
+            request_obj.save()  # Phải save trước khi tạo formset
             
-            messages.success(request, 'Yêu cầu cấp phát đã được tạo thành công.')
-            if 'save_draft' in request.POST:
-                return redirect('inventory_requests:inventory_request_edit', request_id=request_obj.id)
-            else:
-                # Chuyển trạng thái thành chờ phê duyệt và gửi email
-                request_obj.mark_as_pending()
+            # Giờ mới tạo formset với instance
+            employee_formset = RequestEmployeeFormSet(request.POST, instance=request_obj)
+            item_formset = RequestItemFormSet(request.POST, instance=request_obj)
+            employee_product_formset = EmployeeProductFormSet(request.POST, instance=request_obj)
+            
+            # Validate các formset
+            employee_valid = employee_formset.is_valid()
+            item_valid = item_formset.is_valid()
+            employee_product_valid = employee_product_formset.is_valid()
+            
+            if employee_valid and item_valid and employee_product_valid:
+                with transaction.atomic():
+                    # Lưu các formset
+                    employee_formset.save()
+                    item_formset.save()
+                    employee_product_formset.save()
                 
-                # Gửi email thông báo
-                send_template_email(
-                    template_code='request_created',
-                    context={
-                        'request': request_obj,
-                        'user': request.user,
-                    },
-                    to_email=[request.user.email],
-                )
+                messages.success(request, 'Yêu cầu cấp phát đã được tạo thành công.')
                 
-                # Gửi email cho người quản lý
-                if request.user.manager and request.user.manager_email:
+                if 'save_draft' in request.POST:
+                    return redirect('inventory_requests:my_requests')
+                else:
+                    # Chuyển trạng thái thành chờ phê duyệt và gửi email
+                    request_obj.mark_as_pending()
+                    
+                    # Gửi email thông báo
                     send_template_email(
-                        template_code='pending_approval',
+                        template_code='request_created',
                         context={
                             'request': request_obj,
                             'user': request.user,
-                            'manager': request.user.manager,
                         },
-                        to_email=[request.user.manager_email],
+                        to_email=[request.user.email],
                     )
-                
-                messages.success(request, 'Yêu cầu cấp phát đã được gửi đến người phê duyệt.')
-                return redirect('inventory_requests:my_requests')
+                    
+                    # Gửi email cho người quản lý
+                    if request.user.manager and request.user.manager_email:
+                        send_template_email(
+                            template_code='pending_approval',
+                            context={
+                                'request': request_obj,
+                                'user': request.user,
+                                'manager': request.user.manager,
+                            },
+                            to_email=[request.user.manager_email],
+                        )
+                    
+                    messages.success(request, 'Yêu cầu cấp phát đã được gửi đến người phê duyệt.')
+                    return redirect('inventory_requests:my_requests')
+            else:
+                # Có lỗi validation trong formset
+                if not employee_valid:
+                    messages.error(request, 'Có lỗi trong danh sách nhân viên.')
+                    
+                if not item_valid:
+                    messages.error(request, 'Có lỗi trong danh sách sản phẩm.')
+                    
+                if not employee_product_valid:
+                    messages.error(request, 'Có lỗi trong phân bổ sản phẩm cho nhân viên.')
+        else:
+            # Form chính không valid
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f'{field}: {error}')
+            
+            # Vẫn tạo formset để hiển thị
+            employee_formset = RequestEmployeeFormSet(request.POST)
+            item_formset = RequestItemFormSet(request.POST)
+            employee_product_formset = EmployeeProductFormSet(request.POST)
     else:
         form = InventoryRequestForm()
         employee_formset = RequestEmployeeFormSet()
         item_formset = RequestItemFormSet()
+        employee_product_formset = EmployeeProductFormSet()
         employee_product_formset = EmployeeProductFormSet()
     
     context = {
@@ -206,40 +220,30 @@ def inventory_request_edit(request, request_id):
     
     if request.method == 'POST':
         form = InventoryRequestForm(request.POST, instance=request_obj)
+        employee_formset = RequestEmployeeFormSet(request.POST, instance=request_obj)
+        item_formset = RequestItemFormSet(request.POST, instance=request_obj)
+        employee_product_formset = EmployeeProductFormSet(request.POST, instance=request_obj)
         
-        if form.is_valid():
+        # Validate tất cả forms
+        form_valid = form.is_valid()
+        employee_valid = employee_formset.is_valid()
+        item_valid = item_formset.is_valid()
+        employee_product_valid = employee_product_formset.is_valid()
+        
+        if form_valid and employee_valid and item_valid and employee_product_valid:
             with transaction.atomic():
                 # Lưu yêu cầu cơ bản
                 request_obj = form.save()
                 
-                # Xử lý formset nhân viên
-                employee_formset = RequestEmployeeFormSet(request.POST, instance=request_obj)
-                if employee_formset.is_valid():
-                    employee_formset.save()
-                else:
-                    for error in employee_formset.errors:
-                        messages.error(request, error)
-                    
-                # Xử lý formset sản phẩm
-                item_formset = RequestItemFormSet(request.POST, instance=request_obj)
-                if item_formset.is_valid():
-                    item_formset.save()
-                else:
-                    for error in item_formset.errors:
-                        messages.error(request, error)
-                
-                # Xử lý formset phân bổ sản phẩm cho nhân viên
-                employee_product_formset = EmployeeProductFormSet(request.POST, instance=request_obj)
-                if employee_product_formset.is_valid():
-                    employee_product_formset.save()
-                else:
-                    for error in employee_product_formset.errors:
-                        messages.error(request, error)
+                # Lưu các formset
+                employee_formset.save()
+                item_formset.save()
+                employee_product_formset.save()
             
             messages.success(request, 'Yêu cầu cấp phát đã được cập nhật thành công.')
             
             if 'save_draft' in request.POST:
-                return redirect('inventory_requests:inventory_request_edit', request_id=request_obj.id)
+                return redirect('inventory_requests:my_requests')
             else:
                 # Chuyển trạng thái thành chờ phê duyệt và gửi email
                 request_obj.mark_as_pending()
@@ -268,6 +272,21 @@ def inventory_request_edit(request, request_id):
                 
                 messages.success(request, 'Yêu cầu cấp phát đã được gửi đến người phê duyệt.')
                 return redirect('inventory_requests:my_requests')
+        else:
+            # Có lỗi validation - hiển thị lỗi
+            if not form_valid:
+                for field, errors in form.errors.items():
+                    for error in errors:
+                        messages.error(request, f'{field}: {error}')
+            
+            if not employee_valid:
+                messages.error(request, 'Có lỗi trong danh sách nhân viên.')
+                
+            if not item_valid:
+                messages.error(request, 'Có lỗi trong danh sách sản phẩm.')
+                
+            if not employee_product_valid:
+                messages.error(request, 'Có lỗi trong phân bổ sản phẩm cho nhân viên.')
     else:
         form = InventoryRequestForm(instance=request_obj)
         employee_formset = RequestEmployeeFormSet(instance=request_obj)
