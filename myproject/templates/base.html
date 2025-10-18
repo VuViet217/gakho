@@ -97,6 +97,7 @@
           </li>
           
           <!-- Employees -->
+          {% if not menu.employees.roles or request.user.role in menu.employees.roles or request.user.is_superuser %}
           <li class="nav-header">NHÂN SỰ</li>
           <li class="nav-item has-treeview {% if menu.employees.open %}menu-open{% endif %}">
             <a href="#" class="nav-link {% if menu.employees.active %}active{% endif %}">
@@ -117,8 +118,10 @@
               {% endfor %}
             </ul>
           </li>
+          {% endif %}
           
           <!-- Suppliers -->
+          {% if not menu.suppliers.roles or request.user.role in menu.suppliers.roles or request.user.is_superuser %}
           <li class="nav-header">QUẢN LÝ NHÀ CUNG CẤP</li>
           <li class="nav-item has-treeview {% if menu.suppliers.open %}menu-open{% endif %}">
             <a href="#" class="nav-link {% if menu.suppliers.active %}active{% endif %}">
@@ -139,6 +142,7 @@
               {% endfor %}
             </ul>
           </li>
+          {% endif %}
           
           <!-- Inventory -->
           <li class="nav-header">QUẢN LÝ KHO</li>
@@ -166,6 +170,7 @@
           </li>
           
           <!-- Inventory Management -->
+          {% if not menu.inventory.roles or request.user.role in menu.inventory.roles or request.user.is_superuser %}
           <li class="nav-item has-treeview {% if menu.inventory.open %}menu-open{% endif %}">
             <a href="#" class="nav-link {% if menu.inventory.active %}active{% endif %}">
               <i class="{{ menu.inventory.icon }} nav-icon"></i>
@@ -185,8 +190,10 @@
               {% endfor %}
             </ul>
           </li>
+          {% endif %}
           
           <!-- User Management -->
+          {% if not menu.user_management.roles or request.user.role in menu.user_management.roles or request.user.is_superuser %}
           <li class="nav-header">QUẢN LÝ NGƯỜI DÙNG</li>
           <li class="nav-item has-treeview {% if menu.user_management.open %}menu-open{% endif %}">
             <a href="#" class="nav-link {% if menu.user_management.active %}active{% endif %}">
@@ -207,8 +214,10 @@
               {% endfor %}
             </ul>
           </li>
+          {% endif %}
           
           <!-- System Settings -->
+          {% if not menu.system_settings.roles or request.user.role in menu.system_settings.roles or request.user.is_superuser %}
           <li class="nav-header">CẤU HÌNH HỆ THỐNG</li>
           <li class="nav-item has-treeview {% if menu.system_settings.open %}menu-open{% endif %}">
             <a href="#" class="nav-link {% if menu.system_settings.active %}active{% endif %}">
@@ -229,6 +238,7 @@
               {% endfor %}
             </ul>
           </li>
+          {% endif %}
         </ul>
       </nav>
       <!-- /.sidebar-menu -->
