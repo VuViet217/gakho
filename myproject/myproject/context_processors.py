@@ -54,8 +54,8 @@ def menu_context(request):
                 {'name': 'Tạo yêu cầu mới', 'url': 'inventory_requests:inventory_request_create', 'icon': 'fas fa-plus', 'active': False},
                 {'name': 'Yêu cầu của tôi', 'url': 'inventory_requests:my_requests', 'icon': 'fas fa-clipboard-check', 'active': False},
                 {'name': 'Phê duyệt của tôi', 'url': 'inventory_requests:my_approval_requests', 'icon': 'fas fa-check-double', 'active': False},
+                {'name': 'Tất cả yêu cầu', 'url': 'inventory_requests:inventory_request_list', 'icon': 'fas fa-list', 'active': False},
                 {'name': 'Quản lý kho', 'url': 'inventory_requests:warehouse_requests_list', 'icon': 'fas fa-dolly', 'active': False, 'roles': ['admin', 'sm']},
-                {'name': 'Tất cả yêu cầu', 'url': 'inventory_requests:inventory_request_list', 'icon': 'fas fa-list', 'active': False, 'roles': ['admin', 'sm']},
             ]
         },
         'inventory': {
