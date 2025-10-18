@@ -142,6 +142,30 @@
           
           <!-- Inventory -->
           <li class="nav-header">QUẢN LÝ KHO</li>
+          <!-- Inventory Requests -->
+          <li class="nav-item has-treeview {% if menu.inventory_requests.open %}menu-open{% endif %}">
+            <a href="#" class="nav-link {% if menu.inventory_requests.active %}active{% endif %}">
+              <i class="{{ menu.inventory_requests.icon }} nav-icon"></i>
+              <p>
+                {{ menu.inventory_requests.name }}
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              {% for item in menu.inventory_requests.items %}
+                {% if not item.roles or request.user.role in item.roles or request.user.is_superuser %}
+                <li class="nav-item">
+                  <a href="{% if item.url != '#' %}{% url item.url %}{% else %}#{% endif %}" class="nav-link {% if item.active %}active{% endif %}">
+                    <i class="{{ item.icon }} nav-icon"></i>
+                    <p>{{ item.name }}</p>
+                  </a>
+                </li>
+                {% endif %}
+              {% endfor %}
+            </ul>
+          </li>
+          
+          <!-- Inventory Management -->
           <li class="nav-item has-treeview {% if menu.inventory.open %}menu-open{% endif %}">
             <a href="#" class="nav-link {% if menu.inventory.active %}active{% endif %}">
               <i class="{{ menu.inventory.icon }} nav-icon"></i>
@@ -215,6 +239,7 @@
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
+    {% block content_header %}
     <section class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
@@ -230,6 +255,7 @@
         </div>
       </div><!-- /.container-fluid -->
     </section>
+    {% endblock %}
 
     <!-- Main content -->
     <section class="content">

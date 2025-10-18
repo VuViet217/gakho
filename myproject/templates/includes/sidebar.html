@@ -104,8 +104,15 @@
         </li>
         
         <li class="nav-header">QUẢN LÝ KHO</li>
-        <li class="nav-item has-treeview {% if 'inventory/' in request.path %}menu-open{% endif %}">
-          <a href="#" class="nav-link {% if 'inventory/' in request.path %}active{% endif %}">
+        <!-- Menu Yêu cầu cấp phát -->
+        <li class="nav-item">
+          <a href="{% url 'inventory_requests:inventory_request_create' %}" class="nav-link {% if 'inventory/requests/' in request.path %}active{% endif %}">
+            <i class="nav-icon fas fa-clipboard-list"></i>
+            <p>Yêu cầu cấp phát</p>
+          </a>
+        </li>
+        <li class="nav-item has-treeview {% if 'inventory/' in request.path and not 'inventory/requests/' in request.path %}menu-open{% endif %}">
+          <a href="#" class="nav-link {% if 'inventory/' in request.path and not 'inventory/requests/' in request.path %}active{% endif %}">
             <i class="nav-icon fas fa-warehouse"></i>
             <p>
               Quản lý kho
@@ -163,6 +170,8 @@
             </li>
           </ul>
         </li>
+        
+
         
         <li class="nav-header">QUẢN LÝ NGƯỜI DÙNG</li>
         <li class="nav-item has-treeview {% if '/users/' in request.path or '/profile' in request.path %}menu-open{% endif %}">

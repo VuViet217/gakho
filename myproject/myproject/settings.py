@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'suppliers',
     'inventory',
     'system_settings',
+    'inventory_requests',
     'import_export',
     'crispy_forms',
     'crispy_bootstrap4',

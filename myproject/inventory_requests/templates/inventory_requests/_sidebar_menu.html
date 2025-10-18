@@ -1,0 +1,64 @@
+{% comment %}
+Thêm đoạn mã sau vào file templates/partials/_sidebar.html
+{% endcomment %}
+
+<!-- Menu quản lý kho -->
+<li class="nav-item {% if 'inventory' in request.path %}active menu-open{% endif %}">
+    <a href="#" class="nav-link {% if 'inventory' in request.path %}active{% endif %}">
+        <i class="nav-icon fas fa-warehouse"></i>
+        <p>
+            Quản lý kho
+            <i class="fas fa-angle-left right"></i>
+        </p>
+    </a>
+    <ul class="nav nav-treeview">
+        <!-- Menu Kho hiện có -->
+        
+        <!-- Menu Yêu cầu cấp phát -->
+        <li class="nav-item {% if 'inventory/requests' in request.path %}active menu-open{% endif %}">
+            <a href="#" class="nav-link {% if 'inventory/requests' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-clipboard-list"></i>
+                <p>
+                    Yêu cầu cấp phát
+                    <i class="fas fa-angle-left right"></i>
+                </p>
+            </a>
+            <ul class="nav nav-treeview">
+                <li class="nav-item">
+                    <a href="{% url 'inventory_requests:inventory_request_create' %}" class="nav-link {% if 'inventory/requests/create' in request.path %}active{% endif %}">
+                        <i class="fas fa-plus nav-icon"></i>
+                        <p>Tạo yêu cầu mới</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'inventory_requests:my_requests' %}" class="nav-link {% if 'inventory/requests/my-requests' in request.path %}active{% endif %}">
+                        <i class="fas fa-clipboard-list nav-icon"></i>
+                        <p>Yêu cầu của tôi</p>
+                    </a>
+                </li>
+                {% if request.user.role in 'admin,manager' %}
+                <li class="nav-item">
+                    <a href="{% url 'inventory_requests:my_approval_requests' %}" class="nav-link {% if 'inventory/requests/my-approvals' in request.path %}active{% endif %}">
+                        <i class="fas fa-check-double nav-icon"></i>
+                        <p>Phê duyệt của tôi</p>
+                    </a>
+                </li>
+                {% endif %}
+                {% if request.user.role in 'admin,sm' %}
+                <li class="nav-item">
+                    <a href="{% url 'inventory_requests:warehouse_requests_list' %}" class="nav-link {% if 'inventory/requests/warehouse-requests' in request.path %}active{% endif %}">
+                        <i class="fas fa-dolly nav-icon"></i>
+                        <p>Quản lý kho</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'inventory_requests:inventory_request_list' %}" class="nav-link {% if request.path == '/inventory/requests/' %}active{% endif %}">
+                        <i class="fas fa-list nav-icon"></i>
+                        <p>Tất cả yêu cầu</p>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </li>
+    </ul>
+</li>

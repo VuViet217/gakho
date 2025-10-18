@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Quản lý kho{% endblock %}
+
+{% block content_header %}
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Quản lý kho</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="{% url 'home' %}">Trang chủ</a></li>
+                    <li class="breadcrumb-item active">Quản lý kho</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Danh sách yêu cầu đã được phê duyệt</h3>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered table-hover datatable">
+                    <thead>
+                        <tr>
+                            <th>Mã yêu cầu</th>
+                            <th>Tiêu đề</th>
+                            <th>Người tạo</th>
+                            <th>Ngày mong muốn nhận</th>
+                            <th>Trạng thái</th>
+                            <th>Ngày phê duyệt</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for request in requests %}
+                        <tr>
+                            <td>{{ request.request_code }}</td>
+                            <td>{{ request.title }}</td>
+                            <td>{{ request.created_by.get_full_name }}</td>
+                            <td>{{ request.expected_date|date:"d/m/Y" }}</td>
+                            <td>
+                                {% if request.status == 'approved' %}
+                                <span class="badge badge-success">Đã phê duyệt</span>
+                                {% elif request.status == 'scheduled' %}
+                                <span class="badge badge-primary">Đã lên lịch</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ request.approval_date|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                <a href="{% url 'inventory_requests:request_detail' request.id %}" class="btn btn-info btn-sm">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                {% if request.status == 'approved' %}
+                                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#scheduleModal-{{ request.id }}">
+                                    <i class="fas fa-calendar"></i> Lên lịch
+                                </button>
+                                <!-- Modal -->
+                                <div class="modal fade" id="scheduleModal-{{ request.id }}" tabindex="-1" role="dialog" aria-labelledby="scheduleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <form action="{% url 'inventory_requests:request_schedule' request.id %}" method="post">
+                                                {% csrf_token %}
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="scheduleModalLabel">Lên lịch cấp phát</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="form-group">
+                                                        <label for="scheduled_date">Ngày cấp phát</label>
+                                                        <input type="date" class="form-control" id="scheduled_date" name="scheduled_date" required>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="schedule_notes">Ghi chú</label>
+                                                        <textarea class="form-control" id="schedule_notes" name="schedule_notes" rows="3"></textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                                                    <button type="submit" class="btn btn-primary">Xác nhận</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% elif request.status == 'scheduled' %}
+                                <a href="{% url 'inventory_requests:request_complete' request.id %}" class="btn btn-success btn-sm">
+                                    <i class="fas fa-check-circle"></i> Hoàn thành
+                                </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(function() {
+        $('.datatable').DataTable({
+            "responsive": true,
+            "autoWidth": false,
+            "order": [[5, "desc"]]
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,468 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Chỉnh sửa{% else %}Tạo yêu cầu{% endif %}{% endblock %}
+
+{% block extra_css %}
+<!-- Select2 -->
+<link rel="stylesheet" href="/static/admin-lte/plugins/select2/css/select2.min.css">
+<link rel="stylesheet" href="/static/admin-lte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+<style>
+    .select2-container--default .select2-selection--single {
+        height: 38px;
+        line-height: 38px;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 36px;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 38px;
+    }
+</style>
+{% endblock %}
+
+{% block content_header %}
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>{% if form.instance.pk %}Chỉnh sửa{% else %}Tạo yêu cầu cấp phát mới{% endif %}</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="{% url 'home' %}">Trang chủ</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'inventory_requests:my_requests' %}">Yêu cầu của tôi</a></li>
+                    <li class="breadcrumb-item active">{% if form.instance.pk %}Chỉnh sửa{% else %}Tạo mới{% endif %}</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+
+<section class="content">
+    <div class="container-fluid">
+        <form method="post" id="requestForm">
+            {% csrf_token %}
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Chi tiết yêu cầu</h3>
+                </div>
+                <div class="card-body">
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <ul>
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <li>{{ field.label }}: {{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                            {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+                                {{ form.title }}
+                                {% if form.title.help_text %}
+                                <small class="text-muted">{{ form.title.help_text }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.expected_date.id_for_label }}">{{ form.expected_date.label }}</label>
+                                {{ form.expected_date }}
+                                {% if form.expected_date.help_text %}
+                                <small class="text-muted">{{ form.expected_date.help_text }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
+                        {{ form.description }}
+                        {% if form.description.help_text %}
+                        <small class="text-muted">{{ form.description.help_text }}</small>
+                        {% endif %}
+                    </div>
+                    
+                    {% if use_employee_product %}
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h3 class="card-title">Danh sách cấp phát</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-primary btn-sm" id="addEmployeeProductBtn">
+                                    <i class="fas fa-plus"></i> Thêm phân bổ
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="employeeProductFormset">
+                                {{ employee_product_formset.management_form }}
+                                <table class="table table-bordered" id="employeeProductTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Nhân viên</th>
+                                            <th>Sản phẩm</th>
+                                            <th>Số lượng</th>
+                                            <th>Ghi chú</th>
+                                            <th style="width: 100px">Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for form in employee_product_formset %}
+                                        <tr class="employee-product-form">
+                                            <td>
+                                                {% for hidden in form.hidden_fields %}
+                                                {{ hidden }}
+                                                {% endfor %}
+                                                {{ form.employee }}
+                                                {% if form.employee.errors %}
+                                                <div class="invalid-feedback d-block">
+                                                    {{ form.employee.errors.0 }}
+                                                </div>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {{ form.product }}
+                                                {% if form.product.errors %}
+                                                <div class="invalid-feedback d-block">
+                                                    {{ form.product.errors.0 }}
+                                                </div>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {{ form.quantity }}
+                                                {% if form.quantity.errors %}
+                                                <div class="invalid-feedback d-block">
+                                                    {{ form.quantity.errors.0 }}
+                                                </div>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {{ form.notes }}
+                                            </td>
+                                            <td>
+                                                <button type="button" class="btn btn-danger btn-sm delete-row">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                                {{ form.DELETE }}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Ẩn form sản phẩm và nhân viên nhưng vẫn giữ trong mã để tránh lỗi -->
+                    <div class="d-none">
+                        <div id="employeeFormset">
+                            {{ employee_formset.management_form }}
+                            <table class="table" id="employeeTable">
+                                <tbody>
+                                    {% for form in employee_formset %}
+                                    <tr class="employee-form">
+                                        <td>
+                                            {% for hidden in form.hidden_fields %}
+                                            {{ hidden }}
+                                            {% endfor %}
+                                            {{ form.employee }}
+                                            {{ form.DELETE }}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div id="itemFormset">
+                            {{ item_formset.management_form }}
+                            <table class="table" id="itemTable">
+                                <tbody>
+                                    {% for form in item_formset %}
+                                    <tr class="item-form">
+                                        <td>
+                                            {% for hidden in form.hidden_fields %}
+                                            {{ hidden }}
+                                            {% endfor %}
+                                            {{ form.product }}
+                                            {{ form.quantity }}
+                                            {{ form.notes }}
+                                            {{ form.DELETE }}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button type="submit" name="save_draft" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Lưu nháp
+                    </button>
+                    <button type="submit" name="submit" class="btn btn-success">
+                        <i class="fas fa-paper-plane"></i> Gửi yêu cầu
+                    </button>
+                    <a href="{% if request.META.HTTP_REFERER %}{{ request.META.HTTP_REFERER }}{% else %}{% url 'inventory_requests:my_requests' %}{% endif %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Hủy
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+<!-- Empty form templates for JavaScript -->
+<div id="emptyEmployeeForm" class="d-none">
+    <tr class="employee-form">
+        <td>
+            {{ employee_formset.empty_form.employee }}
+            {{ employee_formset.empty_form.DELETE }}
+        </td>
+    </tr>
+</div>
+
+<div id="emptyItemForm" class="d-none">
+    <tr class="item-form">
+        <td>
+            {{ item_formset.empty_form.product }}
+            {{ item_formset.empty_form.quantity }}
+            {{ item_formset.empty_form.notes }}
+            {{ item_formset.empty_form.DELETE }}
+        </td>
+    </tr>
+</div>
+
+{% if use_employee_product %}
+<script type="text/html" id="emptyEmployeeProductForm">
+    <tr class="employee-product-form">
+        <td>
+            {{ employee_product_formset.empty_form.id }}
+            {{ employee_product_formset.empty_form.inventory_request }}
+            {{ employee_product_formset.empty_form.employee }}
+        </td>
+        <td>
+            {{ employee_product_formset.empty_form.product }}
+        </td>
+        <td>
+            {{ employee_product_formset.empty_form.quantity }}
+        </td>
+        <td>
+            {{ employee_product_formset.empty_form.notes }}
+        </td>
+        <td>
+            <button type="button" class="btn btn-danger btn-sm delete-row">
+                <i class="fas fa-trash"></i>
+            </button>
+            {{ employee_product_formset.empty_form.DELETE }}
+        </td>
+    </tr>
+</script>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<!-- Select2 -->
+<script src="/static/admin-lte/plugins/select2/js/select2.full.min.js"></script>
+<!-- DateRangePicker -->
+<script src="/static/admin-lte/plugins/moment/moment.min.js"></script>
+<script src="/static/admin-lte/plugins/daterangepicker/daterangepicker.js"></script>
+
+<script>
+    $(function() {
+        // Cấu hình Select2 toàn cục
+        $.fn.select2.defaults.set("theme", "bootstrap4");
+        $.fn.select2.defaults.set("language", {
+            noResults: function() {
+                return "Không tìm thấy kết quả";
+            },
+            searching: function() {
+                return "Đang tìm kiếm...";
+            },
+            inputTooShort: function() {
+                return ""; // Xóa thông báo "Please enter X or more characters"
+            }
+        });
+        
+        // Initialize Select2 Elements với khả năng tìm kiếm
+        $('.select2').select2({
+            theme: 'bootstrap4',
+            placeholder: "Chọn một giá trị",
+            allowClear: true,
+            width: '100%',
+            minimumInputLength: 0,
+            minimumResultsForSearch: 5, // Hiển thị thanh tìm kiếm khi có ít nhất 5 kết quả
+            language: {
+                inputTooShort: function() {
+                    return ""; // Xóa thông báo "Please enter X or more characters"
+                }
+            }
+        });
+        
+        // Cấu hình riêng cho select nhân viên và sản phẩm
+        $('select[name*="employee"]').select2({
+            theme: 'bootstrap4',
+            placeholder: "Chọn nhân viên",
+            allowClear: true,
+            width: '100%',
+            minimumInputLength: 0, // Hiển thị tất cả các lựa chọn khi mở dropdown
+            minimumResultsForSearch: 5 // Hiển thị thanh tìm kiếm khi có ít nhất 5 kết quả
+        });
+        
+        $('select[name*="product"]').select2({
+            theme: 'bootstrap4',
+            placeholder: "Chọn sản phẩm",
+            allowClear: true,
+            width: '100%',
+            minimumInputLength: 0, // Hiển thị tất cả các lựa chọn khi mở dropdown
+            minimumResultsForSearch: 5 // Hiển thị thanh tìm kiếm khi có ít nhất 5 kết quả
+        });
+        
+        // Date picker
+        $('#id_expected_date').daterangepicker({
+            singleDatePicker: true,
+            locale: {
+                format: 'YYYY-MM-DD'
+            }
+        });
+        
+        // Add employee row
+        let employeeCounter = $('#employeeTable tbody tr').length;
+        $('#addEmployeeBtn').click(function() {
+            let template = $('#emptyEmployeeForm').html();
+            let newRow = template.replace(/__prefix__/g, employeeCounter);
+            $('#employeeTable tbody').append(newRow);
+            
+            // Update management form
+            let mgmtTotal = $('#id_employee_set-TOTAL_FORMS');
+            mgmtTotal.val(parseInt(mgmtTotal.val()) + 1);
+            
+            // Initialize select2 for new row
+            $('#employeeTable tbody tr:last-child select').select2({
+                theme: 'bootstrap4',
+                placeholder: "Chọn nhân viên",
+                allowClear: true,
+                width: '100%',
+                minimumInputLength: 0,
+                minimumResultsForSearch: 5
+            });
+            
+            employeeCounter++;
+        });
+        
+        // Add item row
+        let itemCounter = $('#itemTable tbody tr').length;
+        $('#addItemBtn').click(function() {
+            let template = $('#emptyItemForm').html();
+            let newRow = template.replace(/__prefix__/g, itemCounter);
+            $('#itemTable tbody').append(newRow);
+            
+            // Update management form
+            let mgmtTotal = $('#id_item_set-TOTAL_FORMS');
+            mgmtTotal.val(parseInt(mgmtTotal.val()) + 1);
+            
+            // Initialize select2 for new row
+            $('#itemTable tbody tr:last-child select[name*="product"]').select2({
+                theme: 'bootstrap4',
+                placeholder: "Chọn sản phẩm",
+                allowClear: true,
+                width: '100%',
+                minimumInputLength: 0,
+                minimumResultsForSearch: 5
+            });
+            
+            itemCounter++;
+        });
+        
+        {% if use_employee_product %}
+        // Add employee-product row
+        let employeeProductCounter = $('#employeeProductTable tbody tr').length;
+        $('#addEmployeeProductBtn').click(function() {
+            // Lấy template HTML từ script tag
+            let template = $('#emptyEmployeeProductForm').html();
+            
+            // Thay thế __prefix__ bằng số thứ tự hiện tại
+            let newRow = template.replace(/__prefix__/g, employeeProductCounter);
+            
+            // Thêm hàng mới vào bảng
+            $('#employeeProductTable tbody').append(newRow);
+            
+            // Update management form
+            let mgmtTotal = $('#id_employee_product_set-TOTAL_FORMS');
+            mgmtTotal.val(parseInt(mgmtTotal.val()) + 1);
+            
+            // Khởi tạo select2 cho các dropdown trong hàng mới vừa thêm
+            $('#employeeProductTable tbody tr:last select[name*="employee"]').select2({
+                theme: 'bootstrap4',
+                placeholder: "Chọn nhân viên",
+                allowClear: true,
+                width: '100%',
+                minimumInputLength: 0,
+                minimumResultsForSearch: 5
+            });
+            
+            $('#employeeProductTable tbody tr:last select[name*="product"]').select2({
+                theme: 'bootstrap4',
+                placeholder: "Chọn sản phẩm",
+                allowClear: true,
+                width: '100%',
+                minimumInputLength: 0,
+                minimumResultsForSearch: 5
+            });
+            
+            employeeProductCounter++;
+        });
+        {% endif %}
+        
+        // Delete row
+        $(document).on('click', '.delete-row', function() {
+            let row = $(this).closest('tr');
+            let deleteCheckbox = row.find('[id$="-DELETE"]');
+            
+            // If this is a new row (no ID), just remove it
+            if (row.find('[id$="-id"]').val() === '') {
+                row.remove();
+            } else {
+                // Otherwise mark it for deletion and hide
+                deleteCheckbox.prop('checked', true);
+                row.hide();
+            }
+        });
+        
+        // Form validation
+        $('#requestForm').submit(function(e) {
+            let employeeProductCount = $('#employeeProductTable tbody tr:visible').length;
+            let isValid = true;
+            
+            if (employeeProductCount === 0) {
+                alert('Vui lòng thêm ít nhất một phân bổ sản phẩm.');
+                isValid = false;
+            }
+            
+            // Thêm mặc định một nhân viên và sản phẩm nếu chưa có
+            if ($('#employeeTable tbody tr').length === 0) {
+                $('#addEmployeeBtn').click();
+            }
+            
+            if ($('#itemTable tbody tr').length === 0) {
+                $('#addItemBtn').click();
+            }
+            
+            return isValid;
+        });
+    });
+</script>
+{% endblock %}

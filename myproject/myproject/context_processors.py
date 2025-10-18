@@ -45,6 +45,19 @@ def menu_context(request):
             ]
         },
 
+        'inventory_requests': {
+            'name': 'Yêu cầu cấp phát',
+            'icon': 'fas fa-clipboard-list',
+            'active': False,
+            'open': False,
+            'items': [
+                {'name': 'Tạo yêu cầu mới', 'url': 'inventory_requests:inventory_request_create', 'icon': 'fas fa-plus', 'active': False},
+                {'name': 'Yêu cầu của tôi', 'url': 'inventory_requests:my_requests', 'icon': 'fas fa-clipboard-check', 'active': False},
+                {'name': 'Phê duyệt của tôi', 'url': 'inventory_requests:my_approval_requests', 'icon': 'fas fa-check-double', 'active': False, 'roles': ['admin', 'manager']},
+                {'name': 'Quản lý kho', 'url': 'inventory_requests:warehouse_requests_list', 'icon': 'fas fa-dolly', 'active': False, 'roles': ['admin', 'sm']},
+                {'name': 'Tất cả yêu cầu', 'url': 'inventory_requests:inventory_request_list', 'icon': 'fas fa-list', 'active': False, 'roles': ['admin', 'sm']},
+            ]
+        },
         'inventory': {
             'name': 'Quản lý kho',
             'icon': 'fas fa-warehouse',
@@ -109,8 +122,24 @@ def menu_context(request):
         elif 'po_create' in path or 'purchase-order/create' in path:
             menu['suppliers']['items'][3]['active'] = True
     
+    # Inventory Requests section
+    if 'inventory/requests/' in path:
+        menu['inventory_requests']['active'] = True
+        menu['inventory_requests']['open'] = True
+        
+        if 'inventory/requests/create' in path:
+            menu['inventory_requests']['items'][0]['active'] = True
+        elif 'inventory/requests/my-requests' in path:
+            menu['inventory_requests']['items'][1]['active'] = True
+        elif 'inventory/requests/my-approvals' in path:
+            menu['inventory_requests']['items'][2]['active'] = True
+        elif 'inventory/requests/warehouse-requests' in path:
+            menu['inventory_requests']['items'][3]['active'] = True
+        elif path == '/inventory/requests/' or 'inventory/requests/' in path and not any(s in path for s in ['create', 'my-requests', 'my-approvals', 'warehouse-requests']):
+            menu['inventory_requests']['items'][4]['active'] = True
+    
     # Inventory section
-    if 'inventory/' in path:
+    if 'inventory/' in path and not 'inventory/requests/' in path:
         menu['inventory']['active'] = True
         menu['inventory']['open'] = True
         

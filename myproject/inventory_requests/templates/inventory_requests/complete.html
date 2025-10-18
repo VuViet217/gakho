@@ -1,0 +1,214 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>{{ title }}</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="{% url 'home' %}">Trang chủ</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'inventory_requests:warehouse_requests_list' %}">Quản lý cấp phát</a></li>
+                    <li class="breadcrumb-item active">Hoàn thành yêu cầu</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+        <!-- Chi tiết yêu cầu -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Thông tin yêu cầu #{{ request_obj.request_code }}</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <table class="table table-bordered">
+                            <tr>
+                                <th style="width: 150px">Mã yêu cầu:</th>
+                                <td>{{ request_obj.request_code }}</td>
+                            </tr>
+                            <tr>
+                                <th>Tiêu đề:</th>
+                                <td>{{ request_obj.title }}</td>
+                            </tr>
+                            <tr>
+                                <th>Người yêu cầu:</th>
+                                <td>{{ request_obj.requester.get_full_name }}</td>
+                            </tr>
+                            <tr>
+                                <th>Trạng thái:</th>
+                                <td><span class="badge {{ request_obj.get_status_class }}">{{ request_obj.get_status_display }}</span></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <table class="table table-bordered">
+                            <tr>
+                                <th style="width: 150px">Ngày tạo:</th>
+                                <td>{{ request_obj.created_at|date:"d/m/Y H:i" }}</td>
+                            </tr>
+                            <tr>
+                                <th>Người phê duyệt:</th>
+                                <td>{{ request_obj.approver.get_full_name }}</td>
+                            </tr>
+                            <tr>
+                                <th>Ngày lên lịch:</th>
+                                <td>{{ request_obj.scheduled_date|date:"d/m/Y" }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Danh sách nhân viên -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h3 class="card-title">Danh sách nhân viên</h3>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Họ tên</th>
+                                    <th>Phòng ban</th>
+                                    <th>Chức vụ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for employee_request in request_obj.request_employees.all %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ employee_request.employee.full_name }}</td>
+                                    <td>{{ employee_request.employee.department }}</td>
+                                    <td>{{ employee_request.employee.position }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Form hoàn thành -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Hoàn thành cấp phát</h3>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <ul>
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <li>{{ field.label }}: {{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                            {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Danh sách sản phẩm -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Xác nhận số lượng cấp phát</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i> Vui lòng nhập số lượng thực tế được cấp phát cho từng sản phẩm.
+                            </div>
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Tên sản phẩm</th>
+                                        <th>Danh mục</th>
+                                        <th>Số lượng yêu cầu</th>
+                                        <th>Tồn kho</th>
+                                        <th>Số lượng cấp phát</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in request_obj.items.all %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ item.product.name }}</td>
+                                        <td>{{ item.product.category.name }}</td>
+                                        <td>{{ item.quantity }} {{ item.product.unit }}</td>
+                                        <td>{{ item.product.current_quantity }} {{ item.product.unit }}</td>
+                                        <td>
+                                            <input type="number" 
+                                                   name="issued_quantity_{{ item.id }}"
+                                                   id="id_issued_quantity_{{ item.id }}"
+                                                   value="{{ item.quantity }}"
+                                                   min="0" 
+                                                   max="{{ item.product.current_quantity }}"
+                                                   class="form-control"
+                                                   required>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group mt-4">
+                        <label for="{{ form.note.id_for_label }}">{{ form.note.label }}</label>
+                        {{ form.note }}
+                        {% if form.note.help_text %}
+                        <small class="text-muted">{{ form.note.help_text }}</small>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-check-circle"></i> Hoàn thành cấp phát
+                        </button>
+                        <a href="{% url 'inventory_requests:warehouse_requests_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Quay lại
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(function() {
+        // Kiểm tra giới hạn số lượng cấp phát
+        $('input[name^="issued_quantity_"]').change(function() {
+            let value = parseInt($(this).val());
+            let max = parseInt($(this).attr('max'));
+            
+            if (value > max) {
+                alert('Số lượng cấp phát không được vượt quá số lượng tồn kho!');
+                $(this).val(max);
+            }
+            
+            if (value < 0) {
+                alert('Số lượng cấp phát không được nhỏ hơn 0!');
+                $(this).val(0);
+            }
+        });
+    });
+</script>
+{% endblock %}

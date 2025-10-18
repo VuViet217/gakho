@@ -1,0 +1,425 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Chi tiết yêu cầu{% endblock %}
+
+{% block content %}
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Chi tiết yêu cầu</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="{% url 'home' %}">Trang chủ</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'inventory_requests:request_list' %}">Yêu cầu cấp phát</a></li>
+                    <li class="breadcrumb-item active">Chi tiết</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-clipboard"></i> Yêu cầu #{{ request.request_code }}
+                        </h3>
+                        <div class="card-tools">
+                            {% if request.status == 'draft' and request.created_by == user %}
+                            <a href="{% url 'inventory_requests:request_edit' request.id %}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-edit"></i> Sửa
+                            </a>
+                            <a href="{% url 'inventory_requests:request_submit' request.id %}" class="btn btn-success btn-sm">
+                                <i class="fas fa-paper-plane"></i> Gửi
+                            </a>
+                            <a href="{% url 'inventory_requests:request_delete' request.id %}" class="btn btn-danger btn-sm">
+                                <i class="fas fa-trash"></i> Xóa
+                            </a>
+                            {% endif %}
+                            
+                            {% if request.status == 'pending' and is_approver %}
+                            <a href="{% url 'inventory_requests:request_approve' request.id %}" class="btn btn-success btn-sm">
+                                <i class="fas fa-check"></i> Phê duyệt
+                            </a>
+                            <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#rejectModal">
+                                <i class="fas fa-times"></i> Từ chối
+                            </button>
+                            {% endif %}
+                            
+                            {% if request.status == 'approved' and is_warehouse_manager %}
+                            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#scheduleModal">
+                                <i class="fas fa-calendar"></i> Lên lịch
+                            </button>
+                            {% endif %}
+                            
+                            {% if request.status == 'scheduled' and is_warehouse_manager %}
+                            <a href="{% url 'inventory_requests:request_complete' request.id %}" class="btn btn-success btn-sm">
+                                <i class="fas fa-check-circle"></i> Hoàn thành
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-info"><i class="far fa-clipboard"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Tiêu đề</span>
+                                        <span class="info-box-number">{{ request.title }}</span>
+                                    </div>
+                                </div>
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-warning"><i class="far fa-calendar-alt"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Ngày mong muốn nhận</span>
+                                        <span class="info-box-number">{{ request.expected_date|date:"d/m/Y" }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-success">
+                                        {% if request.status == 'draft' %}
+                                        <i class="fas fa-pencil-alt"></i>
+                                        {% elif request.status == 'pending' %}
+                                        <i class="fas fa-clock"></i>
+                                        {% elif request.status == 'approved' %}
+                                        <i class="fas fa-check"></i>
+                                        {% elif request.status == 'rejected' %}
+                                        <i class="fas fa-times"></i>
+                                        {% elif request.status == 'scheduled' %}
+                                        <i class="fas fa-calendar-check"></i>
+                                        {% elif request.status == 'completed' %}
+                                        <i class="fas fa-check-double"></i>
+                                        {% endif %}
+                                    </span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Trạng thái</span>
+                                        <span class="info-box-number">
+                                            {% if request.status == 'draft' %}
+                                            <span class="badge badge-secondary">Bản nháp</span>
+                                            {% elif request.status == 'pending' %}
+                                            <span class="badge badge-info">Chờ phê duyệt</span>
+                                            {% elif request.status == 'approved' %}
+                                            <span class="badge badge-success">Đã phê duyệt</span>
+                                            {% elif request.status == 'rejected' %}
+                                            <span class="badge badge-danger">Bị từ chối</span>
+                                            {% elif request.status == 'scheduled' %}
+                                            <span class="badge badge-primary">Đã lên lịch</span>
+                                            {% elif request.status == 'completed' %}
+                                            <span class="badge badge-dark">Đã hoàn thành</span>
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-primary"><i class="fas fa-user"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Người tạo</span>
+                                        <span class="info-box-number">{{ request.created_by.get_full_name }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {% if request.description %}
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Mô tả</h3>
+                            </div>
+                            <div class="card-body">
+                                {{ request.description|linebreaks }}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if request.rejection_reason %}
+                        <div class="card card-danger">
+                            <div class="card-header">
+                                <h3 class="card-title">Lý do từ chối</h3>
+                            </div>
+                            <div class="card-body">
+                                {{ request.rejection_reason|linebreaks }}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if request.schedule_notes and request.status in 'scheduled,completed' %}
+                        <div class="card card-primary">
+                            <div class="card-header">
+                                <h3 class="card-title">Thông tin lên lịch</h3>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Ngày cấp phát:</strong> {{ request.scheduled_date|date:"d/m/Y" }}</p>
+                                {% if request.schedule_notes %}
+                                <p><strong>Ghi chú:</strong> {{ request.schedule_notes|linebreaks }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Nhân viên</h3>
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>STT</th>
+                                                    <th>Họ tên</th>
+                                                    <th>Chức danh</th>
+                                                    <th>Bộ phận</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for employee in request_obj.request_employees.all %}
+                                                <tr>
+                                                    <td>{{ forloop.counter }}</td>
+                                                    <td>{{ employee.employee.fullname }}</td>
+                                                    <td>{{ employee.employee.position }}</td>
+                                                    <td>{{ employee.employee.department }}</td>
+                                                </tr>
+                                                {% empty %}
+                                                <tr>
+                                                    <td colspan="4" class="text-center">Không có nhân viên nào</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Sản phẩm yêu cầu</h3>
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>STT</th>
+                                                    <th>Sản phẩm</th>
+                                                    <th>Số lượng</th>
+                                                    <th>Ghi chú</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for item in request_obj.items.all %}
+                                                <tr>
+                                                    <td>{{ forloop.counter }}</td>
+                                                    <td>{{ item.product.name }}</td>
+                                                    <td>{{ item.quantity }}</td>
+                                                    <td>{{ item.notes|default:"-" }}</td>
+                                                </tr>
+                                                {% empty %}
+                                                <tr>
+                                                    <td colspan="4" class="text-center">Không có sản phẩm nào</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {% if has_employee_products %}
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Phân bổ sản phẩm cho nhân viên</h3>
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>STT</th>
+                                                    <th>Nhân viên</th>
+                                                    <th>Sản phẩm</th>
+                                                    <th>Số lượng</th>
+                                                    <th>Ghi chú</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for item in request_obj.employee_products.all %}
+                                                <tr>
+                                                    <td>{{ forloop.counter }}</td>
+                                                    <td>{{ item.employee.fullname }}</td>
+                                                    <td>{{ item.product.name }}</td>
+                                                    <td>{{ item.quantity }}</td>
+                                                    <td>{{ item.notes|default:"-" }}</td>
+                                                </tr>
+                                                {% empty %}
+                                                <tr>
+                                                    <td colspan="5" class="text-center">Chưa có phân bổ sản phẩm cho nhân viên</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="timeline">
+                                    <div class="time-label">
+                                        <span class="bg-green">Timeline</span>
+                                    </div>
+                                    
+                                    <div>
+                                        <i class="fas fa-pencil-alt bg-blue"></i>
+                                        <div class="timeline-item">
+                                            <span class="time"><i class="fas fa-clock"></i> {{ request.created_at|date:"d/m/Y H:i" }}</span>
+                                            <h3 class="timeline-header">Yêu cầu được tạo bởi {{ request.created_by.get_full_name }}</h3>
+                                        </div>
+                                    </div>
+                                    
+                                    {% if request.submitted_at %}
+                                    <div>
+                                        <i class="fas fa-paper-plane bg-info"></i>
+                                        <div class="timeline-item">
+                                            <span class="time"><i class="fas fa-clock"></i> {{ request.submitted_at|date:"d/m/Y H:i" }}</span>
+                                            <h3 class="timeline-header">Yêu cầu được gửi đi</h3>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if request.approval_date %}
+                                    <div>
+                                        {% if request.status == 'rejected' %}
+                                        <i class="fas fa-times bg-danger"></i>
+                                        <div class="timeline-item">
+                                            <span class="time"><i class="fas fa-clock"></i> {{ request.approval_date|date:"d/m/Y H:i" }}</span>
+                                            <h3 class="timeline-header">Yêu cầu bị từ chối bởi {{ request.approved_by.get_full_name }}</h3>
+                                            {% if request.rejection_reason %}
+                                            <div class="timeline-body">
+                                                <strong>Lý do:</strong> {{ request.rejection_reason }}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        {% else %}
+                                        <i class="fas fa-check bg-success"></i>
+                                        <div class="timeline-item">
+                                            <span class="time"><i class="fas fa-clock"></i> {{ request.approval_date|date:"d/m/Y H:i" }}</span>
+                                            <h3 class="timeline-header">Yêu cầu được phê duyệt bởi {{ request.approved_by.get_full_name }}</h3>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if request.scheduled_date and request.status in 'scheduled,completed' %}
+                                    <div>
+                                        <i class="fas fa-calendar-check bg-primary"></i>
+                                        <div class="timeline-item">
+                                            <span class="time"><i class="fas fa-clock"></i> {{ request.scheduled_at|date:"d/m/Y H:i" }}</span>
+                                            <h3 class="timeline-header">Yêu cầu được lên lịch bởi {{ request.scheduled_by.get_full_name }}</h3>
+                                            <div class="timeline-body">
+                                                <strong>Ngày cấp phát:</strong> {{ request.scheduled_date|date:"d/m/Y" }}
+                                                {% if request.schedule_notes %}
+                                                <br><strong>Ghi chú:</strong> {{ request.schedule_notes }}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if request.completed_date %}
+                                    <div>
+                                        <i class="fas fa-check-double bg-dark"></i>
+                                        <div class="timeline-item">
+                                            <span class="time"><i class="fas fa-clock"></i> {{ request.completed_date|date:"d/m/Y H:i" }}</span>
+                                            <h3 class="timeline-header">Yêu cầu đã hoàn thành bởi {{ request.completed_by.get_full_name }}</h3>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    <div>
+                                        <i class="fas fa-clock bg-gray"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% if request.status == 'pending' and is_approver %}
+    <!-- Modal Từ chối -->
+    <div class="modal fade" id="rejectModal" tabindex="-1" role="dialog" aria-labelledby="rejectModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form action="{% url 'inventory_requests:request_reject' request.id %}" method="post">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="rejectModalLabel">Từ chối yêu cầu</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="rejection_reason">Lý do từ chối</label>
+                            <textarea class="form-control" id="rejection_reason" name="rejection_reason" rows="4" required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-danger">Từ chối</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if request.status == 'approved' and is_warehouse_manager %}
+    <!-- Modal Lên lịch -->
+    <div class="modal fade" id="scheduleModal" tabindex="-1" role="dialog" aria-labelledby="scheduleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form action="{% url 'inventory_requests:request_schedule' request.id %}" method="post">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="scheduleModalLabel">Lên lịch cấp phát</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="scheduled_date">Ngày cấp phát</label>
+                            <input type="date" class="form-control" id="scheduled_date" name="scheduled_date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="schedule_notes">Ghi chú</label>
+                            <textarea class="form-control" id="schedule_notes" name="schedule_notes" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary">Xác nhận</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}
