@@ -69,59 +69,42 @@
                     </div>
                 </div>
 
-                <!-- Danh sách nhân viên -->
+                <!-- Phân bổ sản phẩm cho nhân viên -->
                 <div class="card mt-4">
                     <div class="card-header">
-                        <h3 class="card-title">Danh sách nhân viên</h3>
+                        <h3 class="card-title">Phân bổ sản phẩm cho nhân viên</h3>
                     </div>
                     <div class="card-body">
-                        <table class="table table-bordered">
-                            <thead>
+                        <table class="table table-bordered table-hover">
+                            <thead class="thead-light">
                                 <tr>
-                                    <th>#</th>
-                                    <th>Họ tên</th>
-                                    <th>Phòng ban</th>
-                                    <th>Chức vụ</th>
+                                    <th style="width: 5%;">#</th>
+                                    <th style="width: 25%;">Nhân viên</th>
+                                    <th style="width: 30%;">Sản phẩm</th>
+                                    <th style="width: 15%;" class="text-center">Số lượng</th>
+                                    <th style="width: 25%;">Ghi chú</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for employee_request in request_obj.request_employees.all %}
+                                {% for item in request_obj.employee_products.all %}
                                 <tr>
-                                    <td>{{ forloop.counter }}</td>
-                                    <td>{{ employee_request.employee.full_name }}</td>
-                                    <td>{{ employee_request.employee.department }}</td>
-                                    <td>{{ employee_request.employee.position }}</td>
+                                    <td class="text-center">{{ forloop.counter }}</td>
+                                    <td>
+                                        <strong>{{ item.employee.full_name }}</strong><br>
+                                        <small class="text-muted">{{ item.employee.employee_code }}</small>
+                                    </td>
+                                    <td>
+                                        <strong>{{ item.product.name }}</strong><br>
+                                        <small class="text-muted">Mã: {{ item.product.product_code }}</small>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge badge-info">{{ item.quantity }}</span>
+                                    </td>
+                                    <td>{{ item.notes|default:"—" }}</td>
                                 </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Danh sách sản phẩm -->
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h3 class="card-title">Danh sách sản phẩm</h3>
-                    </div>
-                    <div class="card-body">
-                        <table class="table table-bordered">
-                            <thead>
+                                {% empty %}
                                 <tr>
-                                    <th>#</th>
-                                    <th>Tên sản phẩm</th>
-                                    <th>Danh mục</th>
-                                    <th>Số lượng yêu cầu</th>
-                                    <th>Ghi chú</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for item in request_obj.items.all %}
-                                <tr>
-                                    <td>{{ forloop.counter }}</td>
-                                    <td>{{ item.product.name }}</td>
-                                    <td>{{ item.product.category.name }}</td>
-                                    <td>{{ item.quantity }} {{ item.product.unit }}</td>
-                                    <td>{{ item.notes|default:"-" }}</td>
+                                    <td colspan="5" class="text-center text-muted">Chưa có phân bổ nào</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
