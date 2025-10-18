@@ -152,10 +152,19 @@ def inventory_request_create(request):
                 if 'save_draft' in request.POST:
                     return redirect('inventory_requests:my_requests')
                 else:
+                    # Kiểm tra xem người dùng đã có người quản lý chưa
+                    if not request.user.manager:
+                        messages.error(request, 'Bạn chưa được gán người quản lý. Vui lòng liên hệ quản trị viên để được gán người quản lý trước khi gửi yêu cầu.')
+                        return redirect('inventory_requests:inventory_request_edit', request_id=request_obj.id)
+                    
+                    if not request.user.manager.email:
+                        messages.error(request, 'Người quản lý của bạn chưa có email. Vui lòng liên hệ quản trị viên để cập nhật email cho người quản lý.')
+                        return redirect('inventory_requests:inventory_request_edit', request_id=request_obj.id)
+                    
                     # Chuyển trạng thái thành chờ phê duyệt và gửi email
                     request_obj.mark_as_pending()
                     
-                    # Gửi email thông báo
+                    # Gửi email thông báo cho người tạo yêu cầu
                     send_template_email(
                         template_code='request_created',
                         context={
@@ -165,19 +174,18 @@ def inventory_request_create(request):
                         to_email=[request.user.email],
                     )
                     
-                    # Gửi email cho người quản lý
-                    if request.user.manager and request.user.manager_email:
-                        send_template_email(
-                            template_code='pending_approval',
-                            context={
-                                'request': request_obj,
-                                'user': request.user,
-                                'manager': request.user.manager,
-                            },
-                            to_email=[request.user.manager_email],
-                        )
+                    # Gửi email cho người quản lý để phê duyệt
+                    send_template_email(
+                        template_code='pending_approval',
+                        context={
+                            'request': request_obj,
+                            'user': request.user,
+                            'manager': request.user.manager,
+                        },
+                        to_email=[request.user.manager.email],
+                    )
                     
-                    messages.success(request, 'Yêu cầu cấp phát đã được gửi đến người phê duyệt.')
+                    messages.success(request, f'Yêu cầu cấp phát đã được gửi đến người quản lý {request.user.manager.get_full_name()} để phê duyệt.')
                     return redirect('inventory_requests:my_requests')
             else:
                 # Có lỗi validation trong formset
@@ -256,10 +264,19 @@ def inventory_request_edit(request, request_id):
             if 'save_draft' in request.POST:
                 return redirect('inventory_requests:my_requests')
             else:
+                # Kiểm tra xem người dùng đã có người quản lý chưa
+                if not request.user.manager:
+                    messages.error(request, 'Bạn chưa được gán người quản lý. Vui lòng liên hệ quản trị viên để được gán người quản lý trước khi gửi yêu cầu.')
+                    return redirect('inventory_requests:inventory_request_edit', request_id=request_obj.id)
+                
+                if not request.user.manager.email:
+                    messages.error(request, 'Người quản lý của bạn chưa có email. Vui lòng liên hệ quản trị viên để cập nhật email cho người quản lý.')
+                    return redirect('inventory_requests:inventory_request_edit', request_id=request_obj.id)
+                
                 # Chuyển trạng thái thành chờ phê duyệt và gửi email
                 request_obj.mark_as_pending()
                 
-                # Gửi email thông báo
+                # Gửi email thông báo cho người tạo yêu cầu
                 send_template_email(
                     template_code='request_created',
                     context={
@@ -269,19 +286,18 @@ def inventory_request_edit(request, request_id):
                     to_email=[request.user.email],
                 )
                 
-                # Gửi email cho người quản lý
-                if request.user.manager and request.user.manager_email:
-                    send_template_email(
-                        template_code='pending_approval',
-                        context={
-                            'request': request_obj,
-                            'user': request.user,
-                            'manager': request.user.manager,
-                        },
-                        to_email=[request.user.manager_email],
-                    )
+                # Gửi email cho người quản lý để phê duyệt
+                send_template_email(
+                    template_code='pending_approval',
+                    context={
+                        'request': request_obj,
+                        'user': request.user,
+                        'manager': request.user.manager,
+                    },
+                    to_email=[request.user.manager.email],
+                )
                 
-                messages.success(request, 'Yêu cầu cấp phát đã được gửi đến người phê duyệt.')
+                messages.success(request, f'Yêu cầu cấp phát đã được gửi đến người quản lý {request.user.manager.get_full_name()} để phê duyệt.')
                 return redirect('inventory_requests:my_requests')
         else:
             # Có lỗi validation - hiển thị lỗi
@@ -422,19 +438,24 @@ def inventory_request_submit(request, request_id):
         messages.error(request, 'Bạn không có quyền gửi yêu cầu này hoặc yêu cầu không thể gửi.')
         return redirect('inventory_requests:inventory_request_detail', request_id=request_obj.id)
     
-    # Kiểm tra xem yêu cầu có ít nhất một nhân viên và một sản phẩm không
-    if request_obj.request_employees.count() == 0:
-        messages.error(request, 'Yêu cầu cần có ít nhất một nhân viên được chỉ định.')
+    # Kiểm tra xem người dùng đã có người quản lý chưa
+    if not request.user.manager:
+        messages.error(request, 'Bạn chưa được gán người quản lý. Vui lòng liên hệ quản trị viên để được gán người quản lý trước khi gửi yêu cầu.')
         return redirect('inventory_requests:inventory_request_edit', request_id=request_obj.id)
     
-    if request_obj.items.count() == 0:
-        messages.error(request, 'Yêu cầu cần có ít nhất một sản phẩm.')
+    if not request.user.manager.email:
+        messages.error(request, 'Người quản lý của bạn chưa có email. Vui lòng liên hệ quản trị viên để cập nhật email cho người quản lý.')
+        return redirect('inventory_requests:inventory_request_edit', request_id=request_obj.id)
+    
+    # Kiểm tra xem yêu cầu có ít nhất một phân bổ sản phẩm cho nhân viên không
+    if request_obj.employee_products.count() == 0:
+        messages.error(request, 'Yêu cầu cần có ít nhất một phân bổ sản phẩm cho nhân viên.')
         return redirect('inventory_requests:inventory_request_edit', request_id=request_obj.id)
     
     # Chuyển trạng thái thành chờ phê duyệt và gửi email
     request_obj.mark_as_pending()
     
-    # Gửi email thông báo
+    # Gửi email thông báo cho người tạo yêu cầu
     send_template_email(
         template_code='request_created',
         context={
@@ -444,19 +465,18 @@ def inventory_request_submit(request, request_id):
         to_email=[request.user.email],
     )
     
-    # Gửi email cho người quản lý
-    if request.user.manager and request.user.manager_email:
-        send_template_email(
-            template_code='pending_approval',
-            context={
-                'request': request_obj,
-                'user': request.user,
-                'manager': request.user.manager,
-            },
-            to_email=[request.user.manager_email],
-        )
+    # Gửi email cho người quản lý để phê duyệt
+    send_template_email(
+        template_code='pending_approval',
+        context={
+            'request': request_obj,
+            'user': request.user,
+            'manager': request.user.manager,
+        },
+        to_email=[request.user.manager.email],
+    )
     
-    messages.success(request, 'Yêu cầu cấp phát đã được gửi đến người phê duyệt.')
+    messages.success(request, f'Yêu cầu cấp phát đã được gửi đến người quản lý {request.user.manager.get_full_name()} để phê duyệt.')
     return redirect('inventory_requests:inventory_request_detail', request_id=request_obj.id)
 
 
