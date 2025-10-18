@@ -183,6 +183,28 @@
               {% endfor %}
             </ul>
           </li>
+          
+          <!-- System Settings -->
+          <li class="nav-header">CẤU HÌNH HỆ THỐNG</li>
+          <li class="nav-item has-treeview {% if menu.system_settings.open %}menu-open{% endif %}">
+            <a href="#" class="nav-link {% if menu.system_settings.active %}active{% endif %}">
+              <i class="{{ menu.system_settings.icon }} nav-icon"></i>
+              <p>
+                {{ menu.system_settings.name }}
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              {% for item in menu.system_settings.items %}
+              <li class="nav-item">
+                <a href="{% url item.url %}" class="nav-link {% if item.active %}active{% endif %}">
+                  <i class="{{ item.icon }} nav-icon"></i>
+                  <p>{{ item.name }}</p>
+                </a>
+              </li>
+              {% endfor %}
+            </ul>
+          </li>
         </ul>
       </nav>
       <!-- /.sidebar-menu -->

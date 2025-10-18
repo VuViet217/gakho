@@ -11,6 +11,15 @@ def menu_context(request):
             'icon': 'fas fa-tachometer-alt',
             'active': False
         },
+        'system_settings': {
+            'name': 'Quản lý hệ thống',
+            'icon': 'fas fa-cogs',
+            'active': False,
+            'open': False,
+            'items': [
+                {'name': 'Cấu hình Email', 'url': 'email_settings', 'icon': 'fas fa-envelope', 'active': False},
+            ]
+        },
         'employees': {
             'name': 'Quản lý nhân viên',
             'icon': 'fas fa-users',
@@ -136,6 +145,14 @@ def menu_context(request):
             menu['user_management']['items'][1]['active'] = True
         elif '/profile' in path:
             menu['user_management']['items'][2]['active'] = True
+            
+    # System settings section
+    if '/system/' in path:
+        menu['system_settings']['active'] = True
+        menu['system_settings']['open'] = True
+        
+        if 'email' in path:
+            menu['system_settings']['items'][0]['active'] = True
     
     return {
         'menu': menu

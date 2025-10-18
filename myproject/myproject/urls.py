@@ -29,6 +29,7 @@ urlpatterns = [
     path('hr/', include('employees.urls')),
     path('procurement/', include('suppliers.urls')),
     path('inventory/', include('inventory.urls')),
+    path('system/', include('system_settings.urls')),
     path('logout/', LogoutView.as_view(), name='logout'),
 ]
 
