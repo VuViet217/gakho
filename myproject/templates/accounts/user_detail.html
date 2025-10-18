@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-4">
+            <!-- Thông tin người dùng -->
+            <div class="card card-primary">
+                <div class="card-header">
+                    <h3 class="card-title">Thông tin người dùng</h3>
+                </div>
+                <div class="card-body box-profile">
+                    <div class="text-center">
+                        {% if user_detail.profile_image %}
+                        <img class="profile-user-img img-fluid img-circle" 
+                             src="{{ user_detail.profile_image.url }}" 
+                             alt="User profile picture">
+                        {% else %}
+                        <img class="profile-user-img img-fluid img-circle" 
+                             src="{% static 'admin-lte/img/user2-160x160.jpg' %}" 
+                             alt="User profile picture">
+                        {% endif %}
+                    </div>
+
+                    <h3 class="profile-username text-center">{{ user_detail.get_full_name|default:user_detail.username }}</h3>
+
+                    <p class="text-muted text-center">{{ user_detail.get_role_display }}</p>
+
+                    <ul class="list-group list-group-unbordered mb-3">
+                        <li class="list-group-item">
+                            <b>Tên đăng nhập</b> <span class="float-right">{{ user_detail.username }}</span>
+                        </li>
+                        <li class="list-group-item">
+                            <b>Email</b> <span class="float-right">{{ user_detail.email }}</span>
+                        </li>
+                        <li class="list-group-item">
+                            <b>Họ và tên</b> <span class="float-right">{{ user_detail.get_full_name }}</span>
+                        </li>
+                        <li class="list-group-item">
+                            <b>Vai trò</b> <span class="float-right">{{ user_detail.get_role_display }}</span>
+                        </li>
+                        <li class="list-group-item">
+                            <b>Bộ phận</b> <span class="float-right">{{ user_detail.department|default:"Chưa cập nhật" }}</span>
+                        </li>
+                        <li class="list-group-item">
+                            <b>Số điện thoại</b> <span class="float-right">{{ user_detail.phone|default:"Chưa cập nhật" }}</span>
+                        </li>
+                        <li class="list-group-item">
+                            <b>Người quản lý</b> <span class="float-right">{{ user_detail.manager_name|default:"Chưa cập nhật" }}</span>
+                        </li>
+                        <li class="list-group-item">
+                            <b>Email người quản lý</b> <span class="float-right">{{ user_detail.manager_email|default:"Chưa cập nhật" }}</span>
+                        </li>
+                        <li class="list-group-item">
+                            <b>Ngày tham gia</b> <span class="float-right">{{ user_detail.date_joined|date:"d/m/Y" }}</span>
+                        </li>
+                        <li class="list-group-item">
+                            <b>Trạng thái</b> 
+                            <span class="float-right">
+                                {% if user_detail.is_active %}
+                                <span class="badge badge-success">Hoạt động</span>
+                                {% else %}
+                                <span class="badge badge-danger">Đã vô hiệu hóa</span>
+                                {% endif %}
+                            </span>
+                        </li>
+                    </ul>
+
+                    <div class="text-center">
+                        <a href="{% url 'user_update' user_detail.pk %}" class="btn btn-primary">
+                            <i class="fas fa-user-edit"></i> Chỉnh sửa
+                        </a>
+                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal">
+                            <i class="fas fa-trash"></i> Xóa
+                        </button>
+                    </div>
+                </div>
+                <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+        </div>
+        <!-- /.col -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header p-2">
+                    <h3 class="card-title">Quyền hạn và thông tin bổ sung</h3>
+                </div><!-- /.card-header -->
+                <div class="card-body">
+                    <div class="tab-content">
+                        <div class="active tab-pane" id="settings">
+                            <ul class="list-group list-group-unbordered mb-3">
+                                <li class="list-group-item">
+                                    <b>Quyền quản trị viên</b> 
+                                    <span class="float-right">
+                                        {% if user_detail.is_superuser %}
+                                        <span class="badge badge-success">Có</span>
+                                        {% else %}
+                                        <span class="badge badge-secondary">Không</span>
+                                        {% endif %}
+                                    </span>
+                                </li>
+                                <li class="list-group-item">
+                                    <b>Truy cập trang quản trị</b> 
+                                    <span class="float-right">
+                                        {% if user_detail.is_staff %}
+                                        <span class="badge badge-success">Có</span>
+                                        {% else %}
+                                        <span class="badge badge-secondary">Không</span>
+                                        {% endif %}
+                                    </span>
+                                </li>
+                                <li class="list-group-item">
+                                    <b>Có thể phê duyệt</b>
+                                    <span class="float-right">
+                                        {% if user_detail.can_approve %}
+                                        <span class="badge badge-success">Có</span>
+                                        {% else %}
+                                        <span class="badge badge-secondary">Không</span>
+                                        {% endif %}
+                                    </span>
+                                </li>
+                                <li class="list-group-item">
+                                    <b>Lần đăng nhập cuối</b> 
+                                    <span class="float-right">
+                                        {{ user_detail.last_login|date:"d/m/Y H:i"|default:"Chưa đăng nhập" }}
+                                    </span>
+                                </li>
+                            </ul>
+                            
+                            <!-- Các cấp dưới -->
+                            <h5 class="mt-4">Danh sách nhân viên cấp dưới</h5>
+                            {% if subordinates %}
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Tên đăng nhập</th>
+                                        <th>Họ tên</th>
+                                        <th>Vai trò</th>
+                                        <th>Bộ phận</th>
+                                        <th>Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for sub in subordinates %}
+                                    <tr>
+                                        <td>{{ sub.username }}</td>
+                                        <td>{{ sub.get_full_name }}</td>
+                                        <td>{{ sub.get_role_display }}</td>
+                                        <td>{{ sub.department|default:"Chưa cập nhật" }}</td>
+                                        <td>
+                                            <a href="{% url 'user_detail' sub.pk %}" class="btn btn-sm btn-info">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            {% else %}
+                            <p class="text-muted">Không có nhân viên cấp dưới</p>
+                            {% endif %}
+                        </div>
+                        <!-- /.tab-pane -->
+                    </div>
+                    <!-- /.tab-content -->
+                </div><!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div><!-- /.container-fluid -->
+
+<!-- Modal xác nhận xóa -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-danger">
+                <h5 class="modal-title" id="deleteModalLabel">Xác nhận xóa</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa người dùng <strong>{{ user_detail.username }}</strong> không?</p>
+                <p class="text-danger"><i class="fas fa-exclamation-triangle"></i> Lưu ý: Hành động này không thể hoàn tác!</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                <form method="post" action="{% url 'user_delete' user_detail.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Xóa người dùng</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,246 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <form method="post" enctype="multipart/form-data" id="userForm">
+        {% csrf_token %}
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">{{ title }}</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.username.id_for_label }}">{{ form.username.label }} <span class="text-danger">*</span></label>
+                            {{ form.username }}
+                            {% if form.username.errors %}
+                            <div class="text-danger">{{ form.username.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.email.id_for_label }}">{{ form.email.label }} <span class="text-danger">*</span></label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                            <div class="text-danger">{{ form.email.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }} <span class="text-danger">*</span></label>
+                            {{ form.first_name }}
+                            {% if form.first_name.errors %}
+                            <div class="text-danger">{{ form.first_name.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }} <span class="text-danger">*</span></label>
+                            {{ form.last_name }}
+                            {% if form.last_name.errors %}
+                            <div class="text-danger">{{ form.last_name.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                {% if form.password1 %}
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.password1.id_for_label }}">{{ form.password1.label }} <span class="text-danger">*</span></label>
+                            {{ form.password1 }}
+                            <small class="form-text text-muted">
+                                Mật khẩu cần có ít nhất 6 ký tự.
+                            </small>
+                            {% if form.password1.errors %}
+                            <div class="text-danger">{{ form.password1.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.password2.id_for_label }}">{{ form.password2.label }} <span class="text-danger">*</span></label>
+                            {{ form.password2 }}
+                            {% if form.password2.errors %}
+                            <div class="text-danger">{{ form.password2.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.role.id_for_label }}">{{ form.role.label }} <span class="text-danger">*</span></label>
+                            {{ form.role }}
+                            {% if form.role.errors %}
+                            <div class="text-danger">{{ form.role.errors }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted">
+                                SM (Senior Manager) không cần người quản lý
+                            </small>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.department.id_for_label }}">{{ form.department.label }}</label>
+                            {{ form.department }}
+                            {% if form.department.errors %}
+                            <div class="text-danger">{{ form.department.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+                            {{ form.phone }}
+                            {% if form.phone.errors %}
+                            <div class="text-danger">{{ form.phone.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group" id="manager-group">
+                            <label for="{{ form.manager.id_for_label }}">{{ form.manager.label }}</label>
+                            {{ form.manager }}
+                            {% if form.manager.errors %}
+                            <div class="text-danger">{{ form.manager.errors }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted">
+                                Chọn người quản lý hoặc điền email người quản lý bên dưới
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group" id="manager-email-group">
+                            <label for="{{ form.manager_email.id_for_label }}">{{ form.manager_email.label }}</label>
+                            {{ form.manager_email }}
+                            {% if form.manager_email.errors %}
+                            <div class="text-danger">{{ form.manager_email.errors }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted">
+                                Nhập email người quản lý nếu không chọn từ danh sách trên
+                            </small>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.profile_image.id_for_label }}">{{ form.profile_image.label }}</label>
+                            {{ form.profile_image }}
+                            {% if form.profile_image.errors %}
+                            <div class="text-danger">{{ form.profile_image.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    {% if form.is_active %}
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <div class="form-check mt-4">
+                                {{ form.is_active }}
+                                <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                    {{ form.is_active.label }}
+                                </label>
+                            </div>
+                            {% if form.is_active.errors %}
+                            <div class="text-danger">{{ form.is_active.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {{ form.non_field_errors }}
+                </div>
+                {% endif %}
+            </div>
+            <div class="card-footer">
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-save"></i> {{ button_text|default:"Lưu" }}
+                </button>
+                <a href="{% url 'user_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Hủy
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Khởi tạo Select2 cho dropdown người quản lý
+    $('#id_manager').select2({
+        theme: 'bootstrap4',
+        width: '100%',
+        placeholder: 'Chọn người quản lý',
+        allowClear: true
+    });
+
+    // Xử lý khi thay đổi vai trò
+    $('#id_role').on('change', function() {
+        const role = $(this).val();
+        const managerGroup = $('#manager-group');
+        const managerEmailGroup = $('#manager-email-group');
+        const managerSelect = $('#id_manager');
+
+        if (role === 'sm') {
+            // SM không cần người quản lý
+            managerSelect.val('').trigger('change');
+            managerGroup.hide();
+            managerEmailGroup.hide();
+        } else {
+            // Các vai trò khác có thể chọn người quản lý
+            managerGroup.show();
+            managerEmailGroup.show();
+        }
+    });
+
+    // Khi thay đổi manager hoặc manager_email
+    $('#id_manager, #id_manager_email').on('change', function() {
+        const manager = $('#id_manager').val();
+        const managerEmail = $('#id_manager_email').val();
+        
+        // Hiển thị thông báo nếu cả hai đều được điền
+        if (manager && managerEmail) {
+            if (!$('#manager-warning').length) {
+                $('#manager-group').append('<div id="manager-warning" class="text-warning mt-1">Bạn đã chọn người quản lý và điền email. Chỉ cần chọn một trong hai.</div>');
+            }
+        } else {
+            $('#manager-warning').remove();
+        }
+    });
+
+    // Trigger change khi load trang
+    $('#id_role').trigger('change');
+});
+</script>
+{% endblock %}

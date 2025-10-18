@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-4">
+            <!-- Profile Image -->
+            <div class="card card-primary card-outline">
+                <div class="card-body box-profile">
+                    <div class="text-center">
+                        {% if user.profile_image %}
+                        <img class="profile-user-img img-fluid img-circle"
+                             src="{{ user.profile_image.url }}" alt="User profile picture">
+                        {% else %}
+                        <img class="profile-user-img img-fluid img-circle"
+                             src="{% static 'img/avatar-default.png' %}" alt="User profile picture">
+                        {% endif %}
+                    </div>
+                    <h3 class="profile-username text-center">{{ user.get_full_name }}</h3>
+                    <p class="text-muted text-center">
+                        {% for role_value, role_display in user.ROLE_CHOICES %}
+                            {% if role_value == user.role %}
+                                {{ role_display }}
+                            {% endif %}
+                        {% endfor %}
+                    </p>
+                    <ul class="list-group list-group-unbordered mb-3">
+                        <li class="list-group-item">
+                            <b>Tên đăng nhập</b> <span class="float-right">{{ user.username }}</span>
+                        </li>
+                        <li class="list-group-item">
+                            <b>Email</b> <span class="float-right">{{ user.email }}</span>
+                        </li>
+                        <li class="list-group-item">
+                            <b>Bộ phận</b> <span class="float-right">{{ user.department|default:"Chưa phân công" }}</span>
+                        </li>
+                        <li class="list-group-item">
+                            <b>Người quản lý</b> <span class="float-right">
+                                {% if user.manager %}
+                                    {{ user.manager.get_full_name }}
+                                {% elif user.role == 'sm' %}
+                                    <span class="text-muted">Không có</span>
+                                {% else %}
+                                    <span class="text-danger">Chưa phân công</span>
+                                {% endif %}
+                            </span>
+                        </li>
+                        <li class="list-group-item">
+                            <b>Tham gia từ</b> <span class="float-right">{{ user.date_joined|date:"d/m/Y" }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header p-2">
+                    <ul class="nav nav-pills">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#profile" data-toggle="tab">Thông tin cá nhân</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#password" data-toggle="tab">Đổi mật khẩu</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="profile">
+                            <form method="post" enctype="multipart/form-data" class="form-horizontal">
+                                {% csrf_token %}
+                                <input type="hidden" name="form_type" value="profile">
+                                
+                                <div class="form-group row">
+                                    <label for="{{ form.first_name.id_for_label }}" class="col-sm-3 col-form-label">Họ</label>
+                                    <div class="col-sm-9">
+                                        {{ form.first_name|as_crispy_field }}
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group row">
+                                    <label for="{{ form.last_name.id_for_label }}" class="col-sm-3 col-form-label">Tên</label>
+                                    <div class="col-sm-9">
+                                        {{ form.last_name|as_crispy_field }}
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group row">
+                                    <label for="{{ form.email.id_for_label }}" class="col-sm-3 col-form-label">Email</label>
+                                    <div class="col-sm-9">
+                                        {{ form.email|as_crispy_field }}
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group row">
+                                    <label for="{{ form.phone.id_for_label }}" class="col-sm-3 col-form-label">Số điện thoại</label>
+                                    <div class="col-sm-9">
+                                        {{ form.phone|as_crispy_field }}
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group row">
+                                    <label for="{{ form.profile_image.id_for_label }}" class="col-sm-3 col-form-label">Ảnh đại diện</label>
+                                    <div class="col-sm-9">
+                                        {{ form.profile_image|as_crispy_field }}
+                                        {% if user.profile_image %}
+                                        <div class="mb-2">
+                                            <img src="{{ user.profile_image.url }}" alt="Current profile image" style="max-height: 100px; max-width: 100px;" class="img-thumbnail">
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group row">
+                                    <div class="offset-sm-3 col-sm-9">
+                                        <button type="submit" class="btn btn-primary">Cập nhật thông tin</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <div class="tab-pane" id="password">
+                            <form method="post" class="form-horizontal">
+                                {% csrf_token %}
+                                <input type="hidden" name="form_type" value="password">
+                                
+                                <div class="form-group row">
+                                    <label for="{{ password_form.old_password.id_for_label }}" class="col-sm-3 col-form-label">Mật khẩu cũ</label>
+                                    <div class="col-sm-9">
+                                        {{ password_form.old_password|as_crispy_field }}
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group row">
+                                    <label for="{{ password_form.new_password1.id_for_label }}" class="col-sm-3 col-form-label">Mật khẩu mới</label>
+                                    <div class="col-sm-9">
+                                        {{ password_form.new_password1|as_crispy_field }}
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group row">
+                                    <label for="{{ password_form.new_password2.id_for_label }}" class="col-sm-3 col-form-label">Xác nhận mật khẩu mới</label>
+                                    <div class="col-sm-9">
+                                        {{ password_form.new_password2|as_crispy_field }}
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group row">
+                                    <div class="offset-sm-3 col-sm-9">
+                                        <button type="submit" class="btn btn-danger">Đổi mật khẩu</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extrascripts %}
+<script>
+    // Auto-activate tab if there are form errors
+    $(document).ready(function() {
+        {% if password_form.errors %}
+            $('.nav-pills a[href="#password"]').tab('show');
+        {% endif %}
+        
+        {% if form.errors %}
+            $('.nav-pills a[href="#profile"]').tab('show');
+        {% endif %}
+        
+        // Keep the active tab after form submission based on form_type
+        var formType = new URLSearchParams(window.location.search).get('form_type');
+        if (formType === 'password') {
+            $('.nav-pills a[href="#password"]').tab('show');
+        } else if (formType === 'profile') {
+            $('.nav-pills a[href="#profile"]').tab('show');
+        }
+    });
+</script>
+{% endblock %}

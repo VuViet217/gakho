@@ -40,8 +40,8 @@
             <i class="far fa-user"></i> {{ user.get_full_name|default:user.username }}
         </a>
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-            <a href="{% url 'profile' %}" class="dropdown-item">
-                <i class="fas fa-user mr-2"></i> Thông tin cá nhân
+            <a href="{% url 'profile_view' %}" class="dropdown-item">
+              <i class="fas fa-user mr-2"></i> Thông tin cá nhân
             </a>
             <div class="dropdown-divider"></div>
             <a href="{% url 'logout' %}" class="dropdown-item">
@@ -78,7 +78,7 @@
           {% endif %}
         </div>
         <div class="info">
-          <a href="{% url 'profile' %}" class="d-block">{{ user.get_full_name|default:user.username }}</a>
+          <a href="{% url 'profile_view' %}" class="d-block">{{ user.get_full_name|default:user.username }}</a>
         </div>
       </div>
 
@@ -154,6 +154,28 @@
               {% for item in menu.inventory.items %}
               <li class="nav-item">
                 <a href="{% if item.url != '#' %}{% url item.url %}{% else %}#{% endif %}" class="nav-link {% if item.active %}active{% endif %}">
+                  <i class="{{ item.icon }} nav-icon"></i>
+                  <p>{{ item.name }}</p>
+                </a>
+              </li>
+              {% endfor %}
+            </ul>
+          </li>
+          
+          <!-- User Management -->
+          <li class="nav-header">QUẢN LÝ NGƯỜI DÙNG</li>
+          <li class="nav-item has-treeview {% if menu.user_management.open %}menu-open{% endif %}">
+            <a href="#" class="nav-link {% if menu.user_management.active %}active{% endif %}">
+              <i class="{{ menu.user_management.icon }} nav-icon"></i>
+              <p>
+                {{ menu.user_management.name }}
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              {% for item in menu.user_management.items %}
+              <li class="nav-item">
+                <a href="{% url item.url %}" class="nav-link {% if item.active %}active{% endif %}">
                   <i class="{{ item.icon }} nav-icon"></i>
                   <p>{{ item.name }}</p>
                 </a>

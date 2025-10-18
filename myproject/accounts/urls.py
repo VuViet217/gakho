@@ -3,11 +3,20 @@ from . import views
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
+    # Đăng nhập/Đăng xuất
     path('login/', views.CustomLoginView.as_view(), name='login'),
     path('logout/', views.CustomLogoutView.as_view(), name='logout'),
-    path('register/', views.RegisterView.as_view(), name='register'),
     path('dashboard/', views.dashboard, name='dashboard'),
-    path('profile/', views.ProfileUpdateView.as_view(), name='profile'),
+    
+    # Quản lý người dùng (Admin/SM)
+    path('users/', views.UserListView.as_view(), name='user_list'),
+    path('users/create/', views.UserCreateView.as_view(), name='user_create'),
+    path('users/<int:pk>/', views.UserDetailView.as_view(), name='user_detail'),
+    path('users/<int:pk>/edit/', views.UserUpdateView.as_view(), name='user_update'),
+    path('users/<int:pk>/delete/', views.user_delete, name='user_delete'),
+    
+    # Profile cá nhân
+    path('profile/', views.profile_view, name='profile_view'),
     
     # Password reset
     path('password_reset/', auth_views.PasswordResetView.as_view(

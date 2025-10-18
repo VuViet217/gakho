@@ -36,8 +36,8 @@
             <i class="far fa-user"></i> {{ user.get_full_name|default:user.username }}
         </a>
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-            <a href="{% url 'profile' %}" class="dropdown-item">
-                <i class="fas fa-user mr-2"></i> Thông tin cá nhân
+            <a href="{% url 'profile_view' %}" class="dropdown-item">
+              <i class="fas fa-user mr-2"></i> Thông tin cá nhân
             </a>
             <div class="dropdown-divider"></div>
             <a href="{% url 'logout' %}" class="dropdown-item">
@@ -74,7 +74,7 @@
           {% endif %}
         </div>
         <div class="info">
-          <a href="{% url 'profile' %}" class="d-block">{{ user.get_full_name|default:user.username }}</a>
+          <a href="{% url 'profile_view' %}" class="d-block">{{ user.get_full_name|default:user.username }}</a>
         </div>
       </div>
 
@@ -191,6 +191,37 @@
                 <a href="#" class="nav-link">
                   <i class="fas fa-plus-circle nav-icon"></i>
                   <p>Tạo PO mới</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+          
+          <li class="nav-header">QUẢN LÝ NGƯỜI DÙNG</li>
+          <li class="nav-item has-treeview">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-users-cog"></i>
+              <p>
+                Quản lý người dùng
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="{% url 'user_list' %}" class="nav-link">
+                  <i class="fas fa-users nav-icon"></i>
+                  <p>Danh sách người dùng</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{% url 'user_create' %}" class="nav-link">
+                  <i class="fas fa-user-plus nav-icon"></i>
+                  <p>Thêm người dùng</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{% url 'profile_view' %}" class="nav-link">
+                  <i class="fas fa-user-circle nav-icon"></i>
+                  <p>Hồ sơ cá nhân</p>
                 </a>
               </li>
             </ul>

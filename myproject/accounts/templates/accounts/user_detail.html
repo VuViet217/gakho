@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <h3 class="card-title">{{ title }}</h3>
+                <div>
+                    <a href="{% url 'user_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Quay lại danh sách
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body box-profile">
+                            <div class="text-center">
+                                {% if user.profile_image %}
+                                <img class="profile-user-img img-fluid img-circle" src="{{ user.profile_image.url }}" alt="User profile picture">
+                                {% else %}
+                                <img class="profile-user-img img-fluid img-circle" src="{% static 'img/avatar-default.png' %}" alt="User profile picture">
+                                {% endif %}
+                            </div>
+                            <h3 class="profile-username text-center">{{ user.get_full_name }}</h3>
+                            <p class="text-muted text-center">
+                                {% for role_value, role_display in user.ROLE_CHOICES %}
+                                    {% if role_value == user.role %}
+                                        {{ role_display }}
+                                    {% endif %}
+                                {% endfor %}
+                            </p>
+
+                            <ul class="list-group list-group-unbordered mb-3">
+                                <li class="list-group-item">
+                                    <b>Tên đăng nhập</b> <span class="float-right">{{ user.username }}</span>
+                                </li>
+                                <li class="list-group-item">
+                                    <b>Email</b> <span class="float-right">{{ user.email }}</span>
+                                </li>
+                                <li class="list-group-item">
+                                    <b>Số điện thoại</b> <span class="float-right">{{ user.phone|default:"Chưa cập nhật" }}</span>
+                                </li>
+                                <li class="list-group-item">
+                                    <b>Bộ phận</b> <span class="float-right">{{ user.department|default:"Chưa phân công" }}</span>
+                                </li>
+                                <li class="list-group-item">
+                                    <b>Người quản lý</b> 
+                                    <span class="float-right">
+                                    {% if user.manager %}
+                                        <a href="{% url 'user_detail' user.manager.id %}">{{ user.manager.get_full_name }}</a>
+                                    {% elif user.role == 'sm' %}
+                                        <span class="text-muted">Không có</span>
+                                    {% else %}
+                                        <span class="text-danger">Chưa phân công</span>
+                                    {% endif %}
+                                    </span>
+                                </li>
+                                <li class="list-group-item">
+                                    <b>Trạng thái</b> 
+                                    <span class="float-right">
+                                    {% if user.is_active %}
+                                        <span class="badge badge-success">Hoạt động</span>
+                                    {% else %}
+                                        <span class="badge badge-secondary">Ngưng hoạt động</span>
+                                    {% endif %}
+                                    </span>
+                                </li>
+                                <li class="list-group-item">
+                                    <b>Tham gia từ</b> <span class="float-right">{{ user.date_joined|date:"d/m/Y" }}</span>
+                                </li>
+                            </ul>
+
+                            <div class="btn-group btn-block">
+                                <a href="{% url 'user_update' user.id %}" class="btn btn-primary">
+                                    <i class="fas fa-edit"></i> Chỉnh sửa
+                                </a>
+                                {% if not user.is_superuser %}
+                                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal">
+                                    <i class="fas fa-trash"></i> Xóa
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header p-2">
+                            <ul class="nav nav-pills">
+                                <li class="nav-item"><a class="nav-link active" href="#activity" data-toggle="tab">Hoạt động</a></li>
+                                <li class="nav-item"><a class="nav-link" href="#subordinates" data-toggle="tab">Nhân viên quản lý</a></li>
+                                <li class="nav-item"><a class="nav-link" href="#permissions" data-toggle="tab">Quyền hạn</a></li>
+                            </ul>
+                        </div>
+                        <div class="card-body">
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="activity">
+                                    <div class="post">
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-info-circle"></i> Thông tin hoạt động của người dùng sẽ được hiển thị tại đây.
+                                        </div>
+                                        <!-- Activity logs will go here in the future -->
+                                    </div>
+                                </div>
+                                
+                                <div class="tab-pane" id="subordinates">
+                                    {% if user.subordinates.all %}
+                                    <div class="table-responsive">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>Tên nhân viên</th>
+                                                    <th>Email</th>
+                                                    <th>Vai trò</th>
+                                                    <th>Bộ phận</th>
+                                                    <th>Thao tác</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for subordinate in user.subordinates.all %}
+                                                <tr>
+                                                    <td>{{ subordinate.get_full_name }}</td>
+                                                    <td>{{ subordinate.email }}</td>
+                                                    <td>
+                                                        {% for role_value, role_display in subordinate.ROLE_CHOICES %}
+                                                            {% if role_value == subordinate.role %}
+                                                                {{ role_display }}
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </td>
+                                                    <td>{{ subordinate.department|default:"-" }}</td>
+                                                    <td>
+                                                        <a href="{% url 'user_detail' subordinate.id %}" class="btn btn-sm btn-info">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    {% else %}
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle"></i> Người dùng này không quản lý nhân viên nào.
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="tab-pane" id="permissions">
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle"></i> Thông tin quyền hạn sẽ được hiển thị tại đây.
+                                    </div>
+                                    <!-- Permission details will go here in the future -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Xác nhận xóa Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Xác nhận xóa</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa người dùng <strong>{{ user.get_full_name }}</strong> không?</p>
+                <p class="text-danger">
+                    <i class="fas fa-exclamation-triangle"></i> 
+                    Lưu ý: Hành động này không thể hoàn tác. Tất cả dữ liệu liên quan đến người dùng này sẽ bị xóa vĩnh viễn.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                <form action="{% url 'user_delete' user.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Xác nhận xóa</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -34,6 +34,7 @@ def menu_context(request):
                 {'name': 'Tạo đơn hàng mới', 'url': 'po_create', 'icon': 'fas fa-plus-square', 'active': False},
             ]
         },
+
         'inventory': {
             'name': 'Quản lý kho',
             'icon': 'fas fa-warehouse',
@@ -50,6 +51,17 @@ def menu_context(request):
                 {'name': 'Quản lý kho', 'url': 'warehouse_list', 'icon': 'fas fa-warehouse', 'active': False},
                 {'name': 'Vị trí dãy', 'url': 'warehouse_row_list', 'icon': 'fas fa-th-list', 'active': False},
                 {'name': 'Vị trí cột', 'url': 'warehouse_column_list', 'icon': 'fas fa-columns', 'active': False},
+            ]
+        },
+        'user_management': {
+            'name': 'Quản lý người dùng',
+            'icon': 'fas fa-users-cog',
+            'active': False,
+            'open': False,
+            'items': [
+                {'name': 'Danh sách người dùng', 'url': 'user_list', 'icon': 'fas fa-users', 'active': False},
+                {'name': 'Thêm người dùng', 'url': 'user_create', 'icon': 'fas fa-user-plus', 'active': False},
+                {'name': 'Hồ sơ cá nhân', 'url': 'profile_view', 'icon': 'fas fa-user-circle', 'active': False},
             ]
         }
     }
@@ -112,6 +124,18 @@ def menu_context(request):
             menu['inventory']['items'][8]['active'] = True
         elif 'warehouse_column_list' in path or 'warehouse-columns/' in path:
             menu['inventory']['items'][9]['active'] = True
+    
+    # User management section
+    if '/users/' in path or '/profile' in path:
+        menu['user_management']['active'] = True
+        menu['user_management']['open'] = True
+        
+        if 'user_list' in path or ('/users/' in path and 'create' not in path and 'edit' not in path and 'delete' not in path):
+            menu['user_management']['items'][0]['active'] = True
+        elif 'user_create' in path or '/users/create' in path:
+            menu['user_management']['items'][1]['active'] = True
+        elif '/profile' in path:
+            menu['user_management']['items'][2]['active'] = True
     
     return {
         'menu': menu

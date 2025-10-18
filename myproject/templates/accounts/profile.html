@@ -1,26 +1,13 @@
-{% extends 'base_dashboard.html' %}
+{% extends 'base.html' %}
 {% load static %}
 {% load crispy_forms_tags %}
 
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@x.x.x/dist/select2-bootstrap4.min.css">
+{% endblock %}
+
 {% block content %}
-<div class="content-wrapper">
-    <!-- Content Header (Page header) -->
-    <div class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1 class="m-0">Thông tin cá nhân</h1>
-                </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Trang chủ</a></li>
-                        <li class="breadcrumb-item active">Thông tin cá nhân</li>
-                    </ol>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- /.content-header -->
 
     <!-- Main content -->
     <section class="content">
@@ -59,6 +46,12 @@
                                 <li class="list-group-item">
                                     <b>Số điện thoại</b> <a class="float-right">{{ user.phone|default:"Chưa cập nhật" }}</a>
                                 </li>
+                                <li class="list-group-item">
+                                    <b>Người quản lý</b> <a class="float-right">{{ user.manager_name|default:"Chưa cập nhật" }}</a>
+                                </li>
+                                <li class="list-group-item">
+                                    <b>Email người quản lý</b> <a class="float-right">{{ user.manager_email|default:"Chưa cập nhật" }}</a>
+                                </li>
                             </ul>
                         </div>
                         <!-- /.card-body -->
@@ -67,10 +60,20 @@
                 </div>
                 <!-- /.col -->
                 <div class="col-md-8">
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                    
                     <div class="card">
                         <div class="card-header p-2">
                             <ul class="nav nav-pills">
                                 <li class="nav-item"><a class="nav-link active" href="#settings" data-toggle="tab">Cập nhật thông tin</a></li>
+                                <li class="nav-item"><a class="nav-link" href="#password" data-toggle="tab">Đổi mật khẩu</a></li>
                             </ul>
                         </div><!-- /.card-header -->
                         <div class="card-body">
@@ -78,10 +81,25 @@
                                 <div class="active tab-pane" id="settings">
                                     <form class="form-horizontal" method="post" enctype="multipart/form-data">
                                         {% csrf_token %}
+                                        <input type="hidden" name="form_type" value="profile">
                                         {{ form|crispy }}
                                         <div class="form-group row">
                                             <div class="offset-sm-2 col-sm-10">
                                                 <button type="submit" class="btn btn-primary">Cập nhật</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <!-- /.tab-pane -->
+                                
+                                <div class="tab-pane" id="password">
+                                    <form class="form-horizontal" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="form_type" value="password">
+                                        {{ password_form|crispy }}
+                                        <div class="form-group row">
+                                            <div class="offset-sm-2 col-sm-10">
+                                                <button type="submit" class="btn btn-danger">Đổi mật khẩu</button>
                                             </div>
                                         </div>
                                     </form>
@@ -98,6 +116,19 @@
             <!-- /.row -->
         </div><!-- /.container-fluid -->
     </section>
-    <!-- /.content -->
-</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Khởi tạo Select2 cho dropdown người quản lý
+        $('#id_manager').select2({
+            theme: 'bootstrap4',
+            placeholder: 'Chọn người quản lý',
+            allowClear: true,
+            width: '100%'
+        });
+    });
+</script>
 {% endblock %}
