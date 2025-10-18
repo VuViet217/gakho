@@ -31,6 +31,7 @@ urlpatterns = [
     path('inventory/', include('inventory.urls')),
     path('system/', include('system_settings.urls')),
     path('logout/', LogoutView.as_view(), name='logout'),
+    path('summernote/', include('django_summernote.urls')),
 ]
 
 # Serve media and static files in development

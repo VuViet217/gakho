@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<!-- CodeMirror -->
+<link rel="stylesheet" href="{% static 'plugins/codemirror/codemirror.css' %}">
+<link rel="stylesheet" href="{% static 'plugins/codemirror/theme/monokai.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>{{ title }}</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'email_template_list' %}">Quản lý mẫu email</a></li>
+                    <li class="breadcrumb-item active">{{ title }}</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Thông tin mẫu email -->
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Thông tin mẫu email</h3>
+                    </div>
+                    <div class="card-body">
+                        <dl>
+                            <dt>Mã mẫu</dt>
+                            <dd><code>{{ template.code }}</code></dd>
+                            
+                            <dt>Loại mẫu</dt>
+                            <dd>{{ template.get_type_display }}</dd>
+                            
+                            <dt>Tiêu đề</dt>
+                            <dd>{{ template.subject }}</dd>
+                            
+                            <dt>Trạng thái</dt>
+                            <dd>
+                                {% if template.is_active %}
+                                <span class="badge badge-success">Hoạt động</span>
+                                {% else %}
+                                <span class="badge badge-secondary">Không hoạt động</span>
+                                {% endif %}
+                            </dd>
+                            
+                            <dt>Định dạng</dt>
+                            <dd>
+                                {% if template.is_html %}
+                                <span class="badge badge-info">HTML</span>
+                                {% else %}
+                                <span class="badge badge-secondary">Text</span>
+                                {% endif %}
+                            </dd>
+                        </dl>
+                        
+                        {% if available_variables %}
+                        <h5>Các biến có thể sử dụng:</h5>
+                        <ul>
+                            {% for var in available_variables %}
+                            <li><code>{{ var }}</code></li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Form test email -->
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Gửi email test</h3>
+                    </div>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="card-body">
+                            {{ form|crispy }}
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane"></i> Gửi email test
+                            </button>
+                            <a href="{% url 'email_template_list' %}" class="btn btn-default">
+                                <i class="fas fa-arrow-left"></i> Quay lại
+                            </a>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Preview -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Xem trước email</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <strong>Tiêu đề:</strong>
+                            <div class="border p-2 rounded">{{ preview_subject }}</div>
+                        </div>
+                        
+                        <div>
+                            <strong>Nội dung:</strong>
+                            <div class="border p-2 rounded">
+                                <iframe id="preview-frame" style="width:100%; min-height:300px; border:none;"></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<!-- CodeMirror -->
+<script src="{% static 'plugins/codemirror/codemirror.js' %}"></script>
+<script src="{% static 'plugins/codemirror/mode/javascript/javascript.js' %}"></script>
+
+<script>
+    $(function() {
+        // Hiển thị preview trong iframe
+        const previewFrame = document.getElementById('preview-frame');
+        const previewContent = `{{ preview_content|safe|escapejs }}`;
+        
+        if (previewFrame.contentWindow) {
+            previewFrame.contentWindow.document.open();
+            previewFrame.contentWindow.document.write(previewContent);
+            previewFrame.contentWindow.document.close();
+            
+            // Điều chỉnh chiều cao iframe dựa trên nội dung
+            setTimeout(() => {
+                const height = previewFrame.contentWindow.document.body.scrollHeight;
+                previewFrame.style.height = (height + 20) + 'px';
+            }, 100);
+        }
+        
+        // Nếu có textarea chứa JSON dữ liệu test, sử dụng CodeMirror để làm đẹp
+        if (document.getElementById('id_test_data')) {
+            const editor = CodeMirror.fromTextArea(document.getElementById('id_test_data'), {
+                mode: "application/json",
+                theme: "monokai",
+                lineNumbers: true,
+                autoCloseBrackets: true,
+                matchBrackets: true,
+                lineWrapping: true,
+                foldGutter: true,
+                gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
+            });
+            
+            editor.setSize(null, 200);
+        }
+    });
+</script>
+{% endblock %}

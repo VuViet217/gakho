@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<!-- Summernote CSS -->
+<link href="{% static 'plugins/summernote/summernote-bs4.min.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>{{ title }}</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'email_template_list' %}">Quản lý mẫu email</a></li>
+                    <li class="breadcrumb-item active">{{ title }}</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">{% if is_new %}Tạo mẫu email mới{% else %}Chỉnh sửa mẫu email{% endif %}</h3>
+                    </div>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {{ form.code|as_crispy_field }}
+                                    {{ form.name|as_crispy_field }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form.type|as_crispy_field }}
+                                    {{ form.is_active|as_crispy_field }}
+                                    {{ form.is_html|as_crispy_field }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    {{ form.subject|as_crispy_field }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    {{ form.content|as_crispy_field }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    {{ form.description|as_crispy_field }}
+                                </div>
+                            </div>
+
+                            <!-- Hiển thị các biến có thể dùng -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h3 class="card-title">Các biến có thể sử dụng trong mẫu</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <div id="variable-list" class="alert alert-info">
+                                                <p>Các biến sẽ hiển thị ở đây khi bạn thêm vào nội dung template...</p>
+                                            </div>
+                                            <p class="text-muted">Để sử dụng biến trong mẫu email, hãy đặt tên biến trong cặp dấu ngoặc nhọn kép. Ví dụ: <code>{{full_name}}</code>, <code>{{request_id}}</code></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Lưu
+                            </button>
+                            <a href="{% url 'email_template_list' %}" class="btn btn-default">
+                                <i class="fas fa-times"></i> Hủy
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(function() {
+        // Lắng nghe sự kiện thay đổi từ iframe của Summernote
+        const observer = new MutationObserver(function(mutations) {
+            // Lấy nội dung hiện tại từ iframe Summernote
+            const content = $('[name="content"]').val();
+            if (content) {
+                extractVariables(content);
+            }
+        });
+
+        // Cài đặt observer cho iframe của Summernote (sau khi nó được tạo)
+        setTimeout(function() {
+            const summernoteFrame = $('.note-editable').get(0);
+            if (summernoteFrame) {
+                observer.observe(summernoteFrame, {
+                    childList: true,
+                    characterData: true,
+                    subtree: true
+                });
+            }
+        }, 1000);
+
+        // Extract variables on page load
+        setTimeout(function() {
+            const content = $('[name="content"]').val();
+            if (content) {
+                extractVariables(content);
+            }
+        }, 500);
+
+        // Function to extract variables from content
+        function extractVariables(content) {
+            $.ajax({
+                url: "{% url 'get_template_variables' %}",
+                type: "POST",
+                data: JSON.stringify({ content: content }),
+                contentType: "application/json",
+                headers: {
+                    "X-CSRFToken": $("[name=csrfmiddlewaretoken]").val()
+                },
+                success: function(response) {
+                    let variableHtml = '';
+                    if (response.variables && response.variables.length > 0) {
+                        variableHtml = '<p><strong>Biến đã phát hiện:</strong></p><ul>';
+                        response.variables.forEach(function(variable) {
+                            variableHtml += '<li><code>{{' + variable + '}}</code></li>';
+                        });
+                        variableHtml += '</ul>';
+                    } else {
+                        variableHtml = '<p>Không tìm thấy biến nào trong mẫu.</p>';
+                    }
+                    $("#variable-list").html(variableHtml);
+                },
+                error: function() {
+                    $("#variable-list").html('<p class="text-danger">Lỗi khi phân tích biến trong mẫu.</p>');
+                }
+            });
+        }
+
+        // Thêm sự kiện summernote để đảm bảo trích xuất biến khi có thay đổi
+        $('[name="content"]').on('summernote.change', function() {
+            const content = $(this).val();
+            extractVariables(content);
+        });
+    });
+</script>
+{% endblock %}

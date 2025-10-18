@@ -2,6 +2,7 @@ from django.core.mail import send_mail, EmailMessage
 from django.conf import settings
 from django.utils import timezone
 from .models import EmailConfiguration
+from .utils import render_email_template
 import logging
 
 logger = logging.getLogger(__name__)

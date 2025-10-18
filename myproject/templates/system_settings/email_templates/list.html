@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Ẩn breadcrumb trùng lặp (áp dụng chỉ cho trang này) */
+.breadcrumb:nth-of-type(2),
+.breadcrumb-info {
+    display: none !important;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                {% if not hide_header_title %}
+                <h1>{{ title }}</h1>
+                {% endif %}
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">{{ title }}</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+// Xóa breadcrumb trùng lặp khi trang được tải
+document.addEventListener('DOMContentLoaded', function() {
+    // Tìm và xóa breadcrumb trùng lặp (breadcrumb thứ 2)
+    const breadcrumbs = document.querySelectorAll('.breadcrumb');
+    if (breadcrumbs.length > 1) {
+        const duplicateBreadcrumb = document.querySelector('a[href="/dashboard/"] + .breadcrumb');
+        if (duplicateBreadcrumb) {
+            duplicateBreadcrumb.closest('.row').remove();
+        }
+    }
+});
+</script>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-tools">
+                            <a href="{% url 'email_template_create' %}" class="btn btn-success btn-sm">
+                                <i class="fas fa-plus"></i> Thêm mẫu mới
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        {% for type_name, templates in template_groups.items %}
+                        <h5>{{ type_name }}</h5>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 20%">Mẫu</th>
+                                        <th style="width: 15%">Mã</th>
+                                        <th style="width: 40%">Tiêu đề</th>
+                                        <th style="width: 10%">Trạng thái</th>
+                                        <th style="width: 15%">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for template in templates %}
+                                    <tr>
+                                        <td>{{ template.name }}</td>
+                                        <td><code>{{ template.code }}</code></td>
+                                        <td>{{ template.subject }}</td>
+                                        <td>
+                                            {% if template.is_active %}
+                                            <span class="badge badge-success">Hoạt động</span>
+                                            {% else %}
+                                            <span class="badge badge-secondary">Không hoạt động</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <a href="{% url 'email_template_edit' template_id=template.id %}" class="btn btn-info btn-sm" title="Chỉnh sửa">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="{% url 'email_template_test' template_id=template.id %}" class="btn btn-primary btn-sm" title="Gửi test">
+                                                    <i class="fas fa-paper-plane"></i>
+                                                </a>
+                                                <a href="{% url 'email_template_delete' template_id=template.id %}" class="btn btn-danger btn-sm" title="Xóa">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="5" class="text-center">Chưa có mẫu email nào trong loại này</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <hr>
+                        {% empty %}
+                        <div class="alert alert-info">
+                            <p class="mb-0">Chưa có mẫu email nào được tạo. Vui lòng nhấn nút "Thêm mẫu mới" để tạo mẫu đầu tiên.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
