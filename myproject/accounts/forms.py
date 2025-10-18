@@ -254,11 +254,11 @@ class UserProfileForm(forms.ModelForm):
         self.fields['last_name'].required = True
         
         # Thiết lập queryset cho manager (tất cả users trừ chính mình)
-        # Chỉ hiển thị users có vai trò SM, admin, manager
+        # Hiển thị tất cả người dùng đang hoạt động
         if self.instance and self.instance.pk:
             self.fields['manager'].queryset = User.objects.filter(
-                role__in=['sm', 'admin', 'manager']
-            ).exclude(pk=self.instance.pk).order_by('first_name', 'last_name')
+                is_active=True
+            ).exclude(pk=self.instance.pk).order_by('first_name', 'last_name', 'username')
             self.fields['manager'].required = False
     
     def save(self, commit=True):

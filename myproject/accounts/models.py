@@ -43,8 +43,7 @@ class User(AbstractUser):
         null=True,
         blank=True,
         related_name='subordinates',
-        verbose_name='Người quản lý',
-        limit_choices_to={'role__in': ['sm', 'admin', 'manager']}
+        verbose_name='Người quản lý'
     )
     
     # Thông tin liên hệ người quản lý
