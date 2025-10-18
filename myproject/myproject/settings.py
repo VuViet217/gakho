@@ -107,7 +107,10 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'accounts.validators.validate_minimum_length',
+        'NAME': 'accounts.validators.MinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 6,
+        }
     },
 ]
 
