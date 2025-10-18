@@ -558,6 +558,47 @@ def inventory_request_approve(request, request_id):
 
 
 @login_required
+def inventory_request_reject(request, request_id):
+    """Từ chối yêu cầu cấp phát"""
+    
+    request_obj = get_object_or_404(InventoryRequest, id=request_id)
+    
+    # Kiểm tra quyền từ chối
+    if request.user != request_obj.requester.manager or request_obj.status != InventoryRequest.STATUS_PENDING:
+        messages.error(request, 'Bạn không có quyền từ chối yêu cầu này hoặc yêu cầu không ở trạng thái chờ phê duyệt.')
+        return redirect('inventory_requests:inventory_request_detail', request_id=request_obj.id)
+    
+    if request.method == 'POST':
+        rejection_reason = request.POST.get('rejection_reason', '')
+        
+        if rejection_reason:
+            # Từ chối yêu cầu
+            request_obj.reject(request.user, rejection_reason)
+            
+            # Gửi email thông báo đã bị từ chối (không làm gián đoạn nếu lỗi)
+            try:
+                send_template_email(
+                    recipient_list=[request_obj.requester.email],
+                    template_code='request_rejected',
+                    context_data={
+                        'request': request_obj,
+                        'user': request_obj.requester,
+                        'approver': request.user,
+                        'rejection_reason': rejection_reason,
+                    }
+                )
+            except Exception as e:
+                logger.error(f"Không thể gửi email thông báo từ chối: {str(e)}")
+            
+            messages.warning(request, 'Yêu cầu cấp phát đã bị từ chối.')
+        else:
+            messages.error(request, 'Vui lòng nhập lý do từ chối.')
+            return redirect('inventory_requests:my_approval_requests')
+    
+    return redirect('inventory_requests:my_approval_requests')
+
+
+@login_required
 @role_required(['sm', 'admin', 'manager'])
 def warehouse_requests_list(request):
     """Danh sách yêu cầu cấp phát đã được phê duyệt cho quản lý kho"""

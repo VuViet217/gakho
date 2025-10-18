@@ -16,6 +16,7 @@ urlpatterns = [
     
     # Phê duyệt yêu cầu
     path('<int:request_id>/approve/', views.inventory_request_approve, name='inventory_request_approve'),
+    path('<int:request_id>/reject/', views.inventory_request_reject, name='request_reject'),
     
     # Quản lý kho lên lịch và hoàn thành yêu cầu
     path('warehouse-requests/', views.warehouse_requests_list, name='warehouse_requests_list'),
