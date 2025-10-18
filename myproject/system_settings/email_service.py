@@ -84,7 +84,7 @@ def send_test_email(recipient, subject, message):
         
         return False, f"Lỗi khi gửi email: {error_message}"
 
-def send_system_email(recipient_list, subject, message, html_message=None, attachments=None):
+def send_system_email(recipient_list, subject, message, html_message=None, attachments=None, cc_list=None):
     """
     Gửi email từ hệ thống với cấu hình trong database.
     
@@ -94,6 +94,7 @@ def send_system_email(recipient_list, subject, message, html_message=None, attac
         message: Nội dung email dạng text
         html_message: Nội dung email dạng HTML (tùy chọn)
         attachments: Danh sách đường dẫn đến file đính kèm
+        cc_list: Danh sách địa chỉ email CC (tùy chọn)
         
     Returns:
         tuple: (success, error_message)
@@ -109,6 +110,8 @@ def send_system_email(recipient_list, subject, message, html_message=None, attac
         
         logger.info(f"Đang kết nối đến SMTP server: {config.smtp_host}:{config.smtp_port}")
         logger.info(f"Gửi email từ: {config.from_email} đến: {recipient_list}")
+        if cc_list:
+            logger.info(f"CC: {cc_list}")
         
         # Tạo kết nối SMTP với cấu hình từ database - tăng timeout lên 120 giây
         connection = get_connection(
@@ -127,6 +130,7 @@ def send_system_email(recipient_list, subject, message, html_message=None, attac
             body=html_message or message,
             from_email=config.from_email,
             to=recipient_list,
+            cc=cc_list,
             connection=connection
         )
         

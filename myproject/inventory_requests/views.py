@@ -503,33 +503,75 @@ def inventory_request_approve(request, request_id):
                 # Phê duyệt yêu cầu
                 request_obj.approve(request.user, note)
                 
-                # Gửi email thông báo đã được phê duyệt
-                send_template_email(
-                    recipient_list=[request_obj.requester.email],
-                    template_code='request_approved',
-                    context_data={
-                        'request': request_obj,
-                        'user': request_obj.requester,
-                        'approver': request.user,
-                    }
-                )
+                # Chuẩn bị danh sách CC (manager của người tạo yêu cầu)
+                cc_list = []
+                if request_obj.requester.manager and request_obj.requester.manager.email:
+                    cc_list.append(request_obj.requester.manager.email)
+                
+                # Gửi email thông báo đã được phê duyệt cho người tạo yêu cầu (CC manager)
+                try:
+                    send_template_email(
+                        recipient_list=[request_obj.requester.email],
+                        template_code='request_approved',
+                        context_data={
+                            'request': request_obj,
+                            'user': request_obj.requester,
+                            'approver': request.user,
+                        },
+                        cc_list=cc_list if cc_list else None
+                    )
+                except Exception as e:
+                    logger.error(f"Lỗi gửi email phê duyệt cho người tạo yêu cầu: {e}")
+                
+                # Gửi email thông báo cho quản lý kho (SM/Admin) để xử lý xuất kho
+                from accounts.models import User
+                warehouse_managers = User.objects.filter(
+                    role__in=['sm', 'admin'],
+                    is_active=True,
+                    email__isnull=False
+                ).exclude(email='')
+                
+                warehouse_manager_emails = [wm.email for wm in warehouse_managers]
+                
+                if warehouse_manager_emails:
+                    try:
+                        send_template_email(
+                            recipient_list=warehouse_manager_emails,
+                            template_code='pending_approval',
+                            context_data={
+                                'request': request_obj,
+                                'user': warehouse_managers.first(),  # User đại diện cho email
+                                'approver': request.user,
+                            }
+                        )
+                    except Exception as e:
+                        logger.error(f"Lỗi gửi email cho quản lý kho: {e}")
                 
                 messages.success(request, 'Yêu cầu cấp phát đã được phê duyệt.')
             else:
                 # Từ chối yêu cầu
                 request_obj.reject(request.user, rejection_reason)
                 
-                # Gửi email thông báo đã bị từ chối
-                send_template_email(
-                    recipient_list=[request_obj.requester.email],
-                    template_code='request_rejected',
-                    context_data={
-                        'request': request_obj,
-                        'user': request_obj.requester,
-                        'approver': request.user,
-                        'rejection_reason': rejection_reason,
-                    }
-                )
+                # Chuẩn bị danh sách CC (manager của người tạo yêu cầu)
+                cc_list = []
+                if request_obj.requester.manager and request_obj.requester.manager.email:
+                    cc_list.append(request_obj.requester.manager.email)
+                
+                # Gửi email thông báo đã bị từ chối (CC manager)
+                try:
+                    send_template_email(
+                        recipient_list=[request_obj.requester.email],
+                        template_code='request_rejected',
+                        context_data={
+                            'request': request_obj,
+                            'user': request_obj.requester,
+                            'approver': request.user,
+                            'rejection_reason': rejection_reason,
+                        },
+                        cc_list=cc_list if cc_list else None
+                    )
+                except Exception as e:
+                    logger.error(f"Lỗi gửi email từ chối yêu cầu: {e}")
                 
                 messages.warning(request, 'Yêu cầu cấp phát đã bị từ chối.')
             
@@ -564,6 +606,11 @@ def inventory_request_reject(request, request_id):
             # Từ chối yêu cầu
             request_obj.reject(request.user, rejection_reason)
             
+            # Chuẩn bị danh sách CC (manager của người tạo yêu cầu)
+            cc_list = []
+            if request_obj.requester.manager and request_obj.requester.manager.email:
+                cc_list.append(request_obj.requester.manager.email)
+            
             # Gửi email thông báo đã bị từ chối (không làm gián đoạn nếu lỗi)
             try:
                 send_template_email(
@@ -574,7 +621,8 @@ def inventory_request_reject(request, request_id):
                         'user': request_obj.requester,
                         'approver': request.user,
                         'rejection_reason': rejection_reason,
-                    }
+                    },
+                    cc_list=cc_list if cc_list else None
                 )
             except Exception as e:
                 logger.error(f"Không thể gửi email thông báo từ chối: {str(e)}")

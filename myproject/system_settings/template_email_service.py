@@ -1,7 +1,7 @@
 from .utils import render_email_template
 from .email_service import send_system_email
 
-def send_template_email(recipient_list, template_code, context_data, attachments=None):
+def send_template_email(recipient_list, template_code, context_data, attachments=None, cc_list=None):
     """
     Gửi email dựa trên mẫu đã định nghĩa.
     
@@ -10,6 +10,7 @@ def send_template_email(recipient_list, template_code, context_data, attachments
         template_code: Mã mẫu email cần sử dụng
         context_data: Dict chứa dữ liệu để render vào mẫu
         attachments: Danh sách đường dẫn đến file đính kèm
+        cc_list: Danh sách địa chỉ email CC (list hoặc string)
         
     Returns:
         tuple: (success, error_message)
@@ -17,6 +18,10 @@ def send_template_email(recipient_list, template_code, context_data, attachments
     # Chuyển đổi recipient thành list nếu là string
     if isinstance(recipient_list, str):
         recipient_list = [recipient_list]
+    
+    # Chuyển đổi cc_list thành list nếu là string
+    if cc_list and isinstance(cc_list, str):
+        cc_list = [cc_list]
     
     # Render mẫu email
     subject, html_content, text_content = render_email_template(template_code, context_data)
@@ -30,5 +35,6 @@ def send_template_email(recipient_list, template_code, context_data, attachments
         subject=subject,
         message=text_content,
         html_message=html_content,
-        attachments=attachments
+        attachments=attachments,
+        cc_list=cc_list
     )
