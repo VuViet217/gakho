@@ -346,8 +346,8 @@
             let newRow = template.replace(/__prefix__/g, employeeCounter);
             $('#employeeTable tbody').append(newRow);
             
-            // Update management form
-            let mgmtTotal = $('#id_employee_set-TOTAL_FORMS');
+            // Update management form - FIX: Sử dụng đúng prefix 'request_employees'
+            let mgmtTotal = $('#id_request_employees-TOTAL_FORMS');
             mgmtTotal.val(parseInt(mgmtTotal.val()) + 1);
             
             // Initialize select2 for new row
@@ -370,8 +370,8 @@
             let newRow = template.replace(/__prefix__/g, itemCounter);
             $('#itemTable tbody').append(newRow);
             
-            // Update management form
-            let mgmtTotal = $('#id_item_set-TOTAL_FORMS');
+            // Update management form - FIX: Sử dụng đúng prefix 'items'
+            let mgmtTotal = $('#id_items-TOTAL_FORMS');
             mgmtTotal.val(parseInt(mgmtTotal.val()) + 1);
             
             // Initialize select2 for new row
@@ -400,8 +400,8 @@
             // Thêm hàng mới vào bảng
             $('#employeeProductTable tbody').append(newRow);
             
-            // Update management form
-            let mgmtTotal = $('#id_employee_product_set-TOTAL_FORMS');
+            // Update management form - FIX: Sử dụng đúng prefix 'employee_products'
+            let mgmtTotal = $('#id_employee_products-TOTAL_FORMS');
             mgmtTotal.val(parseInt(mgmtTotal.val()) + 1);
             
             // Khởi tạo select2 cho các dropdown trong hàng mới vừa thêm

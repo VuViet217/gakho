@@ -124,10 +124,21 @@ def inventory_request_create(request):
             item_formset = RequestItemFormSet(request.POST, instance=request_obj)
             employee_product_formset = EmployeeProductFormSet(request.POST, instance=request_obj)
             
+            # Debug: Kiểm tra số lượng form trong formset
+            print(f"DEBUG: Total forms in employee_product_formset: {len(employee_product_formset.forms)}")
+            for i, form in enumerate(employee_product_formset.forms):
+                if form.cleaned_data if hasattr(form, 'cleaned_data') else None:
+                    print(f"DEBUG: Form {i} data: {form.cleaned_data}")
+            
             # Validate các formset
             employee_valid = employee_formset.is_valid()
             item_valid = item_formset.is_valid()
             employee_product_valid = employee_product_formset.is_valid()
+            
+            # Debug: Hiển thị lỗi nếu có
+            if not employee_product_valid:
+                print(f"DEBUG: employee_product_formset errors: {employee_product_formset.errors}")
+                print(f"DEBUG: employee_product_formset non_form_errors: {employee_product_formset.non_form_errors()}")
             
             if employee_valid and item_valid and employee_product_valid:
                 with transaction.atomic():
