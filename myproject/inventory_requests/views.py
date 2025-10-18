@@ -81,13 +81,12 @@ def my_requests_list(request):
 def my_approvals_list(request):
     """Danh sách yêu cầu cần tôi phê duyệt"""
     
-    # Chỉ quản lý mới thấy yêu cầu cần phê duyệt
-    if not (request.user.is_superuser or request.user.role in ['sm', 'admin', 'manager']):
-        messages.error(request, 'Bạn không có quyền truy cập chức năng này.')
-        return redirect('inventory_requests:my_requests')
-    
-    # Lấy danh sách nhân viên dưới quyền
+    # Lấy danh sách nhân viên dưới quyền (những người có mình là manager)
     subordinates = request.user.subordinates.all()
+    
+    # Nếu không có nhân viên dưới quyền, thông báo
+    if not subordinates.exists():
+        messages.info(request, 'Bạn chưa có nhân viên nào dưới quyền cần phê duyệt.')
     
     # Lấy các yêu cầu chờ phê duyệt của nhân viên dưới quyền
     requests = InventoryRequest.objects.filter(
@@ -103,6 +102,7 @@ def my_approvals_list(request):
     context = {
         'requests': requests,
         'title': 'Yêu cầu cần phê duyệt',
+        'subordinates_count': subordinates.count(),
     }
     
     return render(request, 'inventory_requests/my_approvals.html', context)
