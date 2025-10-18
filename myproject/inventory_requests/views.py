@@ -171,6 +171,7 @@ def inventory_request_create(request):
                         context_data={
                             'request': request_obj,
                             'user': request.user,
+                            'employee_products': request_obj.employee_products.all(),
                         }
                     )
                     

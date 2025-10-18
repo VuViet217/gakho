@@ -35,17 +35,33 @@ def send_test_email(recipient, subject, message):
         return False, "Không tìm thấy cấu hình email nào đang hoạt động"
     
     try:
+        # Import get_connection để tạo kết nối SMTP với cấu hình từ database
+        from django.core.mail import get_connection
+        
+        # In ra thông tin debug
+        logger.info(f"SMTP Info - Host: {config.smtp_host}, Port: {config.smtp_port}")
+        logger.info(f"SMTP Auth - User: {config.smtp_username}, TLS: {config.use_tls}, SSL: {config.use_ssl}")
+        
+        # Tạo kết nối SMTP với cấu hình từ database
+        connection = get_connection(
+            backend='django.core.mail.backends.smtp.EmailBackend',
+            host=config.smtp_host,
+            port=config.smtp_port,
+            username=config.smtp_username if config.auth_method == 'normal' else None,
+            password=config.smtp_password if config.auth_method == 'normal' else None,
+            use_tls=config.use_tls,
+            use_ssl=config.use_ssl,
+            timeout=config.smtp_timeout / 1000 if config.smtp_timeout else 60,
+        )
+        
         # Gửi email với nhiều thông tin debug hơn
         email = EmailMessage(
             subject=subject,
             body=message,
             from_email=config.from_email,
             to=[recipient],
+            connection=connection
         )
-        
-        # In ra thông tin debug
-        logger.info(f"SMTP Info - Host: {settings.EMAIL_HOST}, Port: {settings.EMAIL_PORT}")
-        logger.info(f"SMTP Auth - User: {settings.EMAIL_HOST_USER}, TLS: {settings.EMAIL_USE_TLS}, SSL: {settings.EMAIL_USE_SSL}")
         
         # Thử gửi với timeout dài hơn
         email.send(fail_silently=False)
@@ -87,11 +103,27 @@ def send_system_email(recipient_list, subject, message, html_message=None, attac
         return False, "Không tìm thấy cấu hình email nào đang hoạt động"
     
     try:
+        # Import get_connection để tạo kết nối SMTP với cấu hình từ database
+        from django.core.mail import get_connection
+        
+        # Tạo kết nối SMTP với cấu hình từ database
+        connection = get_connection(
+            backend='django.core.mail.backends.smtp.EmailBackend',
+            host=config.smtp_host,
+            port=config.smtp_port,
+            username=config.smtp_username if config.auth_method == 'normal' else None,
+            password=config.smtp_password if config.auth_method == 'normal' else None,
+            use_tls=config.use_tls,
+            use_ssl=config.use_ssl,
+            timeout=config.smtp_timeout / 1000 if config.smtp_timeout else 60,
+        )
+        
         email = EmailMessage(
             subject=subject,
             body=html_message or message,
             from_email=config.from_email,
-            to=recipient_list
+            to=recipient_list,
+            connection=connection
         )
         
         if html_message:

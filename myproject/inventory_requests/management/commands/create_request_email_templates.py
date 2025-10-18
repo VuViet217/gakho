@@ -11,18 +11,261 @@ class Command(BaseCommand):
                 'code': 'request_created',
                 'type': 'notification',
                 'name': 'Thông báo tạo yêu cầu mới',
-                'subject': 'Yêu cầu cấp phát mới #{{ request.request_code }} đã được tạo',
-                'content': '''<p>Kính gửi {{ user.get_full_name }},</p>
-<p>Yêu cầu cấp phát của bạn đã được tạo thành công và đã được gửi đến người phê duyệt.</p>
-<p><strong>Thông tin yêu cầu:</strong></p>
-<ul>
-    <li>Mã yêu cầu: {{ request.request_code }}</li>
-    <li>Tiêu đề: {{ request.title }}</li>
-    <li>Trạng thái: Chờ phê duyệt</li>
-    <li>Ngày mong muốn nhận: {{ request.expected_date|date:"d/m/Y" }}</li>
-</ul>
-<p>Bạn có thể theo dõi trạng thái yêu cầu trong phần "Yêu cầu của tôi".</p>
-<p>Trân trọng,<br>Hệ thống Quản lý Kho</p>''',
+                'subject': 'Yêu cầu cấp phát #{{ request.request_code }} đã được tạo thành công',
+                'content': '''<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yêu cầu cấp phát mới</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .content {
+            padding: 30px;
+        }
+        .greeting {
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: #555;
+        }
+        .info-box {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .info-box h3 {
+            margin-top: 0;
+            color: #667eea;
+            font-size: 18px;
+        }
+        .info-row {
+            display: flex;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        .info-label {
+            font-weight: 600;
+            width: 180px;
+            color: #555;
+        }
+        .info-value {
+            flex: 1;
+            color: #333;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            background: #ffc107;
+            color: #000;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .table-container {
+            margin: 30px 0;
+        }
+        .table-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background: white;
+        }
+        thead {
+            background: #667eea;
+            color: white;
+        }
+        th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 14px;
+        }
+        tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            text-align: center;
+            color: #777;
+            font-size: 14px;
+            border-top: 1px solid #e0e0e0;
+        }
+        .footer p {
+            margin: 5px 0;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #667eea;
+            color: white !important;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 600;
+            margin: 20px 0;
+            transition: background 0.3s;
+        }
+        .button:hover {
+            background: #5568d3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Yêu cầu cấp phát đã được tạo thành công</h1>
+        </div>
+        
+        <div class="content">
+            <div class="greeting">
+                Kính gửi <strong>{{ user.get_full_name }}</strong>,
+            </div>
+            
+            <p>Yêu cầu cấp phát của bạn đã được tạo thành công và đã được gửi đến người phê duyệt để xem xét.</p>
+            
+            <div class="info-box">
+                <h3>Thông tin yêu cầu</h3>
+                <div class="info-row">
+                    <div class="info-label">Mã yêu cầu:</div>
+                    <div class="info-value"><strong>{{ request.request_code }}</strong></div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Tiêu đề:</div>
+                    <div class="info-value">{{ request.title }}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Trạng thái:</div>
+                    <div class="info-value"><span class="status-badge">Chờ phê duyệt</span></div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Ngày tạo:</div>
+                    <div class="info-value">{{ request.created_at|date:"d/m/Y H:i" }}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Ngày mong muốn nhận:</div>
+                    <div class="info-value">{{ request.expected_date|date:"d/m/Y" }}</div>
+                </div>
+                {% if request.notes %}
+                <div class="info-row">
+                    <div class="info-label">Ghi chú:</div>
+                    <div class="info-value">{{ request.notes }}</div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="table-container">
+                <div class="table-title">Chi tiết phân bổ sản phẩm cho nhân viên</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 5%;">#</th>
+                            <th style="width: 30%;">Nhân viên</th>
+                            <th style="width: 35%;">Sản phẩm</th>
+                            <th style="width: 15%;" class="text-right">Số lượng</th>
+                            <th style="width: 15%;">Ghi chú</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in employee_products %}
+                        <tr>
+                            <td class="text-center">{{ forloop.counter }}</td>
+                            <td>
+                                <strong>{{ item.employee.full_name }}</strong><br>
+                                <small style="color: #777;">{{ item.employee.employee_code }}</small>
+                            </td>
+                            <td>
+                                <strong>{{ item.product.name }}</strong><br>
+                                <small style="color: #777;">Mã: {{ item.product.code }}</small>
+                            </td>
+                            <td class="text-right"><strong>{{ item.quantity }}</strong></td>
+                            <td>{{ item.notes|default:"—" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center" style="color: #999;">Chưa có phân bổ nào</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="note">
+                <strong>Lưu ý:</strong> Bạn có thể theo dõi trạng thái yêu cầu của mình trong phần <strong>"Yêu cầu của tôi"</strong> trên hệ thống. Bạn sẽ nhận được thông báo qua email khi yêu cầu được phê duyệt hoặc từ chối.
+            </div>
+            
+            <div style="text-align: center;">
+                <a href="#" class="button">Xem chi tiết yêu cầu</a>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>Hệ thống Quản lý Kho</strong></p>
+            <p>Email này được gửi tự động, vui lòng không trả lời.</p>
+            <p style="color: #999; font-size: 12px;">(c) 2025 OVNC Inventory Management System</p>
+        </div>
+    </div>
+</body>
+</html>''',
                 'is_active': True
             },
             
