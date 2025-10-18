@@ -166,23 +166,23 @@ def inventory_request_create(request):
                     
                     # Gửi email thông báo cho người tạo yêu cầu
                     send_template_email(
+                        recipient_list=[request.user.email],
                         template_code='request_created',
-                        context={
+                        context_data={
                             'request': request_obj,
                             'user': request.user,
-                        },
-                        to_email=[request.user.email],
+                        }
                     )
                     
                     # Gửi email cho người quản lý để phê duyệt
                     send_template_email(
+                        recipient_list=[request.user.manager.email],
                         template_code='pending_approval',
-                        context={
+                        context_data={
                             'request': request_obj,
                             'user': request.user,
                             'manager': request.user.manager,
-                        },
-                        to_email=[request.user.manager.email],
+                        }
                     )
                     
                     messages.success(request, f'Yêu cầu cấp phát đã được gửi đến người quản lý {request.user.manager.get_full_name()} để phê duyệt.')
@@ -278,23 +278,23 @@ def inventory_request_edit(request, request_id):
                 
                 # Gửi email thông báo cho người tạo yêu cầu
                 send_template_email(
+                    recipient_list=[request.user.email],
                     template_code='request_created',
-                    context={
+                    context_data={
                         'request': request_obj,
                         'user': request.user,
-                    },
-                    to_email=[request.user.email],
+                    }
                 )
                 
                 # Gửi email cho người quản lý để phê duyệt
                 send_template_email(
+                    recipient_list=[request.user.manager.email],
                     template_code='pending_approval',
-                    context={
+                    context_data={
                         'request': request_obj,
                         'user': request.user,
                         'manager': request.user.manager,
-                    },
-                    to_email=[request.user.manager.email],
+                    }
                 )
                 
                 messages.success(request, f'Yêu cầu cấp phát đã được gửi đến người quản lý {request.user.manager.get_full_name()} để phê duyệt.')
@@ -457,23 +457,23 @@ def inventory_request_submit(request, request_id):
     
     # Gửi email thông báo cho người tạo yêu cầu
     send_template_email(
+        recipient_list=[request.user.email],
         template_code='request_created',
-        context={
+        context_data={
             'request': request_obj,
             'user': request.user,
-        },
-        to_email=[request.user.email],
+        }
     )
     
     # Gửi email cho người quản lý để phê duyệt
     send_template_email(
+        recipient_list=[request.user.manager.email],
         template_code='pending_approval',
-        context={
+        context_data={
             'request': request_obj,
             'user': request.user,
             'manager': request.user.manager,
-        },
-        to_email=[request.user.manager.email],
+        }
     )
     
     messages.success(request, f'Yêu cầu cấp phát đã được gửi đến người quản lý {request.user.manager.get_full_name()} để phê duyệt.')
@@ -505,15 +505,13 @@ def inventory_request_approve(request, request_id):
                 
                 # Gửi email thông báo đã được phê duyệt
                 send_template_email(
+                    recipient_list=[request_obj.requester.email],
                     template_code='request_approved',
-                    context={
+                    context_data={
                         'request': request_obj,
                         'user': request_obj.requester,
                         'approver': request.user,
-                    },
-                    to_email=[request_obj.requester.email],
-                    # CC đến người quản lý kho
-                    cc_emails=[admin.email for admin in User.objects.filter(role__in=['sm', 'admin'])]
+                    }
                 )
                 
                 messages.success(request, 'Yêu cầu cấp phát đã được phê duyệt.')
@@ -523,14 +521,14 @@ def inventory_request_approve(request, request_id):
                 
                 # Gửi email thông báo đã bị từ chối
                 send_template_email(
+                    recipient_list=[request_obj.requester.email],
                     template_code='request_rejected',
-                    context={
+                    context_data={
                         'request': request_obj,
                         'user': request_obj.requester,
                         'approver': request.user,
                         'rejection_reason': rejection_reason,
-                    },
-                    to_email=[request_obj.requester.email],
+                    }
                 )
                 
                 messages.warning(request, 'Yêu cầu cấp phát đã bị từ chối.')
@@ -612,17 +610,14 @@ def inventory_request_schedule(request, request_id):
             
             # Gửi email thông báo đã lên lịch
             send_template_email(
+                recipient_list=[request_obj.requester.email],
                 template_code='warehouse_scheduled',
-                context={
+                context_data={
                     'request': request_obj,
                     'user': request_obj.requester,
                     'warehouse_manager': request.user,
                     'scheduled_date': scheduled_date,
-                },
-                to_email=[request_obj.requester.email],
-                cc_emails=[
-                    request_obj.approver.email if request_obj.approver else None,
-                ]
+                }
             )
             
             messages.success(request, 'Yêu cầu đã được lên lịch cấp phát thành công.')
@@ -684,16 +679,13 @@ def inventory_request_complete(request, request_id):
             
             # Gửi email thông báo đã hoàn thành
             send_template_email(
+                recipient_list=[request_obj.requester.email],
                 template_code='request_completed',
-                context={
+                context_data={
                     'request': request_obj,
                     'user': request_obj.requester,
                     'warehouse_manager': request.user,
-                },
-                to_email=[request_obj.requester.email],
-                cc_emails=[
-                    request_obj.approver.email if request_obj.approver else None,
-                ]
+                }
             )
             
             messages.success(request, 'Yêu cầu đã được đánh dấu hoàn thành thành công.')
