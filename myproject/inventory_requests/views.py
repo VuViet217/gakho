@@ -537,7 +537,7 @@ def inventory_request_approve(request, request_id):
                     try:
                         send_template_email(
                             recipient_list=warehouse_manager_emails,
-                            template_code='pending_approval',
+                            template_code='warehouse_approval_required',
                             context_data={
                                 'request': request_obj,
                                 'user': warehouse_managers.first(),  # User đại diện cho email
