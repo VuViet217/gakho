@@ -3,7 +3,7 @@
 
 {% block title %}{{ title }}{% endblock %}
 
-{% block content %}
+{% block content_header %}
 <section class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
@@ -20,8 +20,9 @@
         </div>
     </div>
 </section>
+{% endblock %}
 
-<section class="content">
+{% block content %}
     <div class="container-fluid">
         <!-- Chi tiết yêu cầu -->
         <div class="card">
