@@ -56,9 +56,10 @@ def menu_context(request):
             'items': [
                 {'name': 'Tạo yêu cầu mới', 'url': 'inventory_requests:inventory_request_create', 'icon': 'fas fa-plus', 'active': False},
                 {'name': 'Yêu cầu của tôi', 'url': 'inventory_requests:my_requests', 'icon': 'fas fa-clipboard-check', 'active': False},
-                {'name': 'Phê duyệt của tôi', 'url': 'inventory_requests:my_approval_requests', 'icon': 'fas fa-check-double', 'active': False},
+                {'name': 'Phê duyệt của tôi', 'url': 'inventory_requests:my_approval_requests', 'icon': 'fas fa-check-double', 'active': False, 'roles': ['admin', 'manager']},
                 {'name': 'Quản lý kho', 'url': 'inventory_requests:warehouse_requests_list', 'icon': 'fas fa-dolly', 'active': False, 'roles': ['admin', 'sm', 'manager']},
-                {'name': 'Tất cả yêu cầu', 'url': 'inventory_requests:inventory_request_list', 'icon': 'fas fa-list', 'active': False},
+                {'name': 'Tất cả yêu cầu', 'url': 'inventory_requests:inventory_request_list', 'icon': 'fas fa-list', 'active': False, 'roles': ['admin', 'sm', 'manager']},
+                {'name': 'Lịch sử giao nhận', 'url': 'inventory_requests:employee_delivery_history', 'icon': 'fas fa-history', 'active': False},
             ]
         },
         'inventory': {
@@ -140,7 +141,9 @@ def menu_context(request):
             menu['inventory_requests']['items'][2]['active'] = True
         elif 'inventory/requests/warehouse-requests' in path:
             menu['inventory_requests']['items'][3]['active'] = True
-        elif path == '/inventory/requests/' or 'inventory/requests/' in path and not any(s in path for s in ['create', 'my-requests', 'my-approvals', 'warehouse-requests']):
+        elif 'inventory/requests/employee-delivery-history' in path:
+            menu['inventory_requests']['items'][5]['active'] = True
+        elif path == '/inventory/requests/' or 'inventory/requests/' in path and not any(s in path for s in ['create', 'my-requests', 'my-approvals', 'warehouse-requests', 'employee-delivery-history']):
             menu['inventory_requests']['items'][4]['active'] = True
     
     # Inventory section
