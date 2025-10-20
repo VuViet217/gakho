@@ -254,7 +254,7 @@
                                     </div>
                                     {% endif %}
                                     
-                                    {% if request_obj.scheduled_date and request.status in 'scheduled,completed' %}
+                                    {% if request_obj.status == 'scheduled' or request_obj.status == 'completed' %}
                                     <div>
                                         <i class="fas fa-calendar-check bg-primary"></i>
                                         <div class="timeline-item">

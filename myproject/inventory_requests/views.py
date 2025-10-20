@@ -694,20 +694,31 @@ def inventory_request_schedule(request, request_id):
             request_obj.schedule(request.user, scheduled_date)
             
             if note:
-                request_obj.notes = (request_obj.notes or '') + f"\n\nGhi chú lên lịch ({timezone.now().strftime('%Y-%m-%d %H:%M')}): {note}"
+                request_obj.schedule_notes = note
                 request_obj.save()
             
+            # Chuẩn bị danh sách CC: quản lý của người yêu cầu + quản lý kho
+            cc_list = []
+            if request_obj.requester.manager and request_obj.requester.manager.email:
+                cc_list.append(request_obj.requester.manager.email)
+            if request.user.email:
+                cc_list.append(request.user.email)
+            
             # Gửi email thông báo đã lên lịch
-            send_template_email(
-                recipient_list=[request_obj.requester.email],
-                template_code='warehouse_scheduled',
-                context_data={
-                    'request': request_obj,
-                    'user': request_obj.requester,
-                    'warehouse_manager': request.user,
-                    'scheduled_date': scheduled_date,
-                }
-            )
+            try:
+                send_template_email(
+                    recipient_list=[request_obj.requester.email],
+                    template_code='warehouse_scheduled',
+                    context_data={
+                        'request': request_obj,
+                        'user': request_obj.requester,
+                        'warehouse_manager': request.user,
+                    },
+                    cc_list=cc_list
+                )
+            except Exception as e:
+                # Log error nhưng không làm gián đoạn quy trình
+                print(f"Error sending email: {e}")
             
             messages.success(request, 'Yêu cầu đã được lên lịch cấp phát thành công.')
             return redirect('inventory_requests:warehouse_requests_list')

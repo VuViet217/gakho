@@ -41,6 +41,7 @@ class InventoryRequest(models.Model):
     updated_at = models.DateTimeField(_('Ngày cập nhật'), auto_now=True)
     expected_date = models.DateField(_('Ngày mong muốn nhận'), null=True, blank=True)
     scheduled_date = models.DateTimeField(_('Ngày giờ dự kiến cấp phát'), null=True, blank=True)
+    scheduled_at = models.DateTimeField(_('Thời điểm lên lịch'), null=True, blank=True)
     completed_date = models.DateTimeField(_('Ngày hoàn thành'), null=True, blank=True)
     
     # Người liên quan
@@ -71,6 +72,7 @@ class InventoryRequest(models.Model):
     approval_date = models.DateTimeField(_('Ngày phê duyệt'), null=True, blank=True)
     approval_note = models.TextField(_('Ghi chú phê duyệt'), blank=True, null=True)
     rejection_reason = models.TextField(_('Lý do từ chối'), blank=True, null=True)
+    schedule_notes = models.TextField(_('Ghi chú lên lịch'), blank=True, null=True)
     
     # Ghi chú bổ sung
     notes = models.TextField(_('Ghi chú'), blank=True, null=True)
@@ -120,6 +122,7 @@ class InventoryRequest(models.Model):
         self.status = self.STATUS_SCHEDULED
         self.warehouse_manager = warehouse_manager
         self.scheduled_date = scheduled_date
+        self.scheduled_at = timezone.now()
         self.save()
     
     def complete(self):
