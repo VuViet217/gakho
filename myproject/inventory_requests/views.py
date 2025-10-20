@@ -9,8 +9,16 @@ from django.db.models import Q
 from django.db import transaction
 from django.core.paginator import Paginator
 from django.template.loader import render_to_string
-from weasyprint import HTML
 import logging
+from io import BytesIO
+from reportlab.lib.pagesizes import A5, landscape
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import mm
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
 
 from myproject.decorators import role_required
 from system_settings.template_email_service import send_template_email
@@ -891,12 +899,144 @@ def print_delivery_note(request, request_id):
         'issued_data': issued_data,
     }
     
-    # Render HTML
-    html_string = render_to_string('inventory_requests/delivery_note_pdf.html', context)
-    
-    # Tạo PDF
+    # Tạo PDF với ReportLab
     try:
-        pdf = HTML(string=html_string, base_url=request.build_absolute_uri('/')).write_pdf()
+        # Tạo buffer để lưu PDF
+        buffer = BytesIO()
+        
+        # Tạo PDF A5 ngang (landscape)
+        doc = SimpleDocTemplate(
+            buffer,
+            pagesize=landscape(A5),
+            rightMargin=10*mm,
+            leftMargin=10*mm,
+            topMargin=10*mm,
+            bottomMargin=10*mm
+        )
+        
+        # Danh sách các elements để thêm vào PDF
+        elements = []
+        
+        # Styles
+        styles = getSampleStyleSheet()
+        
+        # Tiêu đề chính
+        title_style = ParagraphStyle(
+            'CustomTitle',
+            parent=styles['Heading1'],
+            fontSize=16,
+            textColor=colors.HexColor('#1a237e'),
+            spaceAfter=10,
+            alignment=TA_CENTER,
+            fontName='Helvetica-Bold'
+        )
+        
+        normal_style = ParagraphStyle(
+            'CustomNormal',
+            parent=styles['Normal'],
+            fontSize=9,
+            fontName='Helvetica'
+        )
+        
+        # Tiêu đề
+        elements.append(Paragraph('PHIẾU XUẤT KHO', title_style))
+        elements.append(Spacer(1, 5*mm))
+        
+        # Thông tin yêu cầu
+        info_data = [
+            ['Mã yêu cầu:', issued_data['request_code'], 'Ngày hoàn thành:', issued_data['completed_date']],
+            ['Người yêu cầu:', issued_data['requester'], 'Thủ kho:', issued_data['warehouse_manager']],
+        ]
+        
+        info_table = Table(info_data, colWidths=[30*mm, 60*mm, 30*mm, 60*mm])
+        info_table.setStyle(TableStyle([
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 0), (-1, -1), 9),
+            ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+            ('FONTNAME', (2, 0), (2, -1), 'Helvetica-Bold'),
+            ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('LEFTPADDING', (0, 0), (-1, -1), 3),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 3),
+            ('TOPPADDING', (0, 0), (-1, -1), 2),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
+        ]))
+        
+        elements.append(info_table)
+        elements.append(Spacer(1, 5*mm))
+        
+        # Bảng sản phẩm
+        product_data = [
+            ['STT', 'Nhân viên', 'Bộ phận', 'Mã SP', 'Tên sản phẩm', 'SL yêu cầu', 'SL cấp phát']
+        ]
+        
+        for idx, item in enumerate(issued_data['items'], 1):
+            product_data.append([
+                str(idx),
+                item['employee_name'][:20],  # Giới hạn độ dài
+                item['employee_dept'][:15],
+                item['product_code'],
+                item['product_name'][:30],
+                str(item['requested_quantity']),
+                str(item['issued_quantity'])
+            ])
+        
+        product_table = Table(product_data, colWidths=[8*mm, 30*mm, 25*mm, 20*mm, 40*mm, 18*mm, 18*mm])
+        product_table.setStyle(TableStyle([
+            # Header
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1a237e')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 9),
+            ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
+            
+            # Body
+            ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 1), (-1, -1), 8),
+            ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
+            ('ALIGN', (0, 1), (0, -1), 'CENTER'),  # STT
+            ('ALIGN', (5, 1), (-1, -1), 'CENTER'),  # Số lượng
+            
+            # Borders
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('LEFTPADDING', (0, 0), (-1, -1), 2),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 2),
+            ('TOPPADDING', (0, 0), (-1, -1), 2),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
+        ]))
+        
+        elements.append(product_table)
+        elements.append(Spacer(1, 10*mm))
+        
+        # Chữ ký
+        signature_data = [
+            ['Người lập phiếu', 'Người nhận hàng', 'Thủ kho'],
+            ['(Ký, ghi rõ họ tên)', '(Ký, ghi rõ họ tên)', '(Ký, ghi rõ họ tên)'],
+            ['', '', ''],
+            ['', '', ''],
+            ['', '', ''],
+        ]
+        
+        signature_table = Table(signature_data, colWidths=[60*mm, 60*mm, 60*mm])
+        signature_table.setStyle(TableStyle([
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 0), (-1, -1), 9),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ('TOPPADDING', (0, 0), (-1, 0), 5),
+            ('BOTTOMPADDING', (0, 1), (-1, 1), 2),
+        ]))
+        
+        elements.append(signature_table)
+        
+        # Build PDF
+        doc.build(elements)
+        
+        # Lấy giá trị PDF từ buffer
+        pdf = buffer.getvalue()
+        buffer.close()
         
         # Trả về PDF
         response = HttpResponse(pdf, content_type='application/pdf')
