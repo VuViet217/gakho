@@ -9,7 +9,7 @@ class Command(BaseCommand):
         template_code = 'request_completed'
         template_name = 'Yêu cầu đã hoàn thành'
         template_type = 'request_completed'
-        subject = 'Yêu cầu cấp phát #{request_code} đã hoàn thành'
+        subject = 'Yêu cầu cấp phát #{{ request_code }} đã hoàn thành'
         
         html_content = '''<!DOCTYPE html>
 <html>
@@ -36,7 +36,7 @@ class Command(BaseCommand):
                     <tr>
                         <td style="padding: 40px;">
                             <p style="margin: 0 0 20px 0; font-size: 16px; color: #333333; line-height: 1.6;">
-                                Kính gửi <strong>{requester_name}</strong>,
+                                Kính gửi <strong>{{ requester_name }}</strong>,
                             </p>
                             
                             <p style="margin: 0 0 25px 0; font-size: 14px; color: #555555; line-height: 1.6;">
@@ -53,7 +53,7 @@ class Command(BaseCommand):
                                                     <strong>Mã yêu cầu:</strong>
                                                 </td>
                                                 <td style="padding: 8px 0; font-size: 14px; color: #333333;">
-                                                    <strong style="color: #28a745;">{request_code}</strong>
+                                                    <strong style="color: #28a745;">{{ request_code }}</strong>
                                                 </td>
                                             </tr>
                                             <tr>
@@ -61,7 +61,7 @@ class Command(BaseCommand):
                                                     <strong>Tiêu đề:</strong>
                                                 </td>
                                                 <td style="padding: 8px 0; font-size: 14px; color: #333333;">
-                                                    {title}
+                                                    {{ title }}
                                                 </td>
                                             </tr>
                                             <tr>
@@ -69,7 +69,7 @@ class Command(BaseCommand):
                                                     <strong>Ngày hoàn thành:</strong>
                                                 </td>
                                                 <td style="padding: 8px 0; font-size: 14px; color: #333333;">
-                                                    {completed_date}
+                                                    {{ completed_date }}
                                                 </td>
                                             </tr>
                                             <tr>
@@ -77,7 +77,7 @@ class Command(BaseCommand):
                                                     <strong>Người xử lý:</strong>
                                                 </td>
                                                 <td style="padding: 8px 0; font-size: 14px; color: #333333;">
-                                                    {warehouse_manager}
+                                                    {{ warehouse_manager }}
                                                 </td>
                                             </tr>
                                             <tr>
@@ -85,7 +85,7 @@ class Command(BaseCommand):
                                                     <strong>Ghi chú:</strong>
                                                 </td>
                                                 <td style="padding: 8px 0; font-size: 14px; color: #333333;">
-                                                    {note}
+                                                    {{ note }}
                                                 </td>
                                             </tr>
                                         </table>
@@ -101,7 +101,7 @@ class Command(BaseCommand):
                             <table width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
                                 <tr>
                                     <td align="center">
-                                        <a href="{detail_url}" style="display: inline-block; padding: 14px 40px; background-color: #28a745; color: #ffffff; text-decoration: none; border-radius: 5px; font-size: 14px; font-weight: bold; border: 2px solid #28a745;">
+                                        <a href="{{ detail_url }}" style="display: inline-block; padding: 14px 40px; background-color: #28a745; color: #ffffff; text-decoration: none; border-radius: 5px; font-size: 14px; font-weight: bold; border: 2px solid #28a745;">
                                             Xem chi tiết yêu cầu
                                         </a>
                                     </td>
