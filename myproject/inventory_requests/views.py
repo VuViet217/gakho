@@ -856,6 +856,43 @@ def inventory_request_complete(request, request_id):
         
         messages.success(request, 'Yêu cầu đã được đánh dấu hoàn thành thành công.')
         
+        # Gửi email thông báo hoàn thành
+        try:
+            # Email context
+            email_context = {
+                'request_code': request_obj.request_code,
+                'requester_name': request_obj.requester.get_full_name(),
+                'title': request_obj.title,
+                'completed_date': timezone.now().strftime('%d/%m/%Y %H:%M'),
+                'warehouse_manager': request.user.get_full_name(),
+                'note': note if note else 'Không có ghi chú',
+                'detail_url': request.build_absolute_uri(
+                    reverse('inventory_requests:inventory_request_detail', args=[request_obj.id])
+                ),
+            }
+            
+            # Danh sách CC
+            cc_list = []
+            
+            # Thêm quản lý của người tạo yêu cầu (nếu có)
+            if hasattr(request_obj.requester, 'manager') and request_obj.requester.manager:
+                cc_list.append(request_obj.requester.manager.email)
+            
+            # Thêm quản lý kho
+            cc_list.append(request.user.email)
+            
+            # Loại bỏ email trùng
+            cc_list = list(set(filter(None, cc_list)))
+            
+            send_template_email(
+                template_name='request_completed',
+                context=email_context,
+                recipient_list=[request_obj.requester.email],
+                cc_list=cc_list
+            )
+        except Exception as e:
+            logger.error(f"Error sending completion email for request {request_obj.request_code}: {str(e)}")
+        
         # Chuyển hướng về chi tiết yêu cầu (không tự động in)
         return redirect('inventory_requests:inventory_request_detail', request_id=request_obj.id)
     
