@@ -107,26 +107,63 @@
                         <h3 class="card-title">Danh sách sản phẩm</h3>
                     </div>
                     <div class="card-body">
+                        {% if insufficient_products %}
+                        <div class="alert alert-danger">
+                            <h5><i class="icon fas fa-exclamation-triangle"></i> Cảnh báo: Không đủ tồn kho!</h5>
+                            <p>Các sản phẩm sau không đủ tồn kho để lên lịch cấp phát:</p>
+                            <ul>
+                                {% for item in insufficient_products %}
+                                <li>
+                                    <strong>{{ item.product.name }}</strong> (Mã: {{ item.product.product_code }})
+                                    <br>- Yêu cầu: <span class="badge badge-warning">{{ item.requested }}</span>
+                                    <br>- Tồn kho: <span class="badge badge-info">{{ item.available }}</span>
+                                    <br>- Thiếu: <span class="badge badge-danger">{{ item.shortage }}</span>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                            <p class="mb-0"><strong>Vui lòng nhập thêm hàng hoặc điều chỉnh số lượng trong yêu cầu trước khi lên lịch.</strong></p>
+                        </div>
+                        {% endif %}
+                        
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>Tên sản phẩm</th>
-                                    <th>Danh mục</th>
-                                    <th>Số lượng yêu cầu</th>
-                                    <th>Tồn kho</th>
-                                    <th>Ghi chú</th>
+                                    <th>Nhân viên</th>
+                                    <th>Sản phẩm</th>
+                                    <th>Mã sản phẩm</th>
+                                    <th class="text-center">Số lượng yêu cầu</th>
+                                    <th class="text-center">Tồn kho</th>
+                                    <th class="text-center">Trạng thái</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for item in request_obj.items.all %}
-                                <tr>
+                                {% for employee_product in request_obj.employee_products.all %}
+                                <tr {% if employee_product.quantity > employee_product.product.current_quantity %}class="table-danger"{% endif %}>
                                     <td>{{ forloop.counter }}</td>
-                                    <td>{{ item.product.name }}</td>
-                                    <td>{{ item.product.category.name }}</td>
-                                    <td>{{ item.quantity }} {{ item.product.unit }}</td>
-                                    <td>{{ item.product.current_quantity }} {{ item.product.unit }}</td>
-                                    <td>{{ item.notes|default:"-" }}</td>
+                                    <td>
+                                        <strong>{{ employee_product.employee.full_name }}</strong><br>
+                                        <small class="text-muted">{{ employee_product.employee.department.name|default:"N/A" }}</small>
+                                    </td>
+                                    <td>{{ employee_product.product.name }}</td>
+                                    <td><code>{{ employee_product.product.product_code }}</code></td>
+                                    <td class="text-center"><strong>{{ employee_product.quantity }}</strong></td>
+                                    <td class="text-center">
+                                        <span class="badge {% if employee_product.product.current_quantity >= employee_product.quantity %}badge-success{% else %}badge-danger{% endif %}">
+                                            {{ employee_product.product.current_quantity }}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        {% if employee_product.quantity > employee_product.product.current_quantity %}
+                                            <span class="badge badge-danger">
+                                                <i class="fas fa-times-circle"></i> Không đủ
+                                            </span>
+                                        {% else %}
+                                            <span class="badge badge-success">
+                                                <i class="fas fa-check-circle"></i> Đủ hàng
+                                            </span>
+                                        {% endif %}
+                                    </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -177,12 +214,18 @@
                     </div>
                     
                     <div class="form-group">
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-primary" {% if insufficient_products %}disabled{% endif %}>
                             <i class="fas fa-calendar-check"></i> Xác nhận lên lịch
                         </button>
                         <a href="{% url 'inventory_requests:warehouse_requests_list' %}" class="btn btn-secondary">
                             <i class="fas fa-arrow-left"></i> Quay lại
                         </a>
+                        {% if insufficient_products %}
+                        <p class="text-danger mt-2 mb-0">
+                            <i class="fas fa-exclamation-circle"></i> 
+                            <strong>Không thể lên lịch do không đủ tồn kho. Vui lòng nhập thêm hàng trước.</strong>
+                        </p>
+                        {% endif %}
                     </div>
                 </form>
             </div>

@@ -690,7 +690,43 @@ def inventory_request_schedule(request, request_id):
             scheduled_date = form.cleaned_data['scheduled_date']
             note = form.cleaned_data['note']
             
-            # Lên lịch cấp phát
+            # Kiểm tra tồn kho trước khi lên lịch
+            insufficient_products = []
+            for employee_product in request_obj.employee_products.all():
+                product = employee_product.product
+                requested_quantity = employee_product.quantity
+                available_quantity = product.current_quantity
+                
+                if requested_quantity > available_quantity:
+                    insufficient_products.append({
+                        'product': product,
+                        'requested': requested_quantity,
+                        'available': available_quantity,
+                        'shortage': requested_quantity - available_quantity
+                    })
+            
+            # Nếu có sản phẩm không đủ tồn kho
+            if insufficient_products:
+                for item in insufficient_products:
+                    messages.error(
+                        request,
+                        f'Không đủ tồn kho cho sản phẩm "{item["product"].name}" '
+                        f'(Mã: {item["product"].product_code}). '
+                        f'Yêu cầu: {item["requested"]}, '
+                        f'Tồn kho: {item["available"]}, '
+                        f'Thiếu: {item["shortage"]}'
+                    )
+                
+                # Trả về form với thông báo lỗi
+                context = {
+                    'form': form,
+                    'request_obj': request_obj,
+                    'insufficient_products': insufficient_products,
+                    'title': f'Lên lịch cấp phát cho yêu cầu #{request_obj.request_code}',
+                }
+                return render(request, 'inventory_requests/schedule.html', context)
+            
+            # Nếu đủ tồn kho, tiếp tục lên lịch
             request_obj.schedule(request.user, scheduled_date)
             
             if note:
