@@ -1,13 +1,15 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseForbidden, HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseForbidden, HttpResponseRedirect, JsonResponse, HttpResponse
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Q
 from django.db import transaction
 from django.core.paginator import Paginator
+from django.template.loader import render_to_string
+from weasyprint import HTML
 import logging
 
 from myproject.decorators import role_required
@@ -788,54 +790,123 @@ def inventory_request_complete(request, request_id):
         return redirect('inventory_requests:inventory_request_detail', request_id=request_obj.id)
     
     if request.method == 'POST':
-        form = RequestCompletionForm(request.POST, request=request_obj)
+        # Lấy note từ form
+        note = request.POST.get('note', '')
         
-        if form.is_valid():
-            note = form.cleaned_data['note']
-            
-            with transaction.atomic():
-                # Cập nhật số lượng đã cấp phát cho từng sản phẩm
-                for item in request_obj.items.all():
-                    field_name = f'issued_quantity_{item.id}'
-                    issued_quantity = form.cleaned_data.get(field_name, 0)
+        # Thu thập dữ liệu số lượng cấp phát
+        issued_data = []
+        
+        with transaction.atomic():
+            # Cập nhật số lượng đã cấp phát cho từng employee_product
+            for employee_product in request_obj.employee_products.all():
+                field_name = f'issued_quantity_{employee_product.id}'
+                issued_quantity = int(request.POST.get(field_name, 0))
+                
+                if issued_quantity > 0:
+                    # Giảm số lượng tồn kho
+                    product = employee_product.product
+                    product.current_quantity -= issued_quantity
+                    product.save()
                     
-                    if issued_quantity > 0:
-                        # Cập nhật số lượng đã cấp phát
-                        item.issued_quantity = issued_quantity
-                        item.save()
-                        
-                        # Giảm số lượng tồn kho
-                        product = item.product
-                        product.current_quantity -= issued_quantity
-                        product.save()
-                
-                # Đánh dấu hoàn thành yêu cầu
-                request_obj.complete()
-                
-                if note:
-                    request_obj.notes = (request_obj.notes or '') + f"\n\nGhi chú hoàn thành ({timezone.now().strftime('%Y-%m-%d %H:%M')}): {note}"
-                    request_obj.save()
+                    # Lưu thông tin để in phiếu xuất
+                    issued_data.append({
+                        'employee': employee_product.employee,
+                        'product': employee_product.product,
+                        'requested_quantity': employee_product.quantity,
+                        'issued_quantity': issued_quantity,
+                    })
             
-            # Gửi email thông báo đã hoàn thành
-            send_template_email(
-                recipient_list=[request_obj.requester.email],
-                template_code='request_completed',
-                context_data={
-                    'request': request_obj,
-                    'user': request_obj.requester,
-                    'warehouse_manager': request.user,
+            # Đánh dấu hoàn thành yêu cầu
+            request_obj.complete()
+            
+            if note:
+                request_obj.notes = (request_obj.notes or '') + f"\n\nGhi chú hoàn thành ({timezone.now().strftime('%Y-%m-%d %H:%M')}): {note}"
+                request_obj.save()
+        
+        # Lưu dữ liệu vào session để dùng cho PDF
+        request.session['issued_data'] = {
+            'request_id': request_obj.id,
+            'request_code': request_obj.request_code,
+            'requester': request_obj.requester.get_full_name(),
+            'warehouse_manager': request.user.get_full_name(),
+            'completed_date': timezone.now().strftime('%d/%m/%Y %H:%M'),
+            'items': [
+                {
+                    'employee_name': item['employee'].full_name,
+                    'employee_dept': item['employee'].department.name if item['employee'].department else 'N/A',
+                    'product_code': item['product'].product_code,
+                    'product_name': item['product'].name,
+                    'requested_quantity': item['requested_quantity'],
+                    'issued_quantity': item['issued_quantity'],
                 }
-            )
-            
-            messages.success(request, 'Yêu cầu đã được đánh dấu hoàn thành thành công.')
-            return redirect('inventory_requests:warehouse_requests_list')
-    else:
-        form = RequestCompletionForm(request=request_obj)
+                for item in issued_data
+            ]
+        }
+        
+        messages.success(request, 'Yêu cầu đã được đánh dấu hoàn thành thành công.')
+        
+        # Chuyển hướng đến trang in phiếu xuất kho
+        return redirect('inventory_requests:print_delivery_note', request_id=request_obj.id)
     
     context = {
-        'form': form,
         'request_obj': request_obj,
         'title': f'Hoàn thành yêu cầu cấp phát #{request_obj.request_code}',
     }
     
     return render(request, 'inventory_requests/complete.html', context)
+
+
+@login_required
+@role_required(['sm', 'admin', 'manager'])
+def print_delivery_note(request, request_id):
+    """In phiếu xuất kho A5"""
+    
+    request_obj = get_object_or_404(InventoryRequest, id=request_id)
+    
+    # Lấy dữ liệu từ session (nếu mới hoàn thành)
+    issued_data = request.session.get('issued_data', None)
+    
+    # Nếu không có trong session, lấy từ database
+    if not issued_data or issued_data.get('request_id') != request_obj.id:
+        issued_data = {
+            'request_code': request_obj.request_code,
+            'requester': request_obj.requester.get_full_name(),
+            'warehouse_manager': request.user.get_full_name(),
+            'completed_date': request_obj.completed_date.strftime('%d/%m/%Y %H:%M') if request_obj.completed_date else timezone.now().strftime('%d/%m/%Y %H:%M'),
+            'items': [
+                {
+                    'employee_name': ep.employee.full_name,
+                    'employee_dept': ep.employee.department.name if ep.employee.department else 'N/A',
+                    'product_code': ep.product.product_code,
+                    'product_name': ep.product.name,
+                    'requested_quantity': ep.quantity,
+                    'issued_quantity': ep.quantity,  # Giả định đã cấp đủ
+                }
+                for ep in request_obj.employee_products.all()
+            ]
+        }
+    
+    context = {
+        'request_obj': request_obj,
+        'issued_data': issued_data,
+    }
+    
+    # Render HTML
+    html_string = render_to_string('inventory_requests/delivery_note_pdf.html', context)
+    
+    # Tạo PDF
+    try:
+        pdf = HTML(string=html_string, base_url=request.build_absolute_uri('/')).write_pdf()
+        
+        # Trả về PDF
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = f'inline; filename="phieu_xuat_kho_{request_obj.request_code}.pdf"'
+        
+        # Xóa dữ liệu khỏi session
+        if 'issued_data' in request.session:
+            del request.session['issued_data']
+        
+        return response
+    except Exception as e:
+        messages.error(request, f'Lỗi khi tạo PDF: {str(e)}')
+        return redirect('inventory_requests:inventory_request_detail', request_id=request_obj.id)

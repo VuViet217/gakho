@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Phiếu xuất kho - {{ request_obj.request_code }}</title>
+    <style>
+        @page {
+            size: A5;
+            margin: 10mm;
+        }
+        
+        body {
+            font-family: 'DejaVu Sans', Arial, sans-serif;
+            font-size: 10pt;
+            line-height: 1.4;
+            color: #000;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 18pt;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .header p {
+            margin: 3px 0;
+            font-size: 9pt;
+        }
+        
+        .info-section {
+            margin: 10px 0;
+        }
+        
+        .info-row {
+            margin: 5px 0;
+            font-size: 10pt;
+        }
+        
+        .info-row .label {
+            display: inline-block;
+            width: 120px;
+            font-weight: bold;
+        }
+        
+        .info-row .value {
+            display: inline-block;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 9pt;
+        }
+        
+        table th {
+            background-color: #f0f0f0;
+            border: 1px solid #000;
+            padding: 6px 4px;
+            text-align: left;
+            font-weight: bold;
+            font-size: 9pt;
+        }
+        
+        table td {
+            border: 1px solid #000;
+            padding: 6px 4px;
+        }
+        
+        table th.center, table td.center {
+            text-align: center;
+        }
+        
+        table th.right, table td.right {
+            text-align: right;
+        }
+        
+        .signature-section {
+            margin-top: 20px;
+            page-break-inside: avoid;
+        }
+        
+        .signature-row {
+            display: table;
+            width: 100%;
+        }
+        
+        .signature-box {
+            display: table-cell;
+            width: 50%;
+            text-align: center;
+            vertical-align: top;
+            padding: 0 10px;
+        }
+        
+        .signature-box p {
+            margin: 3px 0;
+            font-size: 10pt;
+        }
+        
+        .signature-box .title {
+            font-weight: bold;
+            margin-bottom: 60px;
+        }
+        
+        .signature-box .name {
+            font-weight: bold;
+            text-decoration: underline;
+        }
+        
+        .footer {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 8pt;
+            color: #666;
+            border-top: 1px solid #ccc;
+            padding-top: 8px;
+        }
+        
+        .note {
+            margin: 10px 0;
+            padding: 8px;
+            background-color: #f9f9f9;
+            border-left: 3px solid #666;
+            font-size: 9pt;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>PHIẾU XUẤT KHO</h1>
+        <p>Mã phiếu: <strong>{{ request_obj.request_code }}</strong></p>
+        <p>Ngày xuất: <strong>{{ issued_data.completed_date }}</strong></p>
+    </div>
+    
+    <div class="info-section">
+        <div class="info-row">
+            <span class="label">Người nhận:</span>
+            <span class="value">{{ issued_data.requester }}</span>
+        </div>
+        <div class="info-row">
+            <span class="label">Người xuất kho:</span>
+            <span class="value">{{ issued_data.warehouse_manager }}</span>
+        </div>
+        <div class="info-row">
+            <span class="label">Lý do xuất:</span>
+            <span class="value">Cấp phát vật tư theo yêu cầu</span>
+        </div>
+    </div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th class="center" style="width: 30px;">STT</th>
+                <th>Nhân viên</th>
+                <th>Mã SP</th>
+                <th>Tên vật tư</th>
+                <th class="center" style="width: 60px;">SL yêu cầu</th>
+                <th class="center" style="width: 60px;">SL xuất</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in issued_data.items %}
+            <tr>
+                <td class="center">{{ forloop.counter }}</td>
+                <td>
+                    <strong>{{ item.employee_name }}</strong><br>
+                    <small>{{ item.employee_dept }}</small>
+                </td>
+                <td>{{ item.product_code }}</td>
+                <td>{{ item.product_name }}</td>
+                <td class="center">{{ item.requested_quantity }}</td>
+                <td class="center"><strong>{{ item.issued_quantity }}</strong></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    {% if request_obj.notes %}
+    <div class="note">
+        <strong>Ghi chú:</strong> {{ request_obj.notes }}
+    </div>
+    {% endif %}
+    
+    <div class="signature-section">
+        <div class="signature-row">
+            <div class="signature-box">
+                <p class="title">Người nhận</p>
+                <p>(Ký và ghi rõ họ tên)</p>
+                <p>&nbsp;</p>
+                <p>&nbsp;</p>
+                <p>&nbsp;</p>
+                <p class="name">{{ issued_data.requester }}</p>
+            </div>
+            <div class="signature-box">
+                <p class="title">Thủ kho</p>
+                <p>(Ký và ghi rõ họ tên)</p>
+                <p>&nbsp;</p>
+                <p>&nbsp;</p>
+                <p>&nbsp;</p>
+                <p class="name">{{ issued_data.warehouse_manager }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>OVNC Inventory Management System - Phiếu xuất kho được tạo tự động</p>
+        <p>In lúc: {{ issued_data.completed_date }}</p>
+    </div>
+</body>
+</html>

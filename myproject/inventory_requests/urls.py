@@ -22,4 +22,5 @@ urlpatterns = [
     path('warehouse-requests/', views.warehouse_requests_list, name='warehouse_requests_list'),
     path('<int:request_id>/schedule/', views.inventory_request_schedule, name='inventory_request_schedule'),
     path('<int:request_id>/complete/', views.inventory_request_complete, name='inventory_request_complete'),
+    path('<int:request_id>/print-delivery-note/', views.print_delivery_note, name='print_delivery_note'),
 ]
