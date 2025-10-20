@@ -1103,3 +1103,84 @@ def print_delivery_note(request, request_id):
     except Exception as e:
         messages.error(request, f'Lỗi khi tạo PDF: {str(e)}')
         return redirect('inventory_requests:inventory_request_detail', request_id=request_obj.id)
+
+
+@login_required
+def employee_delivery_history(request):
+    """Lịch sử giao nhận của nhân viên"""
+    from employees.models import Employee
+    
+    # Lấy tham số tìm kiếm
+    search_query = request.GET.get('search', '').strip()
+    employee_id = request.GET.get('employee_id', '')
+    
+    # Khởi tạo biến
+    employee = None
+    delivery_history = []
+    
+    # Nếu có tìm kiếm
+    if search_query:
+        # Tìm nhân viên theo mã hoặc tên
+        employees = Employee.objects.filter(
+            Q(employee_id__icontains=search_query) | 
+            Q(full_name__icontains=search_query)
+        )
+        
+        if employees.count() == 1:
+            # Nếu tìm thấy đúng 1 nhân viên
+            employee = employees.first()
+            employee_id = employee.id
+        elif employees.count() > 1:
+            # Nếu tìm thấy nhiều nhân viên, hiển thị danh sách để chọn
+            context = {
+                'title': 'Lịch sử giao nhận nhân viên',
+                'search_query': search_query,
+                'employees': employees,
+            }
+            return render(request, 'inventory_requests/employee_delivery_history.html', context)
+        else:
+            messages.warning(request, f'Không tìm thấy nhân viên với từ khóa: {search_query}')
+    
+    # Nếu đã chọn nhân viên cụ thể
+    if employee_id:
+        try:
+            employee = Employee.objects.get(id=employee_id)
+            
+            # Lấy lịch sử giao nhận: Tất cả EmployeeProductRequest của nhân viên này 
+            # trong các yêu cầu đã hoàn thành
+            employee_products = EmployeeProductRequest.objects.filter(
+                employee=employee,
+                request__status=InventoryRequest.STATUS_COMPLETED
+            ).select_related(
+                'request', 'product', 'request__requester'
+            ).order_by('-request__completed_date')
+            
+            # Xây dựng danh sách lịch sử
+            for ep in employee_products:
+                delivery_history.append({
+                    'request_code': ep.request.request_code,
+                    'request_id': ep.request.id,
+                    'request_title': ep.request.title,
+                    'completed_date': ep.request.completed_date,
+                    'product_code': ep.product.product_code,
+                    'product_name': ep.product.name,
+                    'quantity': ep.quantity,
+                    'requester': ep.request.requester.get_full_name() if ep.request.requester else 'N/A',
+                })
+                
+        except Employee.DoesNotExist:
+            messages.error(request, 'Không tìm thấy nhân viên.')
+    
+    # Phân trang
+    paginator = Paginator(delivery_history, 20)
+    page = request.GET.get('page')
+    delivery_history_page = paginator.get_page(page)
+    
+    context = {
+        'title': 'Lịch sử giao nhận nhân viên',
+        'employee': employee,
+        'delivery_history': delivery_history_page,
+        'search_query': search_query,
+    }
+    
+    return render(request, 'inventory_requests/employee_delivery_history.html', context)
