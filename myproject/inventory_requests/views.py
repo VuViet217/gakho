@@ -844,7 +844,7 @@ def inventory_request_complete(request, request_id):
                 {
                     'employee_code': item['employee'].employee_id,
                     'employee_name': item['employee'].full_name,
-                    'employee_dept': item['employee'].department.name if item['employee'].department else 'N/A',
+                    'employee_dept': item['employee'].department.code if item['employee'].department else 'N/A',
                     'product_code': item['product'].product_code,
                     'product_name': item['product'].name,
                     'requested_quantity': item['requested_quantity'],
@@ -888,7 +888,7 @@ def print_delivery_note(request, request_id):
                 {
                     'employee_code': ep.employee.employee_id,
                     'employee_name': ep.employee.full_name,
-                    'employee_dept': ep.employee.department.name if ep.employee.department else 'N/A',
+                    'employee_dept': ep.employee.department.code if ep.employee.department else 'N/A',
                     'product_code': ep.product.product_code,
                     'product_name': ep.product.name,
                     'requested_quantity': ep.quantity,
@@ -970,22 +970,31 @@ def print_delivery_note(request, request_id):
         
         # Bảng sản phẩm
         product_data = [
-            ['STT', 'Mã NV', 'Nhân viên', 'Bộ phận', 'Mã SP', 'Tên sản phẩm', 'SL yêu cầu', 'SL cấp phát']
+            ['STT', 'Mã NV', 'Nhân viên', 'BP', 'Mã SP', 'Tên sản phẩm', 'SL yêu cầu', 'SL cấp phát']
         ]
+        
+        # Style cho Paragraph trong bảng
+        cell_style = ParagraphStyle(
+            'CellStyle',
+            parent=styles['Normal'],
+            fontSize=8,
+            fontName='Arial',
+            leading=10
+        )
         
         for idx, item in enumerate(issued_data['items'], 1):
             product_data.append([
                 str(idx),
-                item.get('employee_code', '')[:10],
-                item['employee_name'][:20],
-                item['employee_dept'][:15],
-                item['product_code'],
-                item['product_name'][:30],
+                Paragraph(item.get('employee_code', ''), cell_style),
+                Paragraph(item['employee_name'], cell_style),
+                Paragraph(item['employee_dept'], cell_style),
+                Paragraph(item['product_code'], cell_style),
+                Paragraph(item['product_name'], cell_style),
                 str(item['requested_quantity']),
                 str(item['issued_quantity'])
             ])
         
-        product_table = Table(product_data, colWidths=[8*mm, 15*mm, 25*mm, 20*mm, 18*mm, 35*mm, 16*mm, 16*mm])
+        product_table = Table(product_data, colWidths=[8*mm, 15*mm, 30*mm, 12*mm, 18*mm, 42*mm, 16*mm, 16*mm])
         product_table.setStyle(TableStyle([
             # Header
             ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1a237e')),
@@ -993,6 +1002,7 @@ def print_delivery_note(request, request_id):
             ('FONTNAME', (0, 0), (-1, 0), 'Arial-Bold'),
             ('FONTSIZE', (0, 0), (-1, 0), 9),
             ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
+            ('VALIGN', (0, 0), (-1, 0), 'MIDDLE'),
             
             # Body
             ('FONTNAME', (0, 1), (-1, -1), 'Arial'),
@@ -1000,15 +1010,16 @@ def print_delivery_note(request, request_id):
             ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
             ('ALIGN', (0, 1), (0, -1), 'CENTER'),  # STT
             ('ALIGN', (1, 1), (1, -1), 'CENTER'),  # Mã NV
+            ('ALIGN', (3, 1), (3, -1), 'CENTER'),  # Bộ phận
             ('ALIGN', (6, 1), (-1, -1), 'CENTER'),  # Số lượng
+            ('VALIGN', (0, 1), (-1, -1), 'TOP'),  # Căn trên
             
             # Borders
             ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
-            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-            ('LEFTPADDING', (0, 0), (-1, -1), 2),
-            ('RIGHTPADDING', (0, 0), (-1, -1), 2),
-            ('TOPPADDING', (0, 0), (-1, -1), 2),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
+            ('LEFTPADDING', (0, 0), (-1, -1), 3),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 3),
+            ('TOPPADDING', (0, 0), (-1, -1), 3),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
         ]))
         
         elements.append(product_table)
