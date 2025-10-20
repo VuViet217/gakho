@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Danh sách kiểm kê kho - OVNC Inventory{% endblock %}
+
+{% block content_header %}
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1><i class="fas fa-clipboard-check"></i> Kiểm kê kho</h1>
+      </div>
+      <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+          <li class="breadcrumb-item"><a href="{% url 'main_dashboard' %}">Trang chủ</a></li>
+          <li class="breadcrumb-item"><a href="{% url 'reports:dashboard' %}">Báo cáo</a></li>
+          <li class="breadcrumb-item active">Kiểm kê kho</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header bg-success">
+          <h3 class="card-title">Danh sách kiểm kê kho</h3>
+          <div class="card-tools">
+            <a href="{% url 'reports:audit_create' %}" class="btn btn-primary btn-sm">
+              <i class="fas fa-plus-circle"></i> Tạo phiếu kiểm kê mới
+            </a>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> Tính năng kiểm kê kho đang được phát triển và sẽ sớm có mặt trong phiên bản tiếp theo.
+          </div>
+          
+          <!-- Giả lập dữ liệu mẫu để hiển thị UI -->
+          <div class="table-responsive">
+            <table class="table table-hover table-striped">
+              <thead>
+                <tr>
+                  <th>Mã kiểm kê</th>
+                  <th>Tiêu đề</th>
+                  <th>Ngày kiểm kê</th>
+                  <th>Trạng thái</th>
+                  <th>Người tạo</th>
+                  <th>Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>AUD-202307-001</td>
+                  <td>Kiểm kê cuối tháng 7/2023</td>
+                  <td>31/07/2023</td>
+                  <td><span class="badge badge-success">Hoàn thành</span></td>
+                  <td>Admin</td>
+                  <td>
+                    <a href="#" class="btn btn-info btn-sm">
+                      <i class="fas fa-eye"></i> Xem
+                    </a>
+                    <a href="#" class="btn btn-secondary btn-sm">
+                      <i class="fas fa-file-pdf"></i> PDF
+                    </a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>AUD-202308-001</td>
+                  <td>Kiểm kê cuối tháng 8/2023</td>
+                  <td>31/08/2023</td>
+                  <td><span class="badge badge-warning">Đang kiểm kê</span></td>
+                  <td>Admin</td>
+                  <td>
+                    <a href="#" class="btn btn-info btn-sm">
+                      <i class="fas fa-eye"></i> Xem
+                    </a>
+                    <a href="#" class="btn btn-primary btn-sm">
+                      <i class="fas fa-edit"></i> Sửa
+                    </a>
+                    <a href="#" class="btn btn-success btn-sm">
+                      <i class="fas fa-check"></i> Hoàn thành
+                    </a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>AUD-202309-001</td>
+                  <td>Kiểm kê cuối tháng 9/2023</td>
+                  <td>30/09/2023</td>
+                  <td><span class="badge badge-secondary">Bản nháp</span></td>
+                  <td>Admin</td>
+                  <td>
+                    <a href="#" class="btn btn-info btn-sm">
+                      <i class="fas fa-eye"></i> Xem
+                    </a>
+                    <a href="#" class="btn btn-primary btn-sm">
+                      <i class="fas fa-edit"></i> Sửa
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <div class="text-center mt-4">
+            <a href="{% url 'reports:audit_create' %}" class="btn btn-primary">
+              <i class="fas fa-plus mr-1"></i> Tạo phiếu kiểm kê mới
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+  console.log('Audit list loaded');
+});
+</script>
+{% endblock %}

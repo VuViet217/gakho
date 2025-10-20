@@ -38,6 +38,31 @@ from .forms import (
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
+# Constants
+STATUS_COMPLETED = 'completed'
+
+
+def get_employee_products_with_history(request_obj):
+    """
+    Helper function để lấy danh sách employee_products kèm theo lịch sử lấy hàng gần nhất.
+    Trả về list các dict với cấu trúc: {'employee_product': ep, 'last_delivery': last_delivery}
+    """
+    employee_products_with_history = []
+    for ep in request_obj.employee_products.all():
+        # Tìm lần lấy hàng gần nhất của nhân viên này với sản phẩm này
+        last_delivery = EmployeeProductRequest.objects.filter(
+            employee=ep.employee,
+            product=ep.product,
+            request__status=STATUS_COMPLETED
+        ).exclude(request=request_obj).order_by('-request__completed_date').first()
+        
+        employee_products_with_history.append({
+            'employee_product': ep,
+            'last_delivery': last_delivery
+        })
+    
+    return employee_products_with_history
+
 
 @login_required
 def inventory_request_list(request):
@@ -168,6 +193,9 @@ def inventory_request_create(request):
                     # Chuyển trạng thái thành chờ phê duyệt và gửi email
                     request_obj.mark_as_pending()
                     
+                    # Lấy danh sách employee_products kèm lịch sử
+                    employee_products_with_history = get_employee_products_with_history(request_obj)
+                    
                     # Gửi email thông báo cho người tạo yêu cầu (không làm gián đoạn nếu lỗi)
                     try:
                         send_template_email(
@@ -176,7 +204,7 @@ def inventory_request_create(request):
                             context_data={
                                 'request': request_obj,
                                 'user': request.user,
-                                'employee_products': request_obj.employee_products.all(),
+                                'employee_products_with_history': employee_products_with_history,
                             }
                         )
                     except Exception as e:
@@ -191,7 +219,7 @@ def inventory_request_create(request):
                                 'request': request_obj,
                                 'user': request.user,
                                 'manager': request.user.manager,
-                                'employee_products': request_obj.employee_products.all(),
+                                'employee_products_with_history': employee_products_with_history,
                             }
                         )
                     except Exception as e:
@@ -288,6 +316,9 @@ def inventory_request_edit(request, request_id):
                 # Chuyển trạng thái thành chờ phê duyệt và gửi email
                 request_obj.mark_as_pending()
                 
+                # Lấy danh sách employee_products kèm lịch sử
+                employee_products_with_history = get_employee_products_with_history(request_obj)
+                
                 # Gửi email thông báo cho người tạo yêu cầu
                 send_template_email(
                     recipient_list=[request.user.email],
@@ -295,6 +326,7 @@ def inventory_request_edit(request, request_id):
                     context_data={
                         'request': request_obj,
                         'user': request.user,
+                        'employee_products_with_history': employee_products_with_history,
                     }
                 )
                 
@@ -306,6 +338,7 @@ def inventory_request_edit(request, request_id):
                         'request': request_obj,
                         'user': request.user,
                         'manager': request.user.manager,
+                        'employee_products_with_history': employee_products_with_history,
                     }
                 )
                 
@@ -467,6 +500,9 @@ def inventory_request_submit(request, request_id):
     # Chuyển trạng thái thành chờ phê duyệt và gửi email
     request_obj.mark_as_pending()
     
+    # Lấy danh sách employee_products kèm lịch sử
+    employee_products_with_history = get_employee_products_with_history(request_obj)
+    
     # Gửi email thông báo cho người tạo yêu cầu
     send_template_email(
         recipient_list=[request.user.email],
@@ -474,6 +510,7 @@ def inventory_request_submit(request, request_id):
         context_data={
             'request': request_obj,
             'user': request.user,
+            'employee_products_with_history': employee_products_with_history,
         }
     )
     
@@ -485,6 +522,7 @@ def inventory_request_submit(request, request_id):
             'request': request_obj,
             'user': request.user,
             'manager': request.user.manager,
+            'employee_products_with_history': employee_products_with_history,
         }
     )
     
@@ -591,23 +629,8 @@ def inventory_request_approve(request, request_id):
     else:
         form = RequestApprovalForm()
     
-    # Lấy lịch sử lấy hàng gần nhất cho mỗi employee_product
-    employee_products_with_history = []
-    for ep in request_obj.employee_products.all():
-        # Tìm lần lấy gần nhất của nhân viên này với sản phẩm này
-        last_delivery = EmployeeProductRequest.objects.filter(
-            employee=ep.employee,
-            product=ep.product,
-            request__status=InventoryRequest.STATUS_COMPLETED,
-            request__completed_date__isnull=False
-        ).exclude(
-            request=request_obj  # Loại trừ yêu cầu hiện tại
-        ).order_by('-request__completed_date').first()
-        
-        employee_products_with_history.append({
-            'employee_product': ep,
-            'last_delivery': last_delivery,
-        })
+    # Lấy lịch sử lấy hàng gần nhất cho mỗi employee_product (dùng helper function)
+    employee_products_with_history = get_employee_products_with_history(request_obj)
     
     context = {
         'form': form,

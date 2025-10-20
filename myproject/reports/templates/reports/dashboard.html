@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Báo cáo Tổng quan - OVNC Inventory{% endblock %}
+
+{% block extra_css %}
+<style>
+    .report-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .report-card.warning {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    
+    .report-card.success {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+    
+    .report-card h3 {
+        font-size: 3rem;
+        font-weight: bold;
+        margin: 10px 0;
+    }
+    
+    .report-card p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+    
+    .low-stock-item {
+        padding: 10px;
+        border-left: 4px solid #dc3545;
+        margin-bottom: 10px;
+        background: #f8f9fa;
+        border-radius: 4px;
+    }
+    
+    .low-stock-item.critical {
+        border-left-color: #dc3545;
+        background: #fff5f5;
+    }
+    
+    .low-stock-item.warning {
+        border-left-color: #ffc107;
+        background: #fffbf0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">📊 Báo cáo Tổng quan</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="{% url 'main_dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Báo cáo</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        
+        <!-- Thống kê tổng quan -->
+        <div class="row">
+            <div class="col-lg-4 col-md-6">
+                <div class="report-card">
+                    <i class="fas fa-boxes fa-2x"></i>
+                    <h3>{{ total_products }}</h3>
+                    <p>Tổng số sản phẩm</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="report-card warning">
+                    <i class="fas fa-exclamation-triangle fa-2x"></i>
+                    <h3>{{ low_stock_count }}</h3>
+                    <p>Sản phẩm sắp hết</p>
+                    <a href="{% url 'reports:low_stock_report' %}" class="btn btn-light btn-sm mt-2">
+                        <i class="fas fa-arrow-right"></i> Xem chi tiết
+                    </a>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="report-card success">
+                    <i class="fas fa-dollar-sign fa-2x"></i>
+                    <h3>{{ total_inventory_value|floatformat:0 }}đ</h3>
+                    <p>Tổng giá trị tồn kho</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Báo cáo chi tiết -->
+        <div class="row mt-4">
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header bg-primary">
+                        <h3 class="card-title"><i class="fas fa-exclamation-circle"></i> Sản phẩm sắp hết (Top 10)</h3>
+                    </div>
+                    <div class="card-body">
+                        {% if low_stock_products %}
+                            {% for product in low_stock_products %}
+                            <div class="low-stock-item {% if product.current_quantity == 0 %}critical{% else %}warning{% endif %}">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>{{ product.name }}</strong><br>
+                                        <small class="text-muted">Mã: {{ product.product_code }}</small>
+                                    </div>
+                                    <div class="text-right">
+                                        <h5 class="mb-0">
+                                            {% if product.current_quantity == 0 %}
+                                                <span class="badge badge-danger">Hết hàng</span>
+                                            {% else %}
+                                                <span class="badge badge-warning">{{ product.current_quantity }}</span>
+                                            {% endif %}
+                                        </h5>
+                                        <small class="text-muted">Tối thiểu: {{ product.minimum_quantity }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            
+                            <a href="{% url 'reports:low_stock_report' %}" class="btn btn-primary btn-block mt-3">
+                                <i class="fas fa-list"></i> Xem tất cả
+                            </a>
+                        {% else %}
+                            <p class="text-center text-muted">Không có sản phẩm sắp hết</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header bg-success">
+                        <h3 class="card-title"><i class="fas fa-calendar-alt"></i> Báo cáo tháng</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Tháng hiện tại:</strong> {{ current_month }}/{{ current_year }}
+                        </div>
+                        
+                        <a href="{% url 'reports:monthly_report' %}" class="btn btn-success btn-lg btn-block">
+                            <i class="fas fa-chart-line"></i> Xem báo cáo tháng
+                        </a>
+                        
+                        <a href="{% url 'reports:audit_list' %}" class="btn btn-outline-primary btn-lg btn-block mt-3">
+                            <i class="fas fa-clipboard-check"></i> Danh sách kiểm kê
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-bolt"></i> Thao tác nhanh</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <a href="{% url 'reports:monthly_report_detail' current_year current_month %}" class="btn btn-primary btn-block">
+                                    <i class="fas fa-calendar-check"></i><br>
+                                    Báo cáo tháng này
+                                </a>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="{% url 'reports:low_stock_report' %}" class="btn btn-warning btn-block">
+                                    <i class="fas fa-exclamation-triangle"></i><br>
+                                    Sản phẩm sắp hết
+                                </a>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="{% url 'reports:audit_create' %}" class="btn btn-success btn-block">
+                                    <i class="fas fa-plus-circle"></i><br>
+                                    Tạo phiếu kiểm kê
+                                </a>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="{% url 'reports:audit_list' %}" class="btn btn-info btn-block">
+                                    <i class="fas fa-list"></i><br>
+                                    Danh sách kiểm kê
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Có thể thêm biểu đồ Chart.js ở đây sau
+    console.log('Reports Dashboard loaded');
+});
+</script>
+{% endblock %}

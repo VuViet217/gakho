@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load report_filters %}
+
+{% block title %}Chi tiết báo cáo tháng {{ month }}/{{ year }} - OVNC Inventory{% endblock %}
+
+{% block extra_css %}
+<style>
+.summary-card {
+    background: linear-gradient(135deg, #8E2DE2 0%, #4A00E0 100%);
+    color: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.summary-card.positive {
+    background: linear-gradient(135deg, #06beb6 0%, #48b1bf 100%);
+}
+
+.summary-card.negative {
+    background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+}
+
+.summary-card h3 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.summary-card p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+.change-indicator {
+    font-size: 1.2rem;
+    padding-left: 5px;
+}
+
+.change-indicator.positive {
+    color: #00ff00;
+}
+
+.change-indicator.negative {
+    color: #ff6b6b;
+}
+</style>
+{% endblock %}
+
+{% block content_header %}
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1><i class="fas fa-calendar-check"></i> Báo cáo tháng {{ month }}/{{ year }}</h1>
+      </div>
+      <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+          <li class="breadcrumb-item"><a href="{% url 'main_dashboard' %}">Trang chủ</a></li>
+          <li class="breadcrumb-item"><a href="{% url 'reports:dashboard' %}">Báo cáo</a></li>
+          <li class="breadcrumb-item"><a href="{% url 'reports:monthly_report' %}">Báo cáo tháng</a></li>
+          <li class="breadcrumb-item active">{{ month }}/{{ year }}</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <!-- Thống kê tổng quan -->
+  <div class="row">
+    <div class="col-12">
+      <div class="callout callout-info">
+        <h5><i class="fas fa-info"></i> Trạng thái báo cáo:</h5>
+        {% if is_closed %}
+          <span class="badge badge-success">Đã chốt</span>
+        {% else %}
+          <span class="badge badge-warning">Chưa chốt</span>
+          <form method="post" action="{% url 'reports:close_month' year month %}" class="d-inline ml-2">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Bạn có chắc chắn muốn chốt báo cáo tháng {{ month }}/{{ year }}?')">
+              <i class="fas fa-check-circle"></i> Chốt báo cáo tháng này
+            </button>
+          </form>
+        {% endif %}
+        <a href="{% url 'reports:monthly_report_pdf' year month %}" class="btn btn-secondary btn-sm ml-2">
+          <i class="fas fa-file-pdf"></i> Xuất PDF
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-3">
+      <div class="summary-card">
+        <i class="fas fa-boxes fa-2x"></i>
+        <h3>{{ total_opening }}</h3>
+        <p>Tồn đầu tháng</p>
+      </div>
+    </div>
+    
+    <div class="col-md-3">
+      <div class="summary-card positive">
+        <i class="fas fa-arrow-circle-up fa-2x"></i>
+        <h3>{{ total_received }}</h3>
+        <p>Tổng nhập trong tháng</p>
+      </div>
+    </div>
+    
+    <div class="col-md-3">
+      <div class="summary-card negative">
+        <i class="fas fa-arrow-circle-down fa-2x"></i>
+        <h3>{{ total_issued }}</h3>
+        <p>Tổng xuất trong tháng</p>
+      </div>
+    </div>
+    
+    <div class="col-md-3">
+      <div class="summary-card">
+        <i class="fas fa-dolly fa-2x"></i>
+        <h3>{{ total_closing }}</h3>
+        <p>Tồn cuối tháng</p>
+        {% if total_closing > total_opening %}
+          <span class="change-indicator positive">
+            <i class="fas fa-arrow-up"></i> +{{ total_closing|subtract:total_opening }}
+          </span>
+        {% elif total_closing < total_opening %}
+          <span class="change-indicator negative">
+            <i class="fas fa-arrow-down"></i> {{ total_closing|subtract:total_opening }}
+          </span>
+        {% else %}
+          <span class="change-indicator">
+            <i class="fas fa-equals"></i> 0
+          </span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Danh sách sản phẩm -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Chi tiết tồn kho theo sản phẩm</h3>
+    </div>
+    <div class="card-body">
+      <!-- Bộ lọc -->
+      <form method="get" class="mb-4">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="form-group">
+              <input type="text" name="search" class="form-control" placeholder="Tìm theo tên, mã sản phẩm..." value="{{ search }}">
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <select name="category" class="form-control">
+                <option value="">-- Tất cả danh mục --</option>
+                {% for category in categories %}
+                  <option value="{{ category.id }}" {% if selected_category == category.id|stringformat:"i" %}selected{% endif %}>{{ category.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-filter"></i> Lọc
+            </button>
+            <a href="{% url 'reports:monthly_report_detail' year month %}" class="btn btn-secondary">
+              <i class="fas fa-sync-alt"></i> Đặt lại
+            </a>
+          </div>
+        </div>
+      </form>
+
+      <!-- Bảng sản phẩm -->
+      <div class="table-responsive">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>Mã SP</th>
+              <th>Tên sản phẩm</th>
+              <th>Danh mục</th>
+              <th>Đơn vị</th>
+              <th>Tồn đầu tháng</th>
+              <th>Nhập</th>
+              <th>Xuất</th>
+              <th>Tồn cuối tháng</th>
+              <th>Biến động</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for snapshot in snapshots %}
+              <tr>
+                <td>{{ snapshot.product.product_code }}</td>
+                <td>{{ snapshot.product.name }}</td>
+                <td>{{ snapshot.product.category.name }}</td>
+                <td>{{ snapshot.product.unit.name }}</td>
+                <td>{{ snapshot.opening_stock }}</td>
+                <td>{{ snapshot.total_received }}</td>
+                <td>{{ snapshot.total_issued }}</td>
+                <td>{{ snapshot.closing_stock }}</td>
+                <td>
+                  {% if snapshot.stock_change > 0 %}
+                    <span class="text-success">+{{ snapshot.stock_change }} ({{ snapshot.stock_change_percentage }}%)</span>
+                  {% elif snapshot.stock_change < 0 %}
+                    <span class="text-danger">{{ snapshot.stock_change }} ({{ snapshot.stock_change_percentage }}%)</span>
+                  {% else %}
+                    <span class="text-secondary">0 (0%)</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="9" class="text-center">Không có dữ liệu</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+  console.log('Monthly report detail loaded');
+});
+</script>
+{% endblock %}

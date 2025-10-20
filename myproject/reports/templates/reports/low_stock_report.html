@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Báo cáo sản phẩm sắp hết - OVNC Inventory{% endblock %}
+
+{% block content_header %}
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1><i class="fas fa-exclamation-triangle"></i> Báo cáo sản phẩm sắp hết</h1>
+      </div>
+      <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+          <li class="breadcrumb-item"><a href="{% url 'main_dashboard' %}">Trang chủ</a></li>
+          <li class="breadcrumb-item"><a href="{% url 'reports:dashboard' %}">Báo cáo</a></li>
+          <li class="breadcrumb-item active">Sản phẩm sắp hết</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header bg-warning">
+          <h3 class="card-title">Sản phẩm sắp hết</h3>
+          <div class="card-tools">
+            <a href="{% url 'reports:low_stock_report_pdf' %}" class="btn btn-secondary btn-sm">
+              <i class="fas fa-file-pdf"></i> Xuất PDF
+            </a>
+          </div>
+        </div>
+        <div class="card-body">
+          <!-- Bộ lọc -->
+          <form method="get" class="mb-4">
+            <div class="row">
+              <div class="col-md-4">
+                <div class="form-group">
+                  <input type="text" name="search" class="form-control" placeholder="Tìm theo tên, mã sản phẩm..." value="{{ search }}">
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <select name="category" class="form-control">
+                    <option value="">-- Tất cả danh mục --</option>
+                    {% for category in categories %}
+                      <option value="{{ category.id }}" {% if selected_category == category.id|stringformat:"i" %}selected{% endif %}>{{ category.name }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <select name="status" class="form-control">
+                    <option value="">-- Tất cả trạng thái --</option>
+                    <option value="critical" {% if selected_status == 'critical' %}selected{% endif %}>Hết hàng</option>
+                    <option value="warning" {% if selected_status == 'warning' %}selected{% endif %}>Sắp hết</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-2">
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-filter"></i> Lọc
+                </button>
+                <a href="{% url 'reports:low_stock_report' %}" class="btn btn-secondary">
+                  <i class="fas fa-sync-alt"></i> Đặt lại
+                </a>
+              </div>
+            </div>
+          </form>
+          
+          <!-- Bảng sản phẩm -->
+          {% if products %}
+            <div class="table-responsive">
+              <table class="table table-hover table-striped">
+                <thead>
+                  <tr>
+                    <th>Mã sản phẩm</th>
+                    <th>Tên sản phẩm</th>
+                    <th>Danh mục</th>
+                    <th>Tồn kho</th>
+                    <th>Mức tối thiểu</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for product in products %}
+                    <tr>
+                      <td>{{ product.product_code }}</td>
+                      <td>{{ product.name }}</td>
+                      <td>{{ product.category.name }}</td>
+                      <td>{{ product.current_quantity }} {{ product.unit.name }}</td>
+                      <td>{{ product.minimum_quantity }} {{ product.unit.name }}</td>
+                      <td>
+                        {% if product.current_quantity == 0 %}
+                          <span class="badge badge-danger">Hết hàng</span>
+                        {% else %}
+                          <span class="badge badge-warning">Sắp hết</span>
+                        {% endif %}
+                      </td>
+                      <td>
+                        <a href="{% url 'product_detail' product.id %}" class="btn btn-info btn-sm">
+                          <i class="fas fa-eye"></i> Chi tiết
+                        </a>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <div class="alert alert-info">
+              <i class="fas fa-info-circle"></i> Không tìm thấy sản phẩm sắp hết.
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+  console.log('Low stock report loaded');
+});
+</script>
+{% endblock %}

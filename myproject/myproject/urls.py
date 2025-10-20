@@ -30,6 +30,7 @@ urlpatterns = [
     path('procurement/', include('suppliers.urls')),
     path('inventory/', include('inventory.urls')),
     path('inventory/requests/', include('inventory_requests.urls')),
+    path('reports/', include('reports.urls')),
     path('system/', include('system_settings.urls')),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('summernote/', include('django_summernote.urls')),

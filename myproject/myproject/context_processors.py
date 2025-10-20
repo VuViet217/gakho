@@ -81,6 +81,18 @@ def menu_context(request):
                 {'name': 'Vị trí cột', 'url': 'warehouse_column_list', 'icon': 'fas fa-columns', 'active': False},
             ]
         },
+        'reports': {
+            'name': 'Báo cáo',
+            'icon': 'fas fa-chart-bar',
+            'active': False,
+            'open': False,
+            'items': [
+                {'name': 'Tổng quan', 'url': 'reports:dashboard', 'icon': 'fas fa-chart-line', 'active': False},
+                {'name': 'Báo cáo tháng', 'url': 'reports:monthly_report', 'icon': 'fas fa-calendar-alt', 'active': False},
+                {'name': 'Sản phẩm sắp hết', 'url': 'reports:low_stock_report', 'icon': 'fas fa-exclamation-circle', 'active': False},
+                {'name': 'Kiểm kê kho', 'url': 'reports:audit_list', 'icon': 'fas fa-clipboard-check', 'active': False},
+            ]
+        },
         'user_management': {
             'name': 'Quản lý người dùng',
             'icon': 'fas fa-users-cog',
@@ -171,6 +183,20 @@ def menu_context(request):
             menu['inventory']['items'][8]['active'] = True
         elif 'warehouse_column_list' in path or 'warehouse-columns/' in path:
             menu['inventory']['items'][9]['active'] = True
+    
+    # Reports section
+    if '/reports/' in path:
+        menu['reports']['active'] = True
+        menu['reports']['open'] = True
+        
+        if path == '/reports/' or 'dashboard' in path:
+            menu['reports']['items'][0]['active'] = True
+        elif 'monthly' in path:
+            menu['reports']['items'][1]['active'] = True
+        elif 'low-stock' in path:
+            menu['reports']['items'][2]['active'] = True
+        elif 'audit' in path:
+            menu['reports']['items'][3]['active'] = True
     
     # User management section
     if '/users/' in path or '/profile' in path:

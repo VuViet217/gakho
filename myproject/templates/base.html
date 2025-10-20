@@ -192,6 +192,30 @@
           </li>
           {% endif %}
           
+          <!-- Reports -->
+          {% if not menu.reports.roles or request.user.role in menu.reports.roles or request.user.is_superuser %}
+          <li class="nav-header">BÁO CÁO</li>
+          <li class="nav-item has-treeview {% if menu.reports.open %}menu-open{% endif %}">
+            <a href="#" class="nav-link {% if menu.reports.active %}active{% endif %}">
+              <i class="{{ menu.reports.icon }} nav-icon"></i>
+              <p>
+                {{ menu.reports.name }}
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              {% for item in menu.reports.items %}
+              <li class="nav-item">
+                <a href="{% url item.url %}" class="nav-link {% if item.active %}active{% endif %}">
+                  <i class="{{ item.icon }} nav-icon"></i>
+                  <p>{{ item.name }}</p>
+                </a>
+              </li>
+              {% endfor %}
+            </ul>
+          </li>
+          {% endif %}
+          
           <!-- User Management -->
           {% if not menu.user_management.roles or request.user.role in menu.user_management.roles or request.user.is_superuser %}
           <li class="nav-header">QUẢN LÝ NGƯỜI DÙNG</li>
