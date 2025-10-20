@@ -19,6 +19,8 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, 
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
+from django.conf import settings
+import os
 
 from myproject.decorators import role_required
 from system_settings.template_email_service import send_template_email
@@ -840,6 +842,7 @@ def inventory_request_complete(request, request_id):
             'completed_date': timezone.now().strftime('%d/%m/%Y %H:%M'),
             'items': [
                 {
+                    'employee_code': item['employee'].employee_id,
                     'employee_name': item['employee'].full_name,
                     'employee_dept': item['employee'].department.name if item['employee'].department else 'N/A',
                     'product_code': item['product'].product_code,
@@ -883,6 +886,7 @@ def print_delivery_note(request, request_id):
             'completed_date': request_obj.completed_date.strftime('%d/%m/%Y %H:%M') if request_obj.completed_date else timezone.now().strftime('%d/%m/%Y %H:%M'),
             'items': [
                 {
+                    'employee_code': ep.employee.employee_id,
                     'employee_name': ep.employee.full_name,
                     'employee_dept': ep.employee.department.name if ep.employee.department else 'N/A',
                     'product_code': ep.product.product_code,
@@ -901,6 +905,12 @@ def print_delivery_note(request, request_id):
     
     # Tạo PDF với ReportLab
     try:
+        # Đăng ký font Arial hỗ trợ tiếng Việt
+        font_path = os.path.join(settings.BASE_DIR, 'static', 'fonts', 'Arial.ttf')
+        font_bold_path = os.path.join(settings.BASE_DIR, 'static', 'fonts', 'Arial-Bold.ttf')
+        pdfmetrics.registerFont(TTFont('Arial', font_path))
+        pdfmetrics.registerFont(TTFont('Arial-Bold', font_bold_path))
+        
         # Tạo buffer để lưu PDF
         buffer = BytesIO()
         
@@ -920,7 +930,7 @@ def print_delivery_note(request, request_id):
         # Styles
         styles = getSampleStyleSheet()
         
-        # Tiêu đề chính - sử dụng font hỗ trợ tiếng Việt
+        # Tiêu đề chính - sử dụng font Arial
         title_style = ParagraphStyle(
             'CustomTitle',
             parent=styles['Heading1'],
@@ -928,14 +938,7 @@ def print_delivery_note(request, request_id):
             textColor=colors.HexColor('#1a237e'),
             spaceAfter=10,
             alignment=TA_CENTER,
-            fontName='Times-Bold'  # Times-Roman hỗ trợ tiếng Việt tốt hơn
-        )
-        
-        normal_style = ParagraphStyle(
-            'CustomNormal',
-            parent=styles['Normal'],
-            fontSize=9,
-            fontName='Times-Roman'
+            fontName='Arial-Bold'
         )
         
         # Tiêu đề
@@ -950,10 +953,10 @@ def print_delivery_note(request, request_id):
         
         info_table = Table(info_data, colWidths=[30*mm, 60*mm, 30*mm, 60*mm])
         info_table.setStyle(TableStyle([
-            ('FONTNAME', (0, 0), (-1, -1), 'Times-Roman'),
+            ('FONTNAME', (0, 0), (-1, -1), 'Arial'),
             ('FONTSIZE', (0, 0), (-1, -1), 9),
-            ('FONTNAME', (0, 0), (0, -1), 'Times-Bold'),
-            ('FONTNAME', (2, 0), (2, -1), 'Times-Bold'),
+            ('FONTNAME', (0, 0), (0, -1), 'Arial-Bold'),
+            ('FONTNAME', (2, 0), (2, -1), 'Arial-Bold'),
             ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
             ('LEFTPADDING', (0, 0), (-1, -1), 3),
@@ -967,35 +970,37 @@ def print_delivery_note(request, request_id):
         
         # Bảng sản phẩm
         product_data = [
-            ['STT', 'Nhân viên', 'Bộ phận', 'Mã SP', 'Tên sản phẩm', 'SL yêu cầu', 'SL cấp phát']
+            ['STT', 'Mã NV', 'Nhân viên', 'Bộ phận', 'Mã SP', 'Tên sản phẩm', 'SL yêu cầu', 'SL cấp phát']
         ]
         
         for idx, item in enumerate(issued_data['items'], 1):
             product_data.append([
                 str(idx),
-                item['employee_name'][:25],
-                item['employee_dept'][:20],
+                item.get('employee_code', '')[:10],
+                item['employee_name'][:20],
+                item['employee_dept'][:15],
                 item['product_code'],
-                item['product_name'][:35],
+                item['product_name'][:30],
                 str(item['requested_quantity']),
                 str(item['issued_quantity'])
             ])
         
-        product_table = Table(product_data, colWidths=[8*mm, 30*mm, 25*mm, 20*mm, 40*mm, 18*mm, 18*mm])
+        product_table = Table(product_data, colWidths=[8*mm, 15*mm, 25*mm, 20*mm, 18*mm, 35*mm, 16*mm, 16*mm])
         product_table.setStyle(TableStyle([
             # Header
             ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1a237e')),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-            ('FONTNAME', (0, 0), (-1, 0), 'Times-Bold'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Arial-Bold'),
             ('FONTSIZE', (0, 0), (-1, 0), 9),
             ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
             
             # Body
-            ('FONTNAME', (0, 1), (-1, -1), 'Times-Roman'),
+            ('FONTNAME', (0, 1), (-1, -1), 'Arial'),
             ('FONTSIZE', (0, 1), (-1, -1), 8),
             ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
             ('ALIGN', (0, 1), (0, -1), 'CENTER'),  # STT
-            ('ALIGN', (5, 1), (-1, -1), 'CENTER'),  # Số lượng
+            ('ALIGN', (1, 1), (1, -1), 'CENTER'),  # Mã NV
+            ('ALIGN', (6, 1), (-1, -1), 'CENTER'),  # Số lượng
             
             # Borders
             ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
@@ -1020,8 +1025,8 @@ def print_delivery_note(request, request_id):
         
         signature_table = Table(signature_data, colWidths=[60*mm, 60*mm, 60*mm])
         signature_table.setStyle(TableStyle([
-            ('FONTNAME', (0, 0), (-1, 0), 'Times-Bold'),
-            ('FONTNAME', (0, 1), (-1, -1), 'Times-Roman'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Arial-Bold'),
+            ('FONTNAME', (0, 1), (-1, -1), 'Arial'),
             ('FONTSIZE', (0, 0), (-1, -1), 9),
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
             ('VALIGN', (0, 0), (-1, -1), 'TOP'),
