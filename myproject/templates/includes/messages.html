@@ -1,8 +1,30 @@
 {% if messages %}
-<div id="message-container" style="position: fixed; top: 70px; right: 20px; z-index: 9999; max-width: 400px;">
+<div id="message-container" style="position: fixed; top: 70px; right: 20px; z-index: 9999; max-width: 450px;">
     {% for message in messages %}
-    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" style="margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
-        <strong>
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" 
+         style="margin-bottom: 10px; 
+                box-shadow: 0 4px 12px rgba(0,0,0,0.25); 
+                border-width: 2px;
+                border-left-width: 5px;
+                font-weight: 500;
+                {% if message.tags == 'error' or message.tags == 'danger' %}
+                    background-color: #f8d7da !important; 
+                    border-color: #dc3545 !important; 
+                    color: #721c24 !important;
+                {% elif message.tags == 'success' %}
+                    background-color: #d4edda !important; 
+                    border-color: #28a745 !important; 
+                    color: #155724 !important;
+                {% elif message.tags == 'warning' %}
+                    background-color: #fff3cd !important; 
+                    border-color: #ffc107 !important; 
+                    color: #856404 !important;
+                {% elif message.tags == 'info' %}
+                    background-color: #d1ecf1 !important; 
+                    border-color: #17a2b8 !important; 
+                    color: #0c5460 !important;
+                {% endif %}">
+        <strong style="font-size: 15px;">
             {% if message.tags == 'success' %}
                 <i class="fas fa-check-circle"></i>
             {% elif message.tags == 'error' or message.tags == 'danger' %}
@@ -13,8 +35,13 @@
                 <i class="fas fa-info-circle"></i>
             {% endif %}
         </strong>
-        {{ message }}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span style="font-size: 14px;">{{ message }}</span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" 
+                style="{% if message.tags == 'error' or message.tags == 'danger' %}color: #721c24;
+                       {% elif message.tags == 'success' %}color: #155724;
+                       {% elif message.tags == 'warning' %}color: #856404;
+                       {% elif message.tags == 'info' %}color: #0c5460;
+                       {% endif %}">
             <span aria-hidden="true">&times;</span>
         </button>
     </div>

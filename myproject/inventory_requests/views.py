@@ -749,6 +749,8 @@ def inventory_request_schedule(request, request_id):
                         'request': request_obj,
                         'user': request_obj.requester,
                         'warehouse_manager': request.user,
+                        'scheduled_date': scheduled_date,
+                        'schedule_notes': note,
                     },
                     cc_list=cc_list
                 )
