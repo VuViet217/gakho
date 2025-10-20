@@ -885,9 +885,9 @@ def inventory_request_complete(request, request_id):
             cc_list = list(set(filter(None, cc_list)))
             
             send_template_email(
-                template_name='request_completed',
-                context=email_context,
                 recipient_list=[request_obj.requester.email],
+                template_code='request_completed',
+                context_data=email_context,
                 cc_list=cc_list
             )
         except Exception as e:
