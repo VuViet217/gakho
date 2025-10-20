@@ -204,7 +204,7 @@ class Command(BaseCommand):
         <div class="content-box">
             <div class="message-box">
                 <h2>Xin chào {{{{ request.requester.get_full_name }}}},</h2>
-                <p>Yêu cầu cấp phát vật tư của bạn đã được phê duyệt bởi {{{{ request.approved_by.get_full_name }}}}.</p>
+                <p>Yêu cầu cấp phát vật tư của bạn đã được phê duyệt bởi {{{{ request.approver.get_full_name }}}}.</p>
             </div>
 
             <div class="info-box">
@@ -219,11 +219,11 @@ class Command(BaseCommand):
                 </div>
                 <div class="info-row">
                     <span class="label">Người phê duyệt:</span>
-                    <span class="value">{{{{ request.approved_by.get_full_name }}}}</span>
+                    <span class="value">{{{{ request.approver.get_full_name }}}} ({{{{ request.approver.email }}}})</span>
                 </div>
                 <div class="info-row">
                     <span class="label">Ngày phê duyệt:</span>
-                    <span class="value">{{{{ request.approved_at|date:"d/m/Y H:i" }}}}</span>
+                    <span class="value">{{{{ request.approval_date|date:"d/m/Y H:i" }}}}</span>
                 </div>
                 <div class="info-row">
                     <span class="label">Trạng thái:</span>
@@ -312,7 +312,7 @@ class Command(BaseCommand):
         <div class="content-box">
             <div class="message-box rejected">
                 <h2>Xin chào {{{{ request.requester.get_full_name }}}},</h2>
-                <p>Rất tiếc, yêu cầu cấp phát vật tư của bạn đã bị từ chối bởi {{{{ request.approved_by.get_full_name }}}}.</p>
+                <p>Rất tiếc, yêu cầu cấp phát vật tư của bạn đã bị từ chối bởi {{{{ request.approver.get_full_name }}}}.</p>
             </div>
 
             <div class="info-box rejected">
@@ -327,11 +327,11 @@ class Command(BaseCommand):
                 </div>
                 <div class="info-row">
                     <span class="label">Người từ chối:</span>
-                    <span class="value">{{{{ request.approved_by.get_full_name }}}}</span>
+                    <span class="value">{{{{ request.approver.get_full_name }}}} ({{{{ request.approver.email }}}})</span>
                 </div>
                 <div class="info-row">
                     <span class="label">Ngày từ chối:</span>
-                    <span class="value">{{{{ request.approved_at|date:"d/m/Y H:i" }}}}</span>
+                    <span class="value">{{{{ request.approval_date|date:"d/m/Y H:i" }}}}</span>
                 </div>
                 <div class="info-row">
                     <span class="label">Trạng thái:</span>
