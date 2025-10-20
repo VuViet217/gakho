@@ -853,8 +853,8 @@ def inventory_request_complete(request, request_id):
         
         messages.success(request, 'Yêu cầu đã được đánh dấu hoàn thành thành công.')
         
-        # Chuyển hướng đến trang in phiếu xuất kho
-        return redirect('inventory_requests:print_delivery_note', request_id=request_obj.id)
+        # Chuyển hướng về chi tiết yêu cầu (không tự động in)
+        return redirect('inventory_requests:inventory_request_detail', request_id=request_obj.id)
     
     context = {
         'request_obj': request_obj,
@@ -920,7 +920,7 @@ def print_delivery_note(request, request_id):
         # Styles
         styles = getSampleStyleSheet()
         
-        # Tiêu đề chính
+        # Tiêu đề chính - sử dụng font hỗ trợ tiếng Việt
         title_style = ParagraphStyle(
             'CustomTitle',
             parent=styles['Heading1'],
@@ -928,21 +928,21 @@ def print_delivery_note(request, request_id):
             textColor=colors.HexColor('#1a237e'),
             spaceAfter=10,
             alignment=TA_CENTER,
-            fontName='Helvetica-Bold'
+            fontName='Times-Bold'  # Times-Roman hỗ trợ tiếng Việt tốt hơn
         )
         
         normal_style = ParagraphStyle(
             'CustomNormal',
             parent=styles['Normal'],
             fontSize=9,
-            fontName='Helvetica'
+            fontName='Times-Roman'
         )
         
         # Tiêu đề
         elements.append(Paragraph('PHIẾU XUẤT KHO', title_style))
         elements.append(Spacer(1, 5*mm))
         
-        # Thông tin yêu cầu
+        # Thông tin yêu cầu - Sử dụng text đơn giản thay vì Paragraph
         info_data = [
             ['Mã yêu cầu:', issued_data['request_code'], 'Ngày hoàn thành:', issued_data['completed_date']],
             ['Người yêu cầu:', issued_data['requester'], 'Thủ kho:', issued_data['warehouse_manager']],
@@ -950,10 +950,10 @@ def print_delivery_note(request, request_id):
         
         info_table = Table(info_data, colWidths=[30*mm, 60*mm, 30*mm, 60*mm])
         info_table.setStyle(TableStyle([
-            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+            ('FONTNAME', (0, 0), (-1, -1), 'Times-Roman'),
             ('FONTSIZE', (0, 0), (-1, -1), 9),
-            ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
-            ('FONTNAME', (2, 0), (2, -1), 'Helvetica-Bold'),
+            ('FONTNAME', (0, 0), (0, -1), 'Times-Bold'),
+            ('FONTNAME', (2, 0), (2, -1), 'Times-Bold'),
             ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
             ('LEFTPADDING', (0, 0), (-1, -1), 3),
@@ -973,10 +973,10 @@ def print_delivery_note(request, request_id):
         for idx, item in enumerate(issued_data['items'], 1):
             product_data.append([
                 str(idx),
-                item['employee_name'][:20],  # Giới hạn độ dài
-                item['employee_dept'][:15],
+                item['employee_name'][:25],
+                item['employee_dept'][:20],
                 item['product_code'],
-                item['product_name'][:30],
+                item['product_name'][:35],
                 str(item['requested_quantity']),
                 str(item['issued_quantity'])
             ])
@@ -986,12 +986,12 @@ def print_delivery_note(request, request_id):
             # Header
             ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1a237e')),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Times-Bold'),
             ('FONTSIZE', (0, 0), (-1, 0), 9),
             ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
             
             # Body
-            ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+            ('FONTNAME', (0, 1), (-1, -1), 'Times-Roman'),
             ('FONTSIZE', (0, 1), (-1, -1), 8),
             ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
             ('ALIGN', (0, 1), (0, -1), 'CENTER'),  # STT
@@ -1020,8 +1020,8 @@ def print_delivery_note(request, request_id):
         
         signature_table = Table(signature_data, colWidths=[60*mm, 60*mm, 60*mm])
         signature_table.setStyle(TableStyle([
-            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Times-Bold'),
+            ('FONTNAME', (0, 1), (-1, -1), 'Times-Roman'),
             ('FONTSIZE', (0, 0), (-1, -1), 9),
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
             ('VALIGN', (0, 0), (-1, -1), 'TOP'),
