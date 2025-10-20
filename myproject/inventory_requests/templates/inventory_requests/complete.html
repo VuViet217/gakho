@@ -3,7 +3,7 @@
 
 {% block title %}{{ title }}{% endblock %}
 
-{% block content %}
+{% block content_header %}
 <section class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
@@ -20,8 +20,9 @@
         </div>
     </div>
 </section>
+{% endblock %}
 
-<section class="content">
+{% block content %}
     <div class="container-fluid">
         <!-- Chi tiết yêu cầu -->
         <div class="card">
@@ -61,41 +62,25 @@
                                 <td>{{ request_obj.approver.get_full_name }}</td>
                             </tr>
                             <tr>
-                                <th>Ngày lên lịch:</th>
-                                <td>{{ request_obj.scheduled_date|date:"d/m/Y" }}</td>
+                                <th>Ngày phê duyệt:</th>
+                                <td>{{ request_obj.approval_date|date:"d/m/Y H:i" }}</td>
+                            </tr>
+                            <tr>
+                                <th>Ngày giờ cấp phát:</th>
+                                <td>
+                                    <strong class="text-primary">{{ request_obj.scheduled_date|date:"d/m/Y H:i" }}</strong>
+                                </td>
                             </tr>
                         </table>
                     </div>
                 </div>
 
-                <!-- Danh sách nhân viên -->
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h3 class="card-title">Danh sách nhân viên</h3>
-                    </div>
-                    <div class="card-body">
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Họ tên</th>
-                                    <th>Phòng ban</th>
-                                    <th>Chức vụ</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for employee_request in request_obj.request_employees.all %}
-                                <tr>
-                                    <td>{{ forloop.counter }}</td>
-                                    <td>{{ employee_request.employee.full_name }}</td>
-                                    <td>{{ employee_request.employee.department }}</td>
-                                    <td>{{ employee_request.employee.position }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                {% if request_obj.schedule_notes %}
+                <div class="alert alert-warning mt-3">
+                    <h5><i class="fas fa-sticky-note"></i> Ghi chú từ quản lý kho:</h5>
+                    <p class="mb-0">{{ request_obj.schedule_notes }}</p>
                 </div>
+                {% endif %}
             </div>
         </div>
         
@@ -125,39 +110,56 @@
                     
                     <!-- Danh sách sản phẩm -->
                     <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">Xác nhận số lượng cấp phát</h3>
+                        <div class="card-header bg-info">
+                            <h3 class="card-title">Danh sách vật tư cần cấp phát</h3>
                         </div>
                         <div class="card-body">
-                            <div class="alert alert-info">
-                                <i class="fas fa-info-circle"></i> Vui lòng nhập số lượng thực tế được cấp phát cho từng sản phẩm.
+                            <div class="alert alert-info" style="background-color: #d1ecf1; border: 1px solid #17a2b8; border-left: 4px solid #17a2b8;">
+                                <h5 style="color: #0c5460;"><i class="fas fa-info-circle"></i> Hướng dẫn</h5>
+                                <ul style="margin-bottom: 0; color: #0c5460;">
+                                    <li>Kiểm tra kỹ số lượng tồn kho trước khi cấp phát</li>
+                                    <li>Nhập số lượng thực tế đã cấp phát cho từng sản phẩm</li>
+                                    <li>Số lượng cấp phát không được vượt quá tồn kho hiện tại</li>
+                                    <li>Sau khi hoàn thành, tồn kho sẽ tự động được trừ đi</li>
+                                </ul>
                             </div>
-                            <table class="table table-bordered">
-                                <thead>
+                            <table class="table table-bordered table-hover">
+                                <thead class="thead-light">
                                     <tr>
-                                        <th>#</th>
-                                        <th>Tên sản phẩm</th>
-                                        <th>Danh mục</th>
-                                        <th>Số lượng yêu cầu</th>
-                                        <th>Tồn kho</th>
-                                        <th>Số lượng cấp phát</th>
+                                        <th style="width: 50px;">#</th>
+                                        <th>Nhân viên</th>
+                                        <th>Sản phẩm</th>
+                                        <th>Mã SP</th>
+                                        <th class="text-center" style="width: 100px;">SL yêu cầu</th>
+                                        <th class="text-center" style="width: 100px;">Tồn kho</th>
+                                        <th style="width: 150px;">SL cấp phát</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% for item in request_obj.items.all %}
+                                    {% for employee_product in request_obj.employee_products.all %}
                                     <tr>
                                         <td>{{ forloop.counter }}</td>
-                                        <td>{{ item.product.name }}</td>
-                                        <td>{{ item.product.category.name }}</td>
-                                        <td>{{ item.quantity }} {{ item.product.unit }}</td>
-                                        <td>{{ item.product.current_quantity }} {{ item.product.unit }}</td>
+                                        <td>
+                                            <strong>{{ employee_product.employee.full_name }}</strong><br>
+                                            <small class="text-muted">{{ employee_product.employee.department.name|default:"N/A" }}</small>
+                                        </td>
+                                        <td>{{ employee_product.product.name }}</td>
+                                        <td><code>{{ employee_product.product.product_code }}</code></td>
+                                        <td class="text-center">
+                                            <strong class="text-primary">{{ employee_product.quantity }}</strong>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge {% if employee_product.product.current_quantity >= employee_product.quantity %}badge-success{% else %}badge-danger{% endif %}">
+                                                {{ employee_product.product.current_quantity }}
+                                            </span>
+                                        </td>
                                         <td>
                                             <input type="number" 
-                                                   name="issued_quantity_{{ item.id }}"
-                                                   id="id_issued_quantity_{{ item.id }}"
-                                                   value="{{ item.quantity }}"
+                                                   name="issued_quantity_{{ employee_product.id }}"
+                                                   id="id_issued_quantity_{{ employee_product.id }}"
+                                                   value="{{ employee_product.quantity }}"
                                                    min="0" 
-                                                   max="{{ item.product.current_quantity }}"
+                                                   max="{{ employee_product.product.current_quantity }}"
                                                    class="form-control"
                                                    required>
                                         </td>
