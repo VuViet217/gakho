@@ -9,7 +9,7 @@ class Command(BaseCommand):
         warehouse_approval_template = {
             'code': 'warehouse_approval_required',
             'name': 'Yêu cầu cần xử lý xuất kho',
-            'subject': '[Quản lý kho] Yêu cầu #{request.request_code} cần xử lý xuất kho',
+            'subject': '[Quản lý kho] Yêu cầu #{{ request.request_code }} cần xử lý xuất kho',
             'content': '''
 <!DOCTYPE html>
 <html>
@@ -49,23 +49,23 @@ class Command(BaseCommand):
                 <h2>Thông tin yêu cầu</h2>
                 <div class="info-row">
                     <span class="label">Mã yêu cầu:</span>
-                    <span class="value"><strong>#{request.request_code}</strong></span>
+                    <span class="value"><strong>#{{ request.request_code }}</strong></span>
                 </div>
                 <div class="info-row">
                     <span class="label">Người yêu cầu:</span>
-                    <span class="value">{request.requester.get_full_name} ({request.requester.email})</span>
+                    <span class="value">{{ request.requester.get_full_name }} ({{ request.requester.email }})</span>
                 </div>
                 <div class="info-row">
                     <span class="label">Người phê duyệt:</span>
-                    <span class="value">{approver.get_full_name}</span>
+                    <span class="value">{{ approver.get_full_name }}</span>
                 </div>
                 <div class="info-row">
                     <span class="label">Ngày tạo:</span>
-                    <span class="value">{request.created_at|date:"d/m/Y H:i"}</span>
+                    <span class="value">{{ request.created_at|date:"d/m/Y H:i" }}</span>
                 </div>
                 <div class="info-row">
                     <span class="label">Ngày phê duyệt:</span>
-                    <span class="value">{request.approved_date|date:"d/m/Y H:i"}</span>
+                    <span class="value">{{ request.approved_date|date:"d/m/Y H:i" }}</span>
                 </div>
                 <div class="info-row">
                     <span class="label">Trạng thái:</span>
@@ -87,14 +87,14 @@ class Command(BaseCommand):
                         {% for employee_product in request.employee_products.all %}
                         <tr>
                             <td>
-                                <strong>{employee_product.employee.full_name}</strong><br>
-                                <small>{employee_product.employee.department.name if employee_product.employee.department else 'N/A'}</small>
+                                <strong>{{ employee_product.employee.full_name }}</strong><br>
+                                <small>{{ employee_product.employee.department.name|default:"N/A" }}</small>
                             </td>
                             <td>
-                                <span class="product-code">{employee_product.product.product_code}</span><br>
-                                {employee_product.product.name}
+                                <span class="product-code">{{ employee_product.product.product_code }}</span><br>
+                                {{ employee_product.product.name }}
                             </td>
-                            <td><strong>{employee_product.quantity}</strong></td>
+                            <td><strong>{{ employee_product.quantity }}</strong></td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -104,12 +104,12 @@ class Command(BaseCommand):
             {% if request.note %}
             <div class="info-box">
                 <h3>Ghi chú</h3>
-                <p>{request.note}</p>
+                <p>{{ request.note }}</p>
             </div>
             {% endif %}
 
             <div style="text-align: center;">
-                <a href="{request.get_absolute_url}" class="button">Xem chi tiết và xử lý xuất kho</a>
+                <a href="http://127.0.0.1:8000/inventory/requests/{{ request.id }}/" class="button">Xem chi tiết và xử lý xuất kho</a>
             </div>
         </div>
         

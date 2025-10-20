@@ -36,7 +36,7 @@ Thêm đoạn mã sau vào file templates/partials/_sidebar.html
                         <p>Yêu cầu của tôi</p>
                     </a>
                 </li>
-                {% if request.user.role in 'admin,manager' %}
+                {% if request.user.role == 'admin' or request.user.role == 'manager' %}
                 <li class="nav-item">
                     <a href="{% url 'inventory_requests:my_approval_requests' %}" class="nav-link {% if 'inventory/requests/my-approvals' in request.path %}active{% endif %}">
                         <i class="fas fa-check-double nav-icon"></i>
@@ -44,7 +44,7 @@ Thêm đoạn mã sau vào file templates/partials/_sidebar.html
                     </a>
                 </li>
                 {% endif %}
-                {% if request.user.role in 'admin,sm' %}
+                {% if request.user.role == 'admin' or request.user.role == 'sm' or request.user.role == 'manager' %}
                 <li class="nav-item">
                     <a href="{% url 'inventory_requests:warehouse_requests_list' %}" class="nav-link {% if 'inventory/requests/warehouse-requests' in request.path %}active{% endif %}">
                         <i class="fas fa-dolly nav-icon"></i>

@@ -131,12 +131,13 @@ class RequestScheduleForm(forms.Form):
     """
     Form cho việc lên lịch cấp phát
     """
-    scheduled_date = forms.DateField(
-        label=_('Ngày dự kiến cấp phát'),
-        widget=forms.DateInput(
-            attrs={'type': 'date', 'class': 'form-control'},
-            format='%Y-%m-%d'
+    scheduled_date = forms.DateTimeField(
+        label=_('Ngày giờ dự kiến cấp phát'),
+        widget=forms.DateTimeInput(
+            attrs={'type': 'datetime-local', 'class': 'form-control'},
+            format='%Y-%m-%dT%H:%M'
         ),
+        input_formats=['%Y-%m-%dT%H:%M'],
         required=True
     )
     note = forms.CharField(

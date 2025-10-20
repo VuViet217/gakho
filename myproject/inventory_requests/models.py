@@ -40,7 +40,7 @@ class InventoryRequest(models.Model):
     created_at = models.DateTimeField(_('Ngày tạo'), auto_now_add=True)
     updated_at = models.DateTimeField(_('Ngày cập nhật'), auto_now=True)
     expected_date = models.DateField(_('Ngày mong muốn nhận'), null=True, blank=True)
-    scheduled_date = models.DateField(_('Ngày dự kiến cấp phát'), null=True, blank=True)
+    scheduled_date = models.DateTimeField(_('Ngày giờ dự kiến cấp phát'), null=True, blank=True)
     completed_date = models.DateTimeField(_('Ngày hoàn thành'), null=True, blank=True)
     
     # Người liên quan

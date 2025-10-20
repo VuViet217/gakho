@@ -712,8 +712,9 @@ def inventory_request_schedule(request, request_id):
             messages.success(request, 'Yêu cầu đã được lên lịch cấp phát thành công.')
             return redirect('inventory_requests:warehouse_requests_list')
     else:
-        # Mặc định là ngày mai
-        tomorrow = timezone.now().date() + timezone.timedelta(days=1)
+        # Mặc định là ngày mai lúc 8h sáng
+        tomorrow = timezone.now() + timezone.timedelta(days=1)
+        tomorrow = tomorrow.replace(hour=8, minute=0, second=0, microsecond=0)
         form = RequestScheduleForm(initial={'scheduled_date': tomorrow})
     
     context = {

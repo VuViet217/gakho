@@ -57,7 +57,7 @@ class Command(BaseCommand):
                 'icon': 'fas fa-dolly',
                 'order': 4,
                 'parent': inventory_menu,
-                'roles': 'admin,warehouse',
+                'roles': 'admin,sm,manager',
                 'is_active': True
             },
             {

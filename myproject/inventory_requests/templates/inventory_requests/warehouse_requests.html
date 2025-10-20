@@ -25,6 +25,7 @@
 
 <section class="content">
     <div class="container-fluid">
+        <!-- Yêu cầu đã phê duyệt -->
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">Danh sách yêu cầu đã được phê duyệt</h3>
@@ -43,18 +44,14 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for request in requests %}
+                        {% for request in approved_requests %}
                         <tr>
                             <td>{{ request.request_code }}</td>
                             <td>{{ request.title }}</td>
-                            <td>{{ request.created_by.get_full_name }}</td>
+                            <td>{{ request.requester.get_full_name }}</td>
                             <td>{{ request.expected_date|date:"d/m/Y" }}</td>
                             <td>
-                                {% if request.status == 'approved' %}
                                 <span class="badge badge-success">Đã phê duyệt</span>
-                                {% elif request.status == 'scheduled' %}
-                                <span class="badge badge-primary">Đã lên lịch</span>
-                                {% endif %}
                             </td>
                             <td>{{ request.approval_date|date:"d/m/Y H:i" }}</td>
                             <td>
@@ -77,16 +74,16 @@
                                                         <span aria-hidden="true">&times;</span>
                                                     </button>
                                                 </div>
-                                                <div class="modal-body">
-                                                    <div class="form-group">
-                                                        <label for="scheduled_date">Ngày cấp phát</label>
-                                                        <input type="date" class="form-control" id="scheduled_date" name="scheduled_date" required>
+                                                    <div class="modal-body">
+                                                        <div class="form-group">
+                                                            <label for="scheduled_date">Ngày giờ cấp phát</label>
+                                                            <input type="datetime-local" class="form-control" id="scheduled_date" name="scheduled_date" required>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="schedule_notes">Ghi chú</label>
+                                                            <textarea class="form-control" id="schedule_notes" name="schedule_notes" rows="3"></textarea>
+                                                        </div>
                                                     </div>
-                                                    <div class="form-group">
-                                                        <label for="schedule_notes">Ghi chú</label>
-                                                        <textarea class="form-control" id="schedule_notes" name="schedule_notes" rows="3"></textarea>
-                                                    </div>
-                                                </div>
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
                                                     <button type="submit" class="btn btn-primary">Xác nhận</button>
@@ -102,6 +99,58 @@
                                 {% endif %}
                             </td>
                         </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center">Không có yêu cầu nào đã được phê duyệt</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Yêu cầu đã lên lịch -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h3 class="card-title">Danh sách yêu cầu đã lên lịch</h3>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered table-hover datatable2">
+                    <thead>
+                        <tr>
+                            <th>Mã yêu cầu</th>
+                            <th>Tiêu đề</th>
+                            <th>Người tạo</th>
+                            <th>Ngày mong muốn nhận</th>
+                            <th>Trạng thái</th>
+                            <th>Ngày lên lịch</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for request in scheduled_requests %}
+                        <tr>
+                            <td>{{ request.request_code }}</td>
+                            <td>{{ request.title }}</td>
+                            <td>{{ request.requester.get_full_name }}</td>
+                            <td>{{ request.expected_date|date:"d/m/Y" }}</td>
+                            <td>
+                                <span class="badge badge-primary">Đã lên lịch</span>
+                            </td>
+                            <td>{{ request.scheduled_date|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                <a href="{% url 'inventory_requests:inventory_request_detail' request.id %}" class="btn btn-info btn-sm">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{% url 'inventory_requests:inventory_request_complete' request.id %}" class="btn btn-success btn-sm">
+                                    <i class="fas fa-check-circle"></i> Hoàn thành
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center">Không có yêu cầu nào đã lên lịch</td>
+                        </tr>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -111,13 +160,24 @@
 </section>
 {% endblock %}
 
-{% block scripts %}
+{% block extra_js %}
 <script>
     $(function() {
         $('.datatable').DataTable({
             "responsive": true,
             "autoWidth": false,
-            "order": [[5, "desc"]]
+            "order": [[5, "desc"]],
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Vietnamese.json"
+            }
+        });
+        $('.datatable2').DataTable({
+            "responsive": true,
+            "autoWidth": false,
+            "order": [[5, "desc"]],
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Vietnamese.json"
+            }
         });
     });
 </script>
