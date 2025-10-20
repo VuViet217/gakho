@@ -78,33 +78,48 @@
                         <table class="table table-bordered table-hover">
                             <thead class="thead-light">
                                 <tr>
-                                    <th style="width: 5%;">#</th>
-                                    <th style="width: 25%;">Nhân viên</th>
-                                    <th style="width: 30%;">Sản phẩm</th>
-                                    <th style="width: 15%;" class="text-center">Số lượng</th>
-                                    <th style="width: 25%;">Ghi chú</th>
+                                    <th style="width: 4%;">#</th>
+                                    <th style="width: 20%;">Nhân viên</th>
+                                    <th style="width: 24%;">Sản phẩm</th>
+                                    <th style="width: 10%;" class="text-center">Số lượng</th>
+                                    <th style="width: 20%;">Lần lấy gần nhất</th>
+                                    <th style="width: 22%;">Ghi chú</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for item in request_obj.employee_products.all %}
+                                {% for item in employee_products_with_history %}
                                 <tr>
                                     <td class="text-center">{{ forloop.counter }}</td>
                                     <td>
-                                        <strong>{{ item.employee.full_name }}</strong><br>
-                                        <small class="text-muted">{{ item.employee.employee_code }}</small>
+                                        <strong>{{ item.employee_product.employee.full_name }}</strong><br>
+                                        <small class="text-muted">{{ item.employee_product.employee.employee_id }}</small>
                                     </td>
                                     <td>
-                                        <strong>{{ item.product.name }}</strong><br>
-                                        <small class="text-muted">Mã: {{ item.product.product_code }}</small>
+                                        <strong>{{ item.employee_product.product.name }}</strong><br>
+                                        <small class="text-muted">Mã: {{ item.employee_product.product.product_code }}</small>
                                     </td>
                                     <td class="text-center">
-                                        <span class="badge badge-info">{{ item.quantity }}</span>
+                                        <span class="badge badge-info">{{ item.employee_product.quantity }}</span>
                                     </td>
-                                    <td>{{ item.notes|default:"—" }}</td>
+                                    <td>
+                                        {% if item.last_delivery %}
+                                        <div class="text-sm">
+                                            <i class="far fa-calendar-alt text-muted"></i> 
+                                            {{ item.last_delivery.request.completed_date|date:"d/m/Y" }}<br>
+                                            <small class="text-muted">
+                                                <i class="fas fa-box-open"></i> SL: {{ item.last_delivery.quantity }} 
+                                                <span class="text-primary">({{ item.last_delivery.request.request_code }})</span>
+                                            </small>
+                                        </div>
+                                        {% else %}
+                                        <span class="badge badge-secondary">Chưa từng lấy</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ item.employee_product.notes|default:"—" }}</td>
                                 </tr>
                                 {% empty %}
                                 <tr>
-                                    <td colspan="5" class="text-center text-muted">Chưa có phân bổ nào</td>
+                                    <td colspan="6" class="text-center text-muted">Chưa có phân bổ nào</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>

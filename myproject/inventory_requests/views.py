@@ -591,9 +591,28 @@ def inventory_request_approve(request, request_id):
     else:
         form = RequestApprovalForm()
     
+    # Lấy lịch sử lấy hàng gần nhất cho mỗi employee_product
+    employee_products_with_history = []
+    for ep in request_obj.employee_products.all():
+        # Tìm lần lấy gần nhất của nhân viên này với sản phẩm này
+        last_delivery = EmployeeProductRequest.objects.filter(
+            employee=ep.employee,
+            product=ep.product,
+            request__status=InventoryRequest.STATUS_COMPLETED,
+            request__completed_date__isnull=False
+        ).exclude(
+            request=request_obj  # Loại trừ yêu cầu hiện tại
+        ).order_by('-request__completed_date').first()
+        
+        employee_products_with_history.append({
+            'employee_product': ep,
+            'last_delivery': last_delivery,
+        })
+    
     context = {
         'form': form,
         'request_obj': request_obj,
+        'employee_products_with_history': employee_products_with_history,
         'title': f'Phê duyệt yêu cầu cấp phát #{request_obj.request_code}',
     }
     
