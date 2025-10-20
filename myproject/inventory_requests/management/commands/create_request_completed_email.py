@@ -7,9 +7,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         template_code = 'request_completed'
-        template_name = 'Yêu cầu đã hoàn thành'
+        template_name = 'Xác nhận đã phát hàng'
         template_type = 'request_completed'
-        subject = 'Yêu cầu cấp phát #{{ request_code }} đã hoàn thành'
+        subject = '[Hoàn tất] Phiếu cấp phát #{{ request_code }} - Đã bàn giao hàng'
         
         html_content = '''<!DOCTYPE html>
 <html>
@@ -27,7 +27,7 @@ class Command(BaseCommand):
                     <tr>
                         <td style="background-color: #28a745; padding: 30px 40px; text-align: center;">
                             <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: bold;">
-                                ✓ Yêu cầu cấp phát đã hoàn thành
+                                ✓ Yêu cầu cấp phát đã hoàn tất
                             </h1>
                         </td>
                     </tr>
@@ -40,7 +40,7 @@ class Command(BaseCommand):
                             </p>
                             
                             <p style="margin: 0 0 25px 0; font-size: 14px; color: #555555; line-height: 1.6;">
-                                Yêu cầu cấp phát của bạn đã được hoàn thành và sẵn sàng để nhận.
+                                Yêu cầu cấp phát của bạn đã được xử lý và phát hàng hoàn tất. Đây là email xác nhận để lưu trữ hồ sơ.
                             </p>
                             
                             <!-- Info Box -->
@@ -66,7 +66,7 @@ class Command(BaseCommand):
                                             </tr>
                                             <tr>
                                                 <td style="padding: 8px 0; font-size: 14px; color: #666666;">
-                                                    <strong>Ngày hoàn thành:</strong>
+                                                    <strong>Ngày phát hàng:</strong>
                                                 </td>
                                                 <td style="padding: 8px 0; font-size: 14px; color: #333333;">
                                                     {{ completed_date }}
@@ -74,7 +74,7 @@ class Command(BaseCommand):
                                             </tr>
                                             <tr>
                                                 <td style="padding: 8px 0; font-size: 14px; color: #666666;">
-                                                    <strong>Người xử lý:</strong>
+                                                    <strong>Người phát hàng:</strong>
                                                 </td>
                                                 <td style="padding: 8px 0; font-size: 14px; color: #333333;">
                                                     {{ warehouse_manager }}
@@ -94,7 +94,7 @@ class Command(BaseCommand):
                             </table>
                             
                             <p style="margin: 25px 0 20px 0; font-size: 14px; color: #555555; line-height: 1.6;">
-                                Vui lòng liên hệ với bộ phận kho để nhận hàng theo lịch đã được sắp xếp.
+                                Hàng hóa đã được phát và bàn giao đầy đủ theo yêu cầu. Email này được gửi tự động để xác nhận và lưu trữ hồ sơ giao dịch.
                             </p>
                             
                             <!-- Button -->
@@ -102,14 +102,14 @@ class Command(BaseCommand):
                                 <tr>
                                     <td align="center">
                                         <a href="{{ detail_url }}" style="display: inline-block; padding: 14px 40px; background-color: #28a745; color: #ffffff; text-decoration: none; border-radius: 5px; font-size: 14px; font-weight: bold; border: 2px solid #28a745;">
-                                            Xem chi tiết yêu cầu
+                                            Xem chi tiết phiếu xuất
                                         </a>
                                     </td>
                                 </tr>
                             </table>
                             
                             <p style="margin: 25px 0 0 0; font-size: 13px; color: #888888; line-height: 1.6;">
-                                Cảm ơn bạn đã sử dụng hệ thống quản lý kho.
+                                Cảm ơn bạn. Nếu có bất kỳ thắc mắc nào, vui lòng liên hệ bộ phận kho.
                             </p>
                         </td>
                     </tr>
