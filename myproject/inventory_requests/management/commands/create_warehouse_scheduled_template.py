@@ -10,6 +10,7 @@ class Command(BaseCommand):
             'code': 'warehouse_scheduled',
             'name': 'Thông báo đã lên lịch cấp phát',
             'description': 'Email gửi cho người yêu cầu khi yêu cầu đã được lên lịch cấp phát bởi quản lý kho',
+            'subject': 'Đã lên lịch cấp phát #{{ request.request_code }}',
             'content': '''
 <!DOCTYPE html>
 <html>
@@ -28,69 +29,46 @@ class Command(BaseCommand):
         }
         .email-container {
             background: #ffffff;
-            border: 2px solid #667eea;
+            border: 2px solid #ddd;
             border-radius: 8px;
             padding: 0;
         }
         .header {
-            background: #667eea;
-            color: #ffffff;
             padding: 30px;
             text-align: center;
             border-radius: 6px 6px 0 0;
+            border-bottom: 3px solid #ff9800;
         }
         .header h1 {
             margin: 0;
-            font-size: 26px;
+            font-size: 24px;
             font-weight: 600;
-            color: #ffffff;
+            color: #333;
         }
         .header p {
             margin: 10px 0 0 0;
-            font-size: 15px;
-            color: #ffffff;
-            opacity: 0.95;
+            font-size: 14px;
+            color: #666;
         }
         .content-box {
             background: #ffffff;
             padding: 30px;
         }
         .message-box {
-            background: #f0f4ff;
-            border-left: 4px solid #667eea;
+            background: #f8f9fa;
+            border-left: 4px solid #ff9800;
             padding: 20px;
             margin-bottom: 25px;
         }
         .message-box h2 {
             margin: 0 0 10px 0;
-            font-size: 20px;
+            font-size: 18px;
             color: #333;
         }
         .message-box p {
             margin: 0;
-            font-size: 15px;
+            font-size: 14px;
             color: #555;
-        }
-        .schedule-highlight {
-            background: #fff3e0;
-            border: 2px solid #ff9800;
-            padding: 25px;
-            border-radius: 8px;
-            margin: 20px 0;
-            text-align: center;
-        }
-        .schedule-highlight .datetime {
-            font-size: 36px;
-            font-weight: bold;
-            color: #ff6f00;
-            margin: 10px 0;
-        }
-        .schedule-highlight .label {
-            color: #666;
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 600;
         }
         .info-box {
             background: #ffffff;
@@ -101,13 +79,13 @@ class Command(BaseCommand):
         }
         .info-box h3 {
             margin-top: 0;
-            color: #667eea;
-            font-size: 18px;
-            border-bottom: 2px solid #667eea;
+            color: #ff9800;
+            font-size: 16px;
+            border-bottom: 2px solid #ff9800;
             padding-bottom: 10px;
         }
         .info-row {
-            padding: 12px 0;
+            padding: 10px 0;
             border-bottom: 1px solid #f0f0f0;
         }
         .info-row:last-child {
@@ -117,19 +95,42 @@ class Command(BaseCommand):
             font-weight: 600;
             color: #555;
             display: inline-block;
-            min-width: 180px;
+            min-width: 150px;
         }
         .value {
             color: #333;
         }
-        .status-badge {
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: 600;
-            background: #667eea;
-            color: #ffffff;
+        .schedule-highlight {
+            background: #fff3e0;
+            border: 2px solid #ff9800;
+            border-left: 4px solid #ff9800;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 6px;
+        }
+        .schedule-highlight h3 {
+            margin-top: 0;
+            color: #e65100;
+            font-size: 18px;
+        }
+        .schedule-datetime {
+            background: #ffffff;
+            border: 2px solid #ff9800;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            margin: 15px 0;
+        }
+        .schedule-datetime .date {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ff9800;
+            margin: 0;
+        }
+        .schedule-datetime .time {
+            font-size: 18px;
+            color: #666;
+            margin: 5px 0 0 0;
         }
         .product-table {
             width: 100%;
@@ -138,7 +139,7 @@ class Command(BaseCommand):
             border: 1px solid #e0e0e0;
         }
         .product-table thead {
-            background: #667eea;
+            background: #ff9800;
         }
         .product-table th {
             padding: 12px;
@@ -146,7 +147,7 @@ class Command(BaseCommand):
             font-weight: 600;
             font-size: 13px;
             color: #ffffff;
-            border: 1px solid #5a6fd8;
+            border: 1px solid #f57c00;
         }
         .product-table td {
             padding: 12px;
@@ -158,73 +159,22 @@ class Command(BaseCommand):
         }
         .product-code {
             display: inline-block;
-            background: #667eea;
+            background: #ff9800;
             color: #ffffff;
             padding: 3px 8px;
             border-radius: 3px;
             font-size: 11px;
             font-weight: 600;
         }
-        .note-box {
-            background: #fffbf0;
-            border: 1px solid #ffc107;
-            border-left: 4px solid #ffc107;
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 4px;
-        }
-        .note-box strong {
-            color: #856404;
-        }
-        .note-box p {
-            margin: 5px 0;
-            color: #333;
-        }
-        .next-steps {
-            background: #f0f8ff;
-            border: 1px solid #2196F3;
-            border-left: 4px solid #2196F3;
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 4px;
-        }
-        .next-steps h3 {
-            margin-top: 0;
-            color: #1976D2;
-            font-size: 17px;
-        }
-        .next-steps ul {
-            margin: 10px 0;
-            padding-left: 25px;
-        }
-        .next-steps li {
-            margin: 8px 0;
-            color: #333;
-        }
         .button {
             display: inline-block;
             padding: 12px 30px;
-            background: #667eea;
+            background: #007bff;
             color: #ffffff;
             text-decoration: none;
             border-radius: 5px;
             font-weight: 600;
             margin: 10px 5px;
-        }
-        .contact-info {
-            background: #f8f9fa;
-            border: 1px solid #e0e0e0;
-            padding: 20px;
-            border-radius: 6px;
-            margin: 20px 0;
-            text-align: center;
-        }
-        .contact-info p {
-            margin: 5px 0;
-            color: #333;
-        }
-        .contact-info strong {
-            color: #667eea;
         }
         .footer {
             text-align: center;
@@ -237,28 +187,30 @@ class Command(BaseCommand):
         .footer p {
             margin: 5px 0;
         }
-        .footer strong {
-            color: #667eea;
-        }
     </style>
 </head>
 <body>
     <div class="email-container">
         <div class="header">
-            <h1>THÔNG BÁO LÊN LỊCH CẤP PHÁT</h1>
-            <p>Yêu cầu của bạn đã được xác nhận</p>
+            <h1>ĐÃ LÊN LỊCH CẤP PHÁT</h1>
+            <p>Mã yêu cầu: #{{ request.request_code }}</p>
         </div>
 
         <div class="content-box">
             <div class="message-box">
-                <h2>Yêu cầu đã được lên lịch</h2>
-                <p>Yêu cầu cấp phát của bạn đã được quản lý kho xác nhận và lên lịch cấp phát</p>
+                <h2>Xin chào {{ request.requester.get_full_name }},</h2>
+                <p>Yêu cầu cấp phát vật tư của bạn đã được lên lịch bởi {{ warehouse_manager.get_full_name }}.</p>
             </div>
 
             <div class="schedule-highlight">
-                <div class="label">NGÀY GIỜ CẤP PHÁT DỰ KIẾN</div>
-                <div class="datetime">{{ request.scheduled_date|date:"d/m/Y" }}</div>
-                <div class="datetime" style="font-size: 24px;">{{ request.scheduled_date|date:"H:i" }}</div>
+                <h3>THỜI GIAN CẤP PHÁT ĐÃ ĐẶT LỊCH</h3>
+                <div class="schedule-datetime">
+                    <p class="date">{{ scheduled_date|date:"d/m/Y" }}</p>
+                    <p class="time">{{ scheduled_date|date:"H:i" }}</p>
+                </div>
+                <p style="text-align: center; color: #666; margin: 10px 0; font-size: 14px;">
+                    Vui lòng đến nhận vật tư đúng giờ đã định
+                </p>
             </div>
 
             <div class="info-box">
@@ -268,28 +220,20 @@ class Command(BaseCommand):
                     <span class="value"><strong>#{{ request.request_code }}</strong></span>
                 </div>
                 <div class="info-row">
-                    <span class="label">Người yêu cầu:</span>
-                    <span class="value">{{ request.requester.get_full_name }}</span>
+                    <span class="label">Tiêu đề:</span>
+                    <span class="value">{{ request.title }}</span>
                 </div>
                 <div class="info-row">
-                    <span class="label">Quản lý kho:</span>
+                    <span class="label">Người lên lịch:</span>
                     <span class="value">{{ warehouse_manager.get_full_name }}</span>
                 </div>
                 <div class="info-row">
-                    <span class="label">Ngày tạo yêu cầu:</span>
-                    <span class="value">{{ request.created_at|date:"d/m/Y H:i" }}</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">Ngày phê duyệt:</span>
-                    <span class="value">{{ request.approval_date|date:"d/m/Y H:i" }}</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">Trạng thái:</span>
-                    <span class="value"><span class="status-badge">Đã lên lịch</span></span>
+                    <span class="label">Ngày lên lịch:</span>
+                    <span class="value">{{ request.scheduled_at|date:"d/m/Y H:i" }}</span>
                 </div>
             </div>
 
-            <h3 style="color: #667eea; margin-top: 30px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">DANH SÁCH VẬT TƯ</h3>
+            <h3 style="color: #ff9800; margin-top: 30px; border-bottom: 2px solid #ff9800; padding-bottom: 10px;">DANH SÁCH VẬT TƯ SẼ CẤP PHÁT</h3>
             <table class="product-table">
                 <thead>
                     <tr>
@@ -309,60 +253,50 @@ class Command(BaseCommand):
                             <span class="product-code">{{ employee_product.product.product_code }}</span><br>
                             {{ employee_product.product.name }}
                         </td>
-                        <td style="text-align: center;"><strong style="color: #667eea; font-size: 16px;">{{ employee_product.quantity }}</strong></td>
+                        <td style="text-align: center;"><strong style="color: #ff9800; font-size: 16px;">{{ employee_product.quantity }}</strong></td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
 
-            {% if request.schedule_notes %}
-            <div class="note-box">
-                <strong>Ghi chú từ quản lý kho:</strong>
-                <p>{{ request.schedule_notes }}</p>
+            {% if schedule_notes %}
+            <div style="background: #fff3e0; border: 1px solid #ff9800; border-left: 4px solid #ff9800; padding: 15px; margin: 20px 0; border-radius: 4px;">
+                <strong style="color: #e65100;">Ghi chú từ quản lý kho:</strong>
+                <p style="margin: 5px 0; color: #333;">{{ schedule_notes }}</p>
             </div>
             {% endif %}
 
-            <div class="next-steps">
-                <h3>CÁC BƯỚC TIẾP THEO</h3>
-                <ul>
-                    <li>Vui lòng có mặt tại kho vào đúng thời gian đã lên lịch</li>
-                    <li>Mang theo giấy tờ tùy thân để xác nhận</li>
-                    <li>Chuẩn bị phương tiện vận chuyển nếu cần</li>
-                    <li>Kiểm tra kỹ vật tư trước khi nhận</li>
-                    <li>Ký xác nhận vào phiếu xuất kho</li>
+            <div style="background: #e8f4f8; border: 1px solid #2196F3; border-left: 4px solid #2196F3; padding: 20px; margin: 20px 0; border-radius: 4px;">
+                <h3 style="margin-top: 0; color: #1976D2; font-size: 16px;">LƯU Ý QUAN TRỌNG</h3>
+                <ul style="margin: 10px 0; padding-left: 25px;">
+                    <li style="margin: 8px 0; color: #333;">Vui lòng đến nhận hàng đúng thời gian đã định</li>
+                    <li style="margin: 8px 0; color: #333;">Mang theo giấy tờ xác minh danh tính khi nhận hàng</li>
+                    <li style="margin: 8px 0; color: #333;">Kiểm tra số lượng và chất lượng vật tư trước khi nhận</li>
+                    <li style="margin: 8px 0; color: #333;">Nếu có vấn đề, liên hệ ngay với bộ phận kho</li>
                 </ul>
             </div>
 
             <div style="text-align: center; margin: 30px 0;">
-                <a href="http://127.0.0.1:8000/inventory/requests/{{ request.id }}/" class="button">Xem chi tiết yêu cầu</a>
-            </div>
-
-            <div class="contact-info">
-                <p><strong>CẦN HỖ TRỢ?</strong></p>
-                <p>Liên hệ quản lý kho: <strong>{{ warehouse_manager.get_full_name }}</strong></p>
-                <p>Email: {{ warehouse_manager.email }}</p>
+                <a href="http://127.0.0.1:8000/inventory/requests/{{ request.id }}/" class="button" style="background: #ff9800;">Xem chi tiết yêu cầu</a>
             </div>
         </div>
 
         <div class="footer">
             <p><strong>OVNC Inventory Management System</strong></p>
             <p>Email này được gửi tự động, vui lòng không trả lời.</p>
+            <p>Liên hệ bộ phận kho: warehouse@ovnc.com | Hotline: 1900 xxxx</p>
             <p>&copy; 2025 OVNC. All rights reserved.</p>
         </div>
     </div>
 </body>
 </html>
-            ''',
-            'subject': '[Lên lịch] Yêu cầu #{{ request.request_code }} đã được lên lịch cấp phát',
-            'is_active': True
+            '''
         }
 
         template, created = EmailTemplate.objects.update_or_create(
-            code=warehouse_scheduled_template['code'],
+            code='warehouse_scheduled',
             defaults=warehouse_scheduled_template
         )
 
-        if created:
-            self.stdout.write(self.style.SUCCESS(f'Đã tạo template: {template.code}'))
-        else:
-            self.stdout.write(self.style.SUCCESS(f'Đã cập nhật template: {template.code}'))
+        action = 'Đã tạo' if created else 'Đã cập nhật'
+        self.stdout.write(self.style.SUCCESS(f'{action} template: warehouse_scheduled'))
