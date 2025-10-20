@@ -23,6 +23,7 @@ class EmailConfiguration(models.Model):
     smtp_username = models.CharField(max_length=255, verbose_name='SMTP Username', blank=True, null=True)
     smtp_password = models.CharField(max_length=255, verbose_name='SMTP Password', blank=True, null=True)
     from_email = models.EmailField(verbose_name='Email người gửi')
+    from_name = models.CharField(max_length=255, verbose_name='Tên người gửi', default='Hệ thống quản lý kho')
     use_tls = models.BooleanField(default=True, verbose_name='Sử dụng TLS')
     use_ssl = models.BooleanField(default=False, verbose_name='Sử dụng SSL')
     smtp_conn_timeout = models.PositiveIntegerField(default=60000, verbose_name='SMTP - Communication Timeout')

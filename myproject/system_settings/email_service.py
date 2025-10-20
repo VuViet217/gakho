@@ -55,10 +55,12 @@ def send_test_email(recipient, subject, message):
         )
         
         # Gửi email với nhiều thông tin debug hơn
+        from_email_with_name = f'"{config.from_name}" <{config.from_email}>' if hasattr(config, 'from_name') and config.from_name else config.from_email
+        
         email = EmailMessage(
             subject=subject,
             body=message,
-            from_email=config.from_email,
+            from_email=from_email_with_name,
             to=[recipient],
             connection=connection
         )
@@ -113,6 +115,9 @@ def send_system_email(recipient_list, subject, message, html_message=None, attac
         if cc_list:
             logger.info(f"CC: {cc_list}")
         
+        # Tạo from_email với tên hiển thị
+        from_email_with_name = f'"{config.from_name}" <{config.from_email}>' if hasattr(config, 'from_name') and config.from_name else config.from_email
+        
         # Tạo kết nối SMTP với cấu hình từ database - tăng timeout lên 120 giây
         connection = get_connection(
             backend='django.core.mail.backends.smtp.EmailBackend',
@@ -128,7 +133,7 @@ def send_system_email(recipient_list, subject, message, html_message=None, attac
         email = EmailMessage(
             subject=subject,
             body=html_message or message,
-            from_email=config.from_email,
+            from_email=from_email_with_name,
             to=recipient_list,
             cc=cc_list,
             connection=connection

@@ -15,13 +15,14 @@ class EmailConfigurationForm(forms.ModelForm):
         model = EmailConfiguration
         fields = [
             'smtp_host', 'smtp_port', 'auth_method', 'smtp_username', 'smtp_password', 
-            'from_email', 'use_tls', 'use_ssl', 'smtp_conn_timeout', 'smtp_timeout', 'is_active'
+            'from_name', 'from_email', 'use_tls', 'use_ssl', 'smtp_conn_timeout', 'smtp_timeout', 'is_active'
         ]
         widgets = {
             'smtp_host': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'VD: smtp.gmail.com'}),
             'smtp_port': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'VD: 587 cho TLS, 465 cho SSL'}),
             'auth_method': forms.Select(attrs={'class': 'form-control'}),
             'smtp_username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Tên đăng nhập SMTP'}),
+            'from_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'VD: Phòng Kho Hàng'}),
             'from_email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email hiển thị khi gửi'}),
             'smtp_conn_timeout': forms.NumberInput(attrs={'class': 'form-control'}),
             'smtp_timeout': forms.NumberInput(attrs={'class': 'form-control'}),
