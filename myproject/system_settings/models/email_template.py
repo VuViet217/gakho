@@ -14,6 +14,7 @@ class EmailTemplate(models.Model):
         ('request_rejected', 'Yêu cầu bị từ chối'),
         ('warehouse_scheduled', 'Kho đã hẹn lịch cấp phát'),
         ('request_completed', 'Yêu cầu đã hoàn thành'),
+        ('low_stock_alert', 'Cảnh báo tồn kho thấp'),
         ('other', 'Mẫu khác'),
     ]
     
