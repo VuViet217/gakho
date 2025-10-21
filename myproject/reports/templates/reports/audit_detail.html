@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - OVNC Inventory{% endblock %}
+
+{% block extra_css %}
+<style>
+    .detail-card { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 20px; }
+    .detail-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 2px solid #f0f0f0; }
+    .audit-code { font-size: 1.4rem; font-weight: 700; color: #2c3e50; }
+    .audit-status { padding: 8px 16px; border-radius: 20px; font-weight: 600; }
+    .status-draft { background: linear-gradient(135deg, #95a5a6, #7f8c8d); color: white; }
+    .status-in_progress { background: linear-gradient(135deg, #f39c12, #e67e22); color: white; }
+    .status-completed { background: linear-gradient(135deg, #11998e, #38ef7d); color: white; }
+    .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 20px; }
+    .info-item { padding: 15px; background: #f8f9fa; border-radius: 8px; }
+    .info-label { font-size: 0.85rem; color: #6c757d; margin-bottom: 5px; }
+    .info-value { font-size: 1.1rem; font-weight: 600; color: #2c3e50; }
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
+    .stat-box { padding: 20px; text-align: center; border-radius: 10px; color: white; }
+    .stat-box h3 { font-size: 2rem; margin-bottom: 5px; }
+    .stat-box p { font-size: 0.9rem; opacity: 0.9; }
+    .table-wrapper { overflow-x: auto; }
+    .product-table { width: 100%; border-collapse: collapse; }
+    .product-table th { background: #6B8DD6; color: white; padding: 12px; text-align: left; font-weight: 600; }
+    .product-table td { padding: 12px; border-bottom: 1px solid #e9ecef; }
+    .product-table tr:hover { background: #f8f9fa; }
+    .diff-positive { color: #28a745; font-weight: 600; }
+    .diff-negative { color: #dc3545; font-weight: 600; }
+    .diff-zero { color: #6c757d; }
+    .action-buttons { display: flex; gap: 10px; }
+    .btn-action { padding: 10px 20px; border-radius: 8px; font-weight: 600; border: none; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-block; }
+    .btn-edit { background: linear-gradient(135deg, #f093fb, #f5576c); color: white; }
+    .btn-pdf { background: linear-gradient(135deg, #fa709a, #fee140); color: white; }
+    .btn-complete { background: linear-gradient(135deg, #11998e, #38ef7d); color: white; }
+    .btn-back { background: #e9ecef; color: #495057; }
+</style>
+{% endblock %}
+
+{% block content_header %}
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1><i class="fas fa-clipboard-check"></i> {{ title }}</h1>
+      </div>
+      <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+          <li class="breadcrumb-item"><a href="{% url 'main_dashboard' %}">Trang chủ</a></li>
+          <li class="breadcrumb-item"><a href="{% url 'reports:dashboard' %}">Báo cáo</a></li>
+          <li class="breadcrumb-item"><a href="{% url 'reports:audit_list' %}">Kiểm kê</a></li>
+          <li class="breadcrumb-item active">Chi tiết</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="detail-card">
+    <div class="detail-header">
+      <div>
+        <div class="audit-code">{{ audit.audit_code }}</div>
+        <p style="color: #7f8c8d; margin: 0;">{{ audit.title }}</p>
+      </div>
+      <span class="audit-status status-{{ audit.status }}">
+        {% if audit.status == 'draft' %}Nháp
+        {% elif audit.status == 'in_progress' %}Đang kiểm
+        {% else %}Hoàn thành
+        {% endif %}
+      </span>
+    </div>
+    
+    <div class="info-grid">
+      <div class="info-item">
+        <div class="info-label">Ngày kiểm kê</div>
+        <div class="info-value">{{ audit.audit_date|date:"d/m/Y" }}</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">Người tạo</div>
+        <div class="info-value">{{ audit.created_by.username }}</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">Ngày tạo</div>
+        <div class="info-value">{{ audit.created_at|date:"d/m/Y H:i" }}</div>
+      </div>
+      {% if audit.completed_at %}
+      <div class="info-item">
+        <div class="info-label">Ngày hoàn thành</div>
+        <div class="info-value">{{ audit.completed_at|date:"d/m/Y H:i" }}</div>
+      </div>
+      {% endif %}
+    </div>
+    
+    {% if audit.notes %}
+    <div class="info-item">
+      <div class="info-label">Ghi chú</div>
+      <div class="info-value">{{ audit.notes }}</div>
+    </div>
+    {% endif %}
+    
+    <div class="stats-grid">
+      <div class="stat-box" style="background: linear-gradient(135deg, #6B8DD6, #8E37D7);">
+        <h3>{{ total_items }}</h3>
+        <p>Tổng sản phẩm</p>
+      </div>
+      <div class="stat-box" style="background: linear-gradient(135deg, #11998e, #38ef7d);">
+        <h3>{{ checked_items }}</h3>
+        <p>Đã kiểm</p>
+      </div>
+      <div class="stat-box" style="background: linear-gradient(135deg, #f39c12, #e67e22);">
+        <h3>{{ differences|length }}</h3>
+        <p>Có chênh lệch</p>
+      </div>
+    </div>
+    
+    <div class="action-buttons" style="margin-bottom: 20px;">
+      <a href="{% url 'reports:audit_list' %}" class="btn-action btn-back">
+        <i class="fas fa-arrow-left"></i> Quay lại
+      </a>
+      {% if audit.status != 'completed' %}
+      <a href="{% url 'reports:audit_edit' audit.id %}" class="btn-action btn-edit">
+        <i class="fas fa-edit"></i> Sửa
+      </a>
+      {% endif %}
+      <a href="{% url 'reports:audit_pdf' audit.id %}" class="btn-action btn-pdf">
+        <i class="fas fa-file-pdf"></i> Xuất PDF
+      </a>
+      {% if audit.status == 'in_progress' and request.user.role in 'sm,admin' %}
+      <form method="post" action="{% url 'reports:audit_complete' audit.id %}" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn-action btn-complete"
+                onclick="return confirm('Xác nhận hoàn thành kiểm kê?')">
+          <i class="fas fa-check-circle"></i> Hoàn thành
+        </button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+  
+  <div class="detail-card">
+    <h4 style="margin-bottom: 20px; color: #2c3e50;">Danh sách sản phẩm kiểm kê</h4>
+    <div class="table-wrapper">
+      <table class="product-table">
+        <thead>
+          <tr>
+            <th>STT</th>
+            <th>Mã SP</th>
+            <th>Tên sản phẩm</th>
+            <th>Danh mục</th>
+            <th>ĐVT</th>
+            <th>SL Hệ thống</th>
+            <th>SL Thực tế</th>
+            <th>Chênh lệch</th>
+            <th>Ghi chú</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in items %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td><strong>{{ item.product.product_code }}</strong></td>
+            <td>{{ item.product.name }}</td>
+            <td>{{ item.product.category.name|default:"-" }}</td>
+            <td>{{ item.product.unit.name }}</td>
+            <td>{{ item.system_quantity }}</td>
+            <td>
+              {% if item.actual_quantity is not None %}
+                <strong>{{ item.actual_quantity }}</strong>
+              {% else %}
+                <span class="text-muted">Chưa kiểm</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if item.actual_quantity is not None %}
+                {% if item.difference > 0 %}
+                  <span class="diff-positive">+{{ item.difference }}</span>
+                {% elif item.difference < 0 %}
+                  <span class="diff-negative">{{ item.difference }}</span>
+                {% else %}
+                  <span class="diff-zero">0</span>
+                {% endif %}
+              {% else %}
+                -
+              {% endif %}
+            </td>
+            <td>{{ item.notes|default:"-" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

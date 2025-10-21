@@ -1,22 +1,394 @@
-{% extends 'base.html' %}
-{% load static %}
+{% extends 'base.html' %}{% extends 'base.html' %}
 
-{% block title %}Danh sách kiểm kê kho - OVNC Inventory{% endblock %}
+{% load static %}{% load static %}
+
+
+
+{% block title %}Danh sách kiểm kê kho - OVNC Inventory{% endblock %}{% block title %}Danh sách kiểm kê kho - OVNC Inventory{% endblock %}
+
+
+
+{% block extra_css %}{% block content_header %}
+
+<style><section class="content-header">
+
+    .audit-card {  <div class="container-fluid">
+
+        background: white;    <div class="row mb-2">
+
+        border-radius: 12px;      <div class="col-sm-6">
+
+        padding: 20px;        <h1><i class="fas fa-clipboard-check"></i> Kiểm kê kho</h1>
+
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);      </div>
+
+        transition: all 0.3s ease;      <div class="col-sm-6">
+
+        height: 100%;        <ol class="breadcrumb float-sm-right">
+
+        border: 1px solid #e9ecef;          <li class="breadcrumb-item"><a href="{% url 'main_dashboard' %}">Trang chủ</a></li>
+
+    }          <li class="breadcrumb-item"><a href="{% url 'reports:dashboard' %}">Báo cáo</a></li>
+
+              <li class="breadcrumb-item active">Kiểm kê kho</li>
+
+    .audit-card:hover {        </ol>
+
+        transform: translateY(-4px);      </div>
+
+        box-shadow: 0 6px 20px rgba(0,0,0,0.12);    </div>
+
+    }  </div>
+
+    </section>
+
+    .audit-header {{% endblock %}
+
+        display: flex;
+
+        justify-content: space-between;{% block content %}
+
+        align-items: start;<div class="container-fluid">
+
+        margin-bottom: 15px;  <div class="row">
+
+        padding-bottom: 15px;    <div class="col-12">
+
+        border-bottom: 2px solid #f0f0f0;      <div class="card">
+
+    }        <div class="card-header bg-success">
+
+              <h3 class="card-title">Danh sách kiểm kê kho</h3>
+
+    .audit-code {          <div class="card-tools">
+
+        font-size: 1.1rem;            <a href="{% url 'reports:audit_create' %}" class="btn btn-primary btn-sm">
+
+        font-weight: 700;              <i class="fas fa-plus-circle"></i> Tạo phiếu kiểm kê mới
+
+        color: #2c3e50;            </a>
+
+        margin-bottom: 5px;          </div>
+
+    }        </div>
+
+            <div class="card-body">
+
+    .audit-title {          <div class="alert alert-info">
+
+        font-size: 0.9rem;            <i class="fas fa-info-circle"></i> Tính năng kiểm kê kho đang được phát triển và sẽ sớm có mặt trong phiên bản tiếp theo.
+
+        color: #7f8c8d;          </div>
+
+        margin-bottom: 0;          
+
+    }          <!-- Giả lập dữ liệu mẫu để hiển thị UI -->
+
+              <div class="table-responsive">
+
+    .audit-status {            <table class="table table-hover table-striped">
+
+        padding: 6px 14px;              <thead>
+
+        border-radius: 20px;                <tr>
+
+        font-size: 0.85rem;                  <th>Mã kiểm kê</th>
+
+        font-weight: 600;                  <th>Tiêu đề</th>
+
+        white-space: nowrap;                  <th>Ngày kiểm kê</th>
+
+    }                  <th>Trạng thái</th>
+
+                      <th>Người tạo</th>
+
+    .status-draft {                  <th>Thao tác</th>
+
+        background: linear-gradient(135deg, #95a5a6, #7f8c8d);                </tr>
+
+        color: white;              </thead>
+
+    }              <tbody>
+
+                    <tr>
+
+    .status-in_progress {                  <td>AUD-202307-001</td>
+
+        background: linear-gradient(135deg, #f39c12, #e67e22);                  <td>Kiểm kê cuối tháng 7/2023</td>
+
+        color: white;                  <td>31/07/2023</td>
+
+    }                  <td><span class="badge badge-success">Hoàn thành</span></td>
+
+                      <td>Admin</td>
+
+    .status-completed {                  <td>
+
+        background: linear-gradient(135deg, #11998e, #38ef7d);                    <a href="#" class="btn btn-info btn-sm">
+
+        color: white;                      <i class="fas fa-eye"></i> Xem
+
+    }                    </a>
+
+                        <a href="#" class="btn btn-secondary btn-sm">
+
+    .audit-info {                      <i class="fas fa-file-pdf"></i> PDF
+
+        margin-bottom: 15px;                    </a>
+
+    }                  </td>
+
+                    </tr>
+
+    .info-row {                <tr>
+
+        display: flex;                  <td>AUD-202308-001</td>
+
+        align-items: center;                  <td>Kiểm kê cuối tháng 8/2023</td>
+
+        margin-bottom: 8px;                  <td>31/08/2023</td>
+
+        font-size: 0.9rem;                  <td><span class="badge badge-warning">Đang kiểm kê</span></td>
+
+        color: #495057;                  <td>Admin</td>
+
+    }                  <td>
+
+                        <a href="#" class="btn btn-info btn-sm">
+
+    .info-row i {                      <i class="fas fa-eye"></i> Xem
+
+        width: 20px;                    </a>
+
+        color: #6B8DD6;                    <a href="#" class="btn btn-primary btn-sm">
+
+        margin-right: 8px;                      <i class="fas fa-edit"></i> Sửa
+
+    }                    </a>
+
+                        <a href="#" class="btn btn-success btn-sm">
+
+    .audit-actions {                      <i class="fas fa-check"></i> Hoàn thành
+
+        display: flex;                    </a>
+
+        gap: 8px;                  </td>
+
+        flex-wrap: wrap;                </tr>
+
+    }                <tr>
+
+                      <td>AUD-202309-001</td>
+
+    .action-btn {                  <td>Kiểm kê cuối tháng 9/2023</td>
+
+        flex: 1;                  <td>30/09/2023</td>
+
+        min-width: 0;                  <td><span class="badge badge-secondary">Bản nháp</span></td>
+
+        padding: 8px 12px;                  <td>Admin</td>
+
+        border-radius: 8px;                  <td>
+
+        font-size: 0.85rem;                    <a href="#" class="btn btn-info btn-sm">
+
+        font-weight: 500;                      <i class="fas fa-eye"></i> Xem
+
+        text-align: center;                    </a>
+
+        transition: all 0.2s;                    <a href="#" class="btn btn-primary btn-sm">
+
+        border: none;                      <i class="fas fa-edit"></i> Sửa
+
+        cursor: pointer;                    </a>
+
+        text-decoration: none;                  </td>
+
+        display: inline-block;                </tr>
+
+    }              </tbody>
+
+                </table>
+
+    .action-btn:hover {          </div>
+
+        transform: translateY(-2px);          
+
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);          <div class="text-center mt-4">
+
+        text-decoration: none;            <a href="{% url 'reports:audit_create' %}" class="btn btn-primary">
+
+    }              <i class="fas fa-plus mr-1"></i> Tạo phiếu kiểm kê mới
+
+                </a>
+
+    .btn-view {          </div>
+
+        background: linear-gradient(135deg, #667eea, #764ba2);        </div>
+
+        color: white;      </div>
+
+    }    </div>
+
+      </div>
+
+    .btn-edit {</div>
+
+        background: linear-gradient(135deg, #f093fb, #f5576c);{% endblock %}
+
+        color: white;
+
+    }{% block extra_js %}
+
+    <script>
+
+    .btn-pdf {$(document).ready(function() {
+
+        background: linear-gradient(135deg, #fa709a, #fee140);  console.log('Audit list loaded');
+
+        color: white;});
+
+    }</script>
+
+    {% endblock %}
+    .btn-complete {
+        background: linear-gradient(135deg, #11998e, #38ef7d);
+        color: white;
+    }
+    
+    .filter-section {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    
+    .filter-row {
+        display: flex;
+        gap: 15px;
+        align-items: end;
+    }
+    
+    .filter-group {
+        flex: 1;
+    }
+    
+    .filter-label {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 8px;
+        display: block;
+    }
+    
+    .filter-input {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+    }
+    
+    .filter-input:focus {
+        outline: none;
+        border-color: #6B8DD6;
+        box-shadow: 0 0 0 3px rgba(107, 141, 214, 0.1);
+    }
+    
+    .filter-btn {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .btn-filter {
+        background: linear-gradient(135deg, #6B8DD6, #8E37D7);
+        color: white;
+    }
+    
+    .btn-reset {
+        background: #e9ecef;
+        color: #495057;
+    }
+    
+    .header-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+    
+    .page-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin: 0;
+    }
+    
+    .btn-create {
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #11998e, #38ef7d);
+        color: white;
+        border-radius: 10px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .btn-create:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(17, 153, 142, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        color: #dee2e6;
+        margin-bottom: 20px;
+    }
+    
+    .empty-state h3 {
+        color: #6c757d;
+        margin-bottom: 10px;
+    }
+    
+    .empty-state p {
+        color: #adb5bd;
+    }
+</style>
+{% endblock %}
 
 {% block content_header %}
 <section class="content-header">
   <div class="container-fluid">
-    <div class="row mb-2">
-      <div class="col-sm-6">
-        <h1><i class="fas fa-clipboard-check"></i> Kiểm kê kho</h1>
-      </div>
-      <div class="col-sm-6">
-        <ol class="breadcrumb float-sm-right">
-          <li class="breadcrumb-item"><a href="{% url 'main_dashboard' %}">Trang chủ</a></li>
-          <li class="breadcrumb-item"><a href="{% url 'reports:dashboard' %}">Báo cáo</a></li>
-          <li class="breadcrumb-item active">Kiểm kê kho</li>
-        </ol>
-      </div>
+    <div class="header-actions">
+      <h1 class="page-title">
+        <i class="fas fa-clipboard-check" style="color: #6B8DD6; margin-right: 12px;"></i>
+        Kiểm kê kho
+      </h1>
+      <a href="{% url 'reports:audit_create' %}" class="btn-create">
+        <i class="fas fa-plus-circle"></i>
+        <span>Tạo phiếu kiểm kê</span>
+      </a>
     </div>
   </div>
 </section>
@@ -24,104 +396,107 @@
 
 {% block content %}
 <div class="container-fluid">
+  <!-- Filter -->
+  <div class="filter-section">
+    <form method="get" action="">
+      <div class="filter-row">
+        <div class="filter-group">
+          <label class="filter-label">Tìm kiếm</label>
+          <input type="text" name="search" class="filter-input" 
+                 placeholder="Tìm mã kiểm kê hoặc tiêu đề..."
+                 value="{{ search }}">
+        </div>
+        <div class="filter-group">
+          <label class="filter-label">Trạng thái</label>
+          <select name="status" class="filter-input">
+            <option value="">Tất cả trạng thái</option>
+            <option value="draft" {% if selected_status == 'draft' %}selected{% endif %}>Nháp</option>
+            <option value="in_progress" {% if selected_status == 'in_progress' %}selected{% endif %}>Đang kiểm</option>
+            <option value="completed" {% if selected_status == 'completed' %}selected{% endif %}>Hoàn thành</option>
+          </select>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button type="submit" class="filter-btn btn-filter">
+            <i class="fas fa-search"></i> Lọc
+          </button>
+          <a href="{% url 'reports:audit_list' %}" class="filter-btn btn-reset">
+            <i class="fas fa-redo"></i> Đặt lại
+          </a>
+        </div>
+      </div>
+    </form>
+  </div>
+  
+  <!-- Audit Cards -->
+  {% if audits %}
   <div class="row">
-    <div class="col-12">
-      <div class="card">
-        <div class="card-header bg-success">
-          <h3 class="card-title">Danh sách kiểm kê kho</h3>
-          <div class="card-tools">
-            <a href="{% url 'reports:audit_create' %}" class="btn btn-primary btn-sm">
-              <i class="fas fa-plus-circle"></i> Tạo phiếu kiểm kê mới
-            </a>
+    {% for audit in audits %}
+    <div class="col-lg-4 col-md-6 mb-4">
+      <div class="audit-card">
+        <div class="audit-header">
+          <div>
+            <div class="audit-code">{{ audit.audit_code }}</div>
+            <p class="audit-title">{{ audit.title }}</p>
+          </div>
+          <span class="audit-status status-{{ audit.status }}">
+            {% if audit.status == 'draft' %}Nháp
+            {% elif audit.status == 'in_progress' %}Đang kiểm
+            {% else %}Hoàn thành
+            {% endif %}
+          </span>
+        </div>
+        
+        <div class="audit-info">
+          <div class="info-row">
+            <i class="fas fa-calendar-alt"></i>
+            <span>Ngày KK: {{ audit.audit_date|date:"d/m/Y" }}</span>
+          </div>
+          <div class="info-row">
+            <i class="fas fa-user"></i>
+            <span>Người tạo: {{ audit.created_by.username }}</span>
+          </div>
+          <div class="info-row">
+            <i class="fas fa-boxes"></i>
+            <span>Sản phẩm: {{ audit.items.count }}</span>
           </div>
         </div>
-        <div class="card-body">
-          <div class="alert alert-info">
-            <i class="fas fa-info-circle"></i> Tính năng kiểm kê kho đang được phát triển và sẽ sớm có mặt trong phiên bản tiếp theo.
-          </div>
-          
-          <!-- Giả lập dữ liệu mẫu để hiển thị UI -->
-          <div class="table-responsive">
-            <table class="table table-hover table-striped">
-              <thead>
-                <tr>
-                  <th>Mã kiểm kê</th>
-                  <th>Tiêu đề</th>
-                  <th>Ngày kiểm kê</th>
-                  <th>Trạng thái</th>
-                  <th>Người tạo</th>
-                  <th>Thao tác</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>AUD-202307-001</td>
-                  <td>Kiểm kê cuối tháng 7/2023</td>
-                  <td>31/07/2023</td>
-                  <td><span class="badge badge-success">Hoàn thành</span></td>
-                  <td>Admin</td>
-                  <td>
-                    <a href="#" class="btn btn-info btn-sm">
-                      <i class="fas fa-eye"></i> Xem
-                    </a>
-                    <a href="#" class="btn btn-secondary btn-sm">
-                      <i class="fas fa-file-pdf"></i> PDF
-                    </a>
-                  </td>
-                </tr>
-                <tr>
-                  <td>AUD-202308-001</td>
-                  <td>Kiểm kê cuối tháng 8/2023</td>
-                  <td>31/08/2023</td>
-                  <td><span class="badge badge-warning">Đang kiểm kê</span></td>
-                  <td>Admin</td>
-                  <td>
-                    <a href="#" class="btn btn-info btn-sm">
-                      <i class="fas fa-eye"></i> Xem
-                    </a>
-                    <a href="#" class="btn btn-primary btn-sm">
-                      <i class="fas fa-edit"></i> Sửa
-                    </a>
-                    <a href="#" class="btn btn-success btn-sm">
-                      <i class="fas fa-check"></i> Hoàn thành
-                    </a>
-                  </td>
-                </tr>
-                <tr>
-                  <td>AUD-202309-001</td>
-                  <td>Kiểm kê cuối tháng 9/2023</td>
-                  <td>30/09/2023</td>
-                  <td><span class="badge badge-secondary">Bản nháp</span></td>
-                  <td>Admin</td>
-                  <td>
-                    <a href="#" class="btn btn-info btn-sm">
-                      <i class="fas fa-eye"></i> Xem
-                    </a>
-                    <a href="#" class="btn btn-primary btn-sm">
-                      <i class="fas fa-edit"></i> Sửa
-                    </a>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          
-          <div class="text-center mt-4">
-            <a href="{% url 'reports:audit_create' %}" class="btn btn-primary">
-              <i class="fas fa-plus mr-1"></i> Tạo phiếu kiểm kê mới
-            </a>
-          </div>
+        
+        <div class="audit-actions">
+          <a href="{% url 'reports:audit_detail' audit.id %}" class="action-btn btn-view">
+            <i class="fas fa-eye"></i> Xem
+          </a>
+          {% if audit.status != 'completed' %}
+          <a href="{% url 'reports:audit_edit' audit.id %}" class="action-btn btn-edit">
+            <i class="fas fa-edit"></i> Sửa
+          </a>
+          {% endif %}
+          <a href="{% url 'reports:audit_pdf' audit.id %}" class="action-btn btn-pdf">
+            <i class="fas fa-file-pdf"></i> PDF
+          </a>
+          {% if audit.status == 'in_progress' and request.user.role in 'sm,admin' %}
+          <form method="post" action="{% url 'reports:audit_complete' audit.id %}" style="flex: 1; min-width: 0;">
+            {% csrf_token %}
+            <button type="submit" class="action-btn btn-complete" style="width: 100%;"
+                    onclick="return confirm('Xác nhận hoàn thành kiểm kê?')">
+              <i class="fas fa-check-circle"></i> Hoàn thành
+            </button>
+          </form>
+          {% endif %}
         </div>
       </div>
     </div>
+    {% endfor %}
   </div>
+  {% else %}
+  <div class="empty-state">
+    <i class="fas fa-clipboard-list"></i>
+    <h3>Chưa có phiếu kiểm kê nào</h3>
+    <p>Tạo phiếu kiểm kê đầu tiên để bắt đầu quản lý kiểm kê kho</p>
+    <a href="{% url 'reports:audit_create' %}" class="btn-create" style="margin-top: 20px;">
+      <i class="fas fa-plus-circle"></i>
+      <span>Tạo phiếu kiểm kê</span>
+    </a>
+  </div>
+  {% endif %}
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-$(document).ready(function() {
-  console.log('Audit list loaded');
-});
-</script>
 {% endblock %}

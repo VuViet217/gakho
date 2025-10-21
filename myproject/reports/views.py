@@ -19,7 +19,7 @@ import os
 from django.conf import settings
 
 from myproject.decorators import role_required
-from inventory.models import Product
+from inventory.models import Product, Category
 from .models import MonthlyInventorySnapshot, InventoryAudit, InventoryAuditItem
 
 # Đăng ký font Arial cho tiếng Việt
@@ -412,45 +412,283 @@ def low_stock_report_pdf(request):
 @login_required
 def audit_list(request):
     """Danh sách kiểm kê"""
-    # Placeholder for now
-    return render(request, 'reports/audit_list.html', {
-        'title': 'Danh sách kiểm kê'
-    })
+    audits = InventoryAudit.objects.all().select_related('created_by').order_by('-audit_date', '-created_at')
+    
+    # Filter
+    status = request.GET.get('status', '')
+    search = request.GET.get('search', '')
+    
+    if status:
+        audits = audits.filter(status=status)
+    
+    if search:
+        audits = audits.filter(
+            Q(audit_code__icontains=search) |
+            Q(title__icontains=search)
+        )
+    
+    context = {
+        'title': 'Danh sách kiểm kê',
+        'audits': audits,
+        'selected_status': status,
+        'search': search,
+    }
+    return render(request, 'reports/audit_list.html', context)
 
 
 @login_required
 def audit_create(request):
     """Tạo phiếu kiểm kê"""
-    # Placeholder for now
-    return render(request, 'reports/audit_create.html', {
-        'title': 'Tạo phiếu kiểm kê mới'
-    })
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        audit_date = request.POST.get('audit_date')
+        notes = request.POST.get('notes', '')
+        product_ids = request.POST.getlist('products')
+        
+        if not title or not audit_date:
+            messages.error(request, 'Vui lòng điền đầy đủ thông tin')
+            return redirect('reports:audit_create')
+        
+        # Tạo audit
+        audit = InventoryAudit.objects.create(
+            title=title,
+            audit_date=audit_date,
+            notes=notes,
+            created_by=request.user,
+            status='draft'
+        )
+        
+        # Thêm sản phẩm vào audit
+        if product_ids:
+            for product_id in product_ids:
+                try:
+                    product = Product.objects.get(id=product_id)
+                    InventoryAuditItem.objects.create(
+                        audit=audit,
+                        product=product,
+                        system_quantity=product.current_quantity
+                    )
+                except Product.DoesNotExist:
+                    pass
+        else:
+            # Nếu không chọn sản phẩm cụ thể, thêm tất cả
+            products = Product.objects.all()
+            for product in products:
+                InventoryAuditItem.objects.create(
+                    audit=audit,
+                    product=product,
+                    system_quantity=product.current_quantity
+                )
+        
+        messages.success(request, f'Đã tạo phiếu kiểm kê {audit.audit_code}')
+        return redirect('reports:audit_detail', audit_id=audit.id)
+    
+    # GET request
+    products = Product.objects.all().select_related('category', 'unit').order_by('product_code')
+    categories = Category.objects.all()
+    
+    context = {
+        'title': 'Tạo phiếu kiểm kê mới',
+        'products': products,
+        'categories': categories,
+        'today': timezone.now(),
+    }
+    return render(request, 'reports/audit_create.html', context)
 
 
 @login_required
 def audit_detail(request, audit_id):
     """Chi tiết kiểm kê"""
-    # Placeholder for now
-    return HttpResponse("Audit detail page coming soon")
+    audit = get_object_or_404(InventoryAudit.objects.select_related('created_by'), id=audit_id)
+    items = audit.items.select_related('product__category', 'product__unit').order_by('product__product_code')
+    
+    # Tính thống kê
+    total_items = items.count()
+    checked_items = items.filter(actual_quantity__isnull=False).count()
+    
+    differences = []
+    for item in items:
+        if item.actual_quantity is not None and item.difference != 0:
+            differences.append(item)
+    
+    context = {
+        'title': f'Chi tiết kiểm kê {audit.audit_code}',
+        'audit': audit,
+        'items': items,
+        'total_items': total_items,
+        'checked_items': checked_items,
+        'differences': differences,
+    }
+    return render(request, 'reports/audit_detail.html', context)
 
 
 @login_required
 def audit_edit(request, audit_id):
-    """Sửa kiểm kê"""
-    # Placeholder for now
-    return HttpResponse("Audit edit page coming soon")
+    """Sửa kiểm kê - Cập nhật số lượng thực tế"""
+    audit = get_object_or_404(InventoryAudit, id=audit_id)
+    
+    if audit.status == 'completed':
+        messages.error(request, 'Không thể sửa phiếu kiểm kê đã hoàn thành')
+        return redirect('reports:audit_detail', audit_id=audit_id)
+    
+    if request.method == 'POST':
+        # Cập nhật trạng thái
+        audit.status = 'in_progress'
+        audit.save()
+        
+        # Cập nhật số lượng thực tế cho từng item
+        for key, value in request.POST.items():
+            if key.startswith('actual_'):
+                item_id = key.replace('actual_', '')
+                try:
+                    item = InventoryAuditItem.objects.get(id=item_id, audit=audit)
+                    if value.strip():
+                        item.actual_quantity = int(value)
+                        notes_key = f'notes_{item_id}'
+                        if notes_key in request.POST:
+                            item.notes = request.POST[notes_key]
+                        item.save()
+                except (InventoryAuditItem.DoesNotExist, ValueError):
+                    pass
+        
+        messages.success(request, 'Đã cập nhật thông tin kiểm kê')
+        return redirect('reports:audit_detail', audit_id=audit_id)
+    
+    items = audit.items.select_related('product__category', 'product__unit').order_by('product__product_code')
+    
+    context = {
+        'title': f'Sửa kiểm kê {audit.audit_code}',
+        'audit': audit,
+        'items': items,
+    }
+    return render(request, 'reports/audit_edit.html', context)
 
 
 @login_required
 def audit_pdf(request, audit_id):
     """PDF kiểm kê"""
-    # Placeholder for now
-    return HttpResponse("PDF export functionality coming soon")
+    from reportlab.lib.pagesizes import A4, landscape
+    from reportlab.lib import colors
+    from reportlab.lib.units import mm
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.pdfbase import pdfmetrics
+    from reportlab.pdfbase.ttfonts import TTFont
+    from reportlab.lib.enums import TA_CENTER
+    from io import BytesIO
+    import os
+    from django.conf import settings
+    
+    audit = get_object_or_404(InventoryAudit.objects.select_related('created_by'), id=audit_id)
+    items = audit.items.select_related('product__category', 'product__unit').order_by('product__product_code')
+    
+    # Đăng ký font
+    arial_font_path = os.path.join(settings.BASE_DIR, 'static', 'fonts', 'Arial.ttf')
+    arial_bold_path = os.path.join(settings.BASE_DIR, 'static', 'fonts', 'Arial_Bold.ttf')
+    
+    if os.path.exists(arial_font_path):
+        pdfmetrics.registerFont(TTFont('Arial', arial_font_path))
+    if os.path.exists(arial_bold_path):
+        pdfmetrics.registerFont(TTFont('Arial-Bold', arial_bold_path))
+    
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=landscape(A4), topMargin=15*mm, bottomMargin=15*mm)
+    elements = []
+    
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontName='Arial-Bold' if os.path.exists(arial_bold_path) else 'Helvetica-Bold',
+        fontSize=16,
+        textColor=colors.HexColor('#2c3e50'),
+        spaceAfter=5*mm,
+        alignment=TA_CENTER
+    )
+    
+    subtitle_style = ParagraphStyle(
+        'CustomSubtitle',
+        parent=styles['Normal'],
+        fontName='Arial' if os.path.exists(arial_font_path) else 'Helvetica',
+        fontSize=11,
+        textColor=colors.HexColor('#7f8c8d'),
+        spaceAfter=8*mm,
+        alignment=TA_CENTER
+    )
+    
+    # Title
+    title = Paragraph(f"PHIẾU KIỂM KÊ KHO - {audit.audit_code}", title_style)
+    elements.append(title)
+    
+    subtitle = Paragraph(f"{audit.title} - Ngày: {audit.audit_date.strftime('%d/%m/%Y')}", subtitle_style)
+    elements.append(subtitle)
+    
+    # Chi tiết
+    data = [['STT', 'Mã SP', 'Tên sản phẩm', 'Danh mục', 'ĐVT', 'SL Hệ thống', 'SL Thực tế', 'Chênh lệch', 'Ghi chú']]
+    
+    for idx, item in enumerate(items, 1):
+        actual = str(item.actual_quantity) if item.actual_quantity is not None else ''
+        diff = str(item.difference) if item.actual_quantity is not None else ''
+        
+        data.append([
+            str(idx),
+            item.product.product_code[:15],
+            item.product.name[:25] + '...' if len(item.product.name) > 25 else item.product.name,
+            item.product.category.name[:15] if item.product.category else '-',
+            item.product.unit.name[:8] if item.product.unit else '-',
+            str(item.system_quantity),
+            actual,
+            diff,
+            item.notes[:20] if item.notes else '',
+        ])
+    
+    col_widths = [12*mm, 22*mm, 55*mm, 28*mm, 18*mm, 25*mm, 25*mm, 25*mm, 35*mm]
+    table = Table(data, colWidths=col_widths)
+    
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#6B8DD6')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Arial-Bold' if os.path.exists(arial_bold_path) else 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 9),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
+        ('TOPPADDING', (0, 0), (-1, 0), 8),
+        ('FONTNAME', (0, 1), (-1, -1), 'Arial' if os.path.exists(arial_font_path) else 'Helvetica'),
+        ('FONTSIZE', (0, 1), (-1, -1), 8),
+        ('ALIGN', (0, 1), (0, -1), 'CENTER'),
+        ('ALIGN', (5, 1), (-2, -1), 'CENTER'),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f8f9fa')]),
+        ('BOTTOMPADDING', (0, 1), (-1, -1), 6),
+        ('TOPPADDING', (0, 1), (-1, -1), 6),
+    ]))
+    
+    elements.append(table)
+    doc.build(elements)
+    
+    buffer.seek(0)
+    response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="Phieu_kiem_ke_{audit.audit_code}.pdf"'
+    
+    return response
 
 
 @login_required
 @role_required(['sm', 'admin'])
 def audit_complete(request, audit_id):
     """Hoàn thành kiểm kê"""
-    # Placeholder for now
-    return HttpResponse("Audit completion functionality coming soon")
+    audit = get_object_or_404(InventoryAudit, id=audit_id)
+    
+    if audit.status == 'completed':
+        messages.warning(request, 'Phiếu kiểm kê đã được hoàn thành trước đó')
+        return redirect('reports:audit_detail', audit_id=audit_id)
+    
+    if request.method == 'POST':
+        audit.status = 'completed'
+        audit.completed_at = timezone.now()
+        audit.save()
+        
+        messages.success(request, f'Đã hoàn thành phiếu kiểm kê {audit.audit_code}')
+        return redirect('reports:audit_detail', audit_id=audit_id)
+    
+    return redirect('reports:audit_detail', audit_id=audit_id)

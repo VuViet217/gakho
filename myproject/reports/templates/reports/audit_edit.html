@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - OVNC Inventory{% endblock %}
+
+{% block extra_css %}
+<style>
+    .edit-form { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .edit-header { margin-bottom: 25px; padding-bottom: 20px; border-bottom: 2px solid #f0f0f0; }
+    .audit-code { font-size: 1.4rem; font-weight: 700; color: #2c3e50; margin-bottom: 5px; }
+    .audit-subtitle { color: #7f8c8d; margin: 0; }
+    .table-wrapper { overflow-x: auto; margin-bottom: 25px; }
+    .edit-table { width: 100%; border-collapse: collapse; }
+    .edit-table th { background: #6B8DD6; color: white; padding: 12px; text-align: left; font-weight: 600; position: sticky; top: 0; }
+    .edit-table td { padding: 12px; border-bottom: 1px solid #e9ecef; vertical-align: middle; }
+    .edit-table tr:hover { background: #f8f9fa; }
+    .quantity-input { width: 100px; padding: 8px; border: 1px solid #dee2e6; border-radius: 6px; text-align: center; font-weight: 600; }
+    .quantity-input:focus { outline: none; border-color: #6B8DD6; box-shadow: 0 0 0 3px rgba(107, 141, 214, 0.1); }
+    .notes-input { width: 100%; padding: 8px; border: 1px solid #dee2e6; border-radius: 6px; }
+    .diff-display { padding: 6px 12px; border-radius: 6px; font-weight: 600; display: inline-block; }
+    .diff-positive { background: #d4edda; color: #155724; }
+    .diff-negative { background: #f8d7da; color: #721c24; }
+    .diff-zero { background: #d1ecf1; color: #0c5460; }
+    .btn-submit { padding: 12px 32px; background: linear-gradient(135deg, #11998e, #38ef7d); color: white; border-radius: 8px; font-weight: 600; border: none; cursor: pointer; transition: all 0.3s; }
+    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(17, 153, 142, 0.3); }
+    .btn-cancel { padding: 12px 32px; background: #e9ecef; color: #495057; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-block; }
+    .btn-cancel:hover { background: #dee2e6; text-decoration: none; color: #495057; }
+    .alert-info { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+</style>
+{% endblock %}
+
+{% block content_header %}
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1><i class="fas fa-edit"></i> {{ title }}</h1>
+      </div>
+      <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+          <li class="breadcrumb-item"><a href="{% url 'main_dashboard' %}">Trang chủ</a></li>
+          <li class="breadcrumb-item"><a href="{% url 'reports:dashboard' %}">Báo cáo</a></li>
+          <li class="breadcrumb-item"><a href="{% url 'reports:audit_list' %}">Kiểm kê</a></li>
+          <li class="breadcrumb-item"><a href="{% url 'reports:audit_detail' audit.id %}">Chi tiết</a></li>
+          <li class="breadcrumb-item active">Sửa</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="edit-form">
+    <div class="edit-header">
+      <div class="audit-code">{{ audit.audit_code }}</div>
+      <p class="audit-subtitle">{{ audit.title }}</p>
+    </div>
+    
+    <div class="alert-info">
+      <i class="fas fa-info-circle"></i> Nhập số lượng thực tế cho từng sản phẩm. Hệ thống sẽ tự động tính chênh lệch.
+    </div>
+    
+    <form method="post" action="{% url 'reports:audit_edit' audit.id %}">
+      {% csrf_token %}
+      
+      <div class="table-wrapper">
+        <table class="edit-table">
+          <thead>
+            <tr>
+              <th>STT</th>
+              <th>Mã SP</th>
+              <th>Tên sản phẩm</th>
+              <th>Danh mục</th>
+              <th>ĐVT</th>
+              <th>SL Hệ thống</th>
+              <th>SL Thực tế</th>
+              <th>Chênh lệch</th>
+              <th>Ghi chú</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in items %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td><strong>{{ item.product.product_code }}</strong></td>
+              <td>{{ item.product.name }}</td>
+              <td>{{ item.product.category.name|default:"-" }}</td>
+              <td>{{ item.product.unit.name }}</td>
+              <td><strong>{{ item.system_quantity }}</strong></td>
+              <td>
+                <input type="number" name="actual_{{ item.id }}" 
+                       class="quantity-input" 
+                       value="{{ item.actual_quantity|default:'' }}"
+                       placeholder="Nhập SL"
+                       min="0"
+                       step="1"
+                       data-system="{{ item.system_quantity }}"
+                       data-row="{{ forloop.counter }}"
+                       onchange="calculateDiff(this)">
+              </td>
+              <td>
+                <span id="diff_{{ forloop.counter }}" class="diff-display">
+                  {% if item.actual_quantity is not None %}
+                    {% if item.difference > 0 %}
+                      <span class="diff-positive">+{{ item.difference }}</span>
+                    {% elif item.difference < 0 %}
+                      <span class="diff-negative">{{ item.difference }}</span>
+                    {% else %}
+                      <span class="diff-zero">0</span>
+                    {% endif %}
+                  {% else %}
+                    -
+                  {% endif %}
+                </span>
+              </td>
+              <td>
+                <input type="text" name="notes_{{ item.id }}" 
+                       class="notes-input" 
+                       value="{{ item.notes|default:'' }}"
+                       placeholder="Ghi chú...">
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      
+      <div style="display: flex; gap: 10px;">
+        <button type="submit" class="btn-submit">
+          <i class="fas fa-save"></i> Lưu thay đổi
+        </button>
+        <a href="{% url 'reports:audit_detail' audit.id %}" class="btn-cancel">
+          <i class="fas fa-times"></i> Hủy bỏ
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function calculateDiff(input) {
+    const row = input.dataset.row;
+    const systemQty = parseFloat(input.dataset.system);
+    const actualQty = parseFloat(input.value);
+    const diffSpan = document.getElementById('diff_' + row);
+    
+    if (!isNaN(actualQty)) {
+      const diff = actualQty - systemQty;
+      
+      if (diff > 0) {
+        diffSpan.innerHTML = '<span class="diff-positive">+' + diff + '</span>';
+      } else if (diff < 0) {
+        diffSpan.innerHTML = '<span class="diff-negative">' + diff + '</span>';
+      } else {
+        diffSpan.innerHTML = '<span class="diff-zero">0</span>';
+      }
+    } else {
+      diffSpan.innerHTML = '-';
+    }
+  }
+</script>
+{% endblock %}
