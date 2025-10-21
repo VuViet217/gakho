@@ -45,49 +45,29 @@ def reports_dashboard(request):
         current_quantity__lte=F('minimum_quantity')
     ).count()
     
-    # Tổng giá trị tồn kho
-    products = Product.objects.all()
-    total_inventory_value = 0
-    for p in products:
-        latest_price = p.latest_purchase_price
-        if latest_price:
-            total_inventory_value += p.current_quantity * latest_price
-    
     # Snapshot tháng hiện tại
     current_snapshot = MonthlyInventorySnapshot.objects.filter(
         year=current_year,
         month=current_month
     ).first()
     
+    # Tất cả snapshots của tháng hiện tại
+    snapshots = MonthlyInventorySnapshot.objects.filter(
+        year=current_year,
+        month=current_month
+    )
+    
     # Sản phẩm sắp hết (top 10)
     low_stock_products = Product.objects.filter(
         current_quantity__lte=F('minimum_quantity')
-    ).order_by('current_quantity')[:10]
-    
-    # Biến động tồn kho 6 tháng gần nhất
-    six_months_ago = today - timedelta(days=180)
-    monthly_data = []
-    
-    for i in range(6):
-        date = today - timedelta(days=30 * i)
-        snapshots = MonthlyInventorySnapshot.objects.filter(
-            year=date.year,
-            month=date.month
-        )
-        
-        total_stock = sum(s.closing_stock for s in snapshots)
-        monthly_data.insert(0, {
-            'month': f"{date.month}/{date.year}",
-            'total_stock': total_stock
-        })
+    ).select_related('category', 'unit').order_by('current_quantity')[:10]
     
     context = {
         'total_products': total_products,
         'low_stock_count': low_stock_count,
-        'total_inventory_value': total_inventory_value,
         'current_snapshot': current_snapshot,
+        'snapshots': snapshots,
         'low_stock_products': low_stock_products,
-        'monthly_data': monthly_data,
         'current_month': current_month,
         'current_year': current_year,
     }
@@ -267,8 +247,159 @@ def low_stock_report(request):
 @login_required
 def monthly_report_pdf(request, year, month):
     """Xuất PDF báo cáo tháng"""
-    # Placeholder for now
-    return HttpResponse("PDF export functionality coming soon")
+    from reportlab.lib.pagesizes import A4, landscape
+    from reportlab.lib import colors
+    from reportlab.lib.units import mm
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.pdfbase import pdfmetrics
+    from reportlab.pdfbase.ttfonts import TTFont
+    from reportlab.lib.enums import TA_CENTER, TA_LEFT
+    from io import BytesIO
+    import os
+    from django.conf import settings
+    
+    # Đăng ký font Arial cho tiếng Việt
+    arial_font_path = os.path.join(settings.BASE_DIR, 'static', 'fonts', 'Arial.ttf')
+    arial_bold_path = os.path.join(settings.BASE_DIR, 'static', 'fonts', 'Arial_Bold.ttf')
+    
+    if os.path.exists(arial_font_path):
+        pdfmetrics.registerFont(TTFont('Arial', arial_font_path))
+    if os.path.exists(arial_bold_path):
+        pdfmetrics.registerFont(TTFont('Arial-Bold', arial_bold_path))
+    
+    # Lấy dữ liệu báo cáo
+    snapshots = MonthlyInventorySnapshot.objects.filter(
+        year=year,
+        month=month
+    ).select_related('product__category', 'product__unit').order_by('product__product_code')
+    
+    if not snapshots.exists():
+        return HttpResponse("Chưa có dữ liệu báo cáo cho tháng này", status=404)
+    
+    # Tính tổng
+    total_opening = sum(s.opening_stock for s in snapshots)
+    total_closing = sum(s.closing_stock for s in snapshots)
+    total_received = sum(s.total_received for s in snapshots)
+    total_issued = sum(s.total_issued for s in snapshots)
+    
+    # Tạo PDF
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=landscape(A4), topMargin=15*mm, bottomMargin=15*mm)
+    
+    # Container cho các elements
+    elements = []
+    
+    # Styles
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontName='Arial-Bold' if os.path.exists(arial_bold_path) else 'Helvetica-Bold',
+        fontSize=16,
+        textColor=colors.HexColor('#2c3e50'),
+        spaceAfter=5*mm,
+        alignment=TA_CENTER
+    )
+    
+    subtitle_style = ParagraphStyle(
+        'CustomSubtitle',
+        parent=styles['Normal'],
+        fontName='Arial' if os.path.exists(arial_font_path) else 'Helvetica',
+        fontSize=11,
+        textColor=colors.HexColor('#7f8c8d'),
+        spaceAfter=8*mm,
+        alignment=TA_CENTER
+    )
+    
+    # Title
+    title = Paragraph(f"BÁO CÁO TỒN KHO THÁNG {month}/{year}", title_style)
+    elements.append(title)
+    
+    subtitle = Paragraph(f"OVNC Inventory - Ngày xuất: {timezone.now().strftime('%d/%m/%Y %H:%M')}", subtitle_style)
+    elements.append(subtitle)
+    
+    # Thông tin tổng quan
+    summary_data = [
+        ['Tồn đầu tháng', 'Nhập trong tháng', 'Xuất trong tháng', 'Tồn cuối tháng'],
+        [f'{total_opening:,}', f'{total_received:,}', f'{total_issued:,}', f'{total_closing:,}']
+    ]
+    
+    summary_table = Table(summary_data, colWidths=[60*mm, 60*mm, 60*mm, 60*mm])
+    summary_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#6B8DD6')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Arial-Bold' if os.path.exists(arial_bold_path) else 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 11),
+        ('FONTNAME', (0, 1), (-1, -1), 'Arial' if os.path.exists(arial_font_path) else 'Helvetica'),
+        ('FONTSIZE', (0, 1), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 10),
+        ('TOPPADDING', (0, 0), (-1, -1), 10),
+        ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+        ('BACKGROUND', (0, 1), (-1, 1), colors.HexColor('#f8f9fa')),
+    ]))
+    elements.append(summary_table)
+    elements.append(Spacer(1, 10*mm))
+    
+    # Chi tiết sản phẩm
+    data = [['STT', 'Mã SP', 'Tên sản phẩm', 'Danh mục', 'ĐVT', 'Tồn đầu', 'Nhập', 'Xuất', 'Tồn cuối']]
+    
+    for idx, snapshot in enumerate(snapshots, 1):
+        data.append([
+            str(idx),
+            snapshot.product.product_code[:15],
+            snapshot.product.name[:30] + '...' if len(snapshot.product.name) > 30 else snapshot.product.name,
+            snapshot.product.category.name[:15] if snapshot.product.category else '-',
+            snapshot.product.unit.name[:10] if snapshot.product.unit else '-',
+            f'{snapshot.opening_stock:,}',
+            f'{snapshot.total_received:,}',
+            f'{snapshot.total_issued:,}',
+            f'{snapshot.closing_stock:,}',
+        ])
+    
+    # Tạo bảng
+    col_widths = [12*mm, 25*mm, 60*mm, 30*mm, 20*mm, 22*mm, 22*mm, 22*mm, 22*mm]
+    table = Table(data, colWidths=col_widths)
+    
+    table.setStyle(TableStyle([
+        # Header
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#6B8DD6')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Arial-Bold' if os.path.exists(arial_bold_path) else 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 9),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
+        ('TOPPADDING', (0, 0), (-1, 0), 8),
+        
+        # Body
+        ('FONTNAME', (0, 1), (-1, -1), 'Arial' if os.path.exists(arial_font_path) else 'Helvetica'),
+        ('FONTSIZE', (0, 1), (-1, -1), 8),
+        ('ALIGN', (0, 1), (0, -1), 'CENTER'),  # STT
+        ('ALIGN', (1, 1), (1, -1), 'LEFT'),    # Mã SP
+        ('ALIGN', (2, 1), (2, -1), 'LEFT'),    # Tên SP
+        ('ALIGN', (3, 1), (3, -1), 'LEFT'),    # Danh mục
+        ('ALIGN', (4, 1), (4, -1), 'CENTER'),  # ĐVT
+        ('ALIGN', (5, 1), (-1, -1), 'RIGHT'),  # Số lượng
+        
+        # Grid
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f8f9fa')]),
+        ('BOTTOMPADDING', (0, 1), (-1, -1), 6),
+        ('TOPPADDING', (0, 1), (-1, -1), 6),
+    ]))
+    
+    elements.append(table)
+    
+    # Build PDF
+    doc.build(elements)
+    
+    # Trả về response
+    buffer.seek(0)
+    response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="Bao_cao_thang_{month}_{year}.pdf"'
+    
+    return response
 
 
 @login_required

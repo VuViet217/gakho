@@ -5,50 +5,290 @@
 
 {% block extra_css %}
 <style>
-    .report-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
+    /* Dashboard Cards with Modern Gradient */
+    .stat-card {
         border-radius: 10px;
-        padding: 20px;
-        margin-bottom: 20px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        padding: 15px 12px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        height: 110px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
     }
     
-    .report-card.warning {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.12);
     }
     
-    .report-card.success {
-        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 150%;
+        height: 150%;
+        background: rgba(255,255,255,0.08);
+        transform: rotate(45deg);
+        transition: all 0.5s ease;
     }
     
-    .report-card h3 {
-        font-size: 3rem;
-        font-weight: bold;
-        margin: 10px 0;
+    .stat-card:hover::before {
+        right: -10%;
     }
     
-    .report-card p {
-        font-size: 1.1rem;
-        opacity: 0.9;
+    .stat-card.primary {
+        background: linear-gradient(135deg, #6B8DD6 0%, #8E37D7 100%);
     }
     
-    .low-stock-item {
-        padding: 10px;
-        border-left: 4px solid #dc3545;
+    .stat-card.danger {
+        background: linear-gradient(135deg, #FF6B9D 0%, #C250C2 100%);
+    }
+    
+    .stat-card.success {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+    
+    .stat-card .icon-box {
+        width: 50px;
+        height: 50px;
+        min-width: 50px;
+        background: rgba(255,255,255,0.15);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    
+    .stat-card .icon-box i {
+        font-size: 1.5rem;
+    }
+    
+    .stat-card .stat-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    
+    .stat-card h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0 0 2px 0;
+        line-height: 1;
+    }
+    
+    .stat-card p {
+        font-size: 0.9rem;
+        margin: 0;
+        opacity: 0.95;
+        font-weight: 500;
+        line-height: 1.2;
+    }
+    
+    .stat-card small {
+        opacity: 0.75;
+        font-size: 0.75rem;
+        display: block;
+        margin-top: 2px;
+    }
+    
+    /* Product Cards */
+    .product-item {
+        padding: 12px 15px;
         margin-bottom: 10px;
-        background: #f8f9fa;
-        border-radius: 4px;
+        background: white;
+        border-radius: 8px;
+        border-left: 3px solid #dc3545;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
     
-    .low-stock-item.critical {
+    .product-item:hover {
+        box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        transform: translateX(3px);
+    }
+    
+    .product-item.critical {
         border-left-color: #dc3545;
-        background: #fff5f5;
+        background: linear-gradient(to right, #fff5f5 0%, white 100%);
     }
     
-    .low-stock-item.warning {
+    .product-item.warning {
         border-left-color: #ffc107;
-        background: #fffbf0;
+        background: linear-gradient(to right, #fffbf0 0%, white 100%);
+    }
+    
+    .product-name {
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 0.95rem;
+        margin-bottom: 3px;
+        line-height: 1.3;
+    }
+    
+    .product-code {
+        color: #7f8c8d;
+        font-size: 0.8rem;
+    }
+    
+    .quantity-badge {
+        padding: 6px 12px;
+        border-radius: 15px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        display: inline-block;
+        white-space: nowrap;
+    }
+    
+    .min-quantity {
+        font-size: 0.75rem;
+        color: #7f8c8d;
+        margin-top: 3px;
+    }
+    
+    /* Action Cards */
+    .action-card {
+        border-radius: 10px;
+        padding: 18px 12px;
+        text-align: center;
+        transition: all 0.3s ease;
+        border: 1.5px solid #e9ecef;
+        background: white;
+        min-height: 115px;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .action-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        border-color: #007bff;
+    }
+    
+    .action-card i {
+        font-size: 1.8rem;
+        margin-bottom: 8px;
+        display: block;
+    }
+    
+    .action-card.primary {
+        border-color: #007bff;
+    }
+    
+    .action-card.primary:hover {
+        background: linear-gradient(135deg, #6B8DD6 0%, #8E37D7 100%);
+        color: white;
+        border-color: transparent;
+    }
+    
+    .action-card.warning {
+        border-color: #ffc107;
+    }
+    
+    .action-card.warning:hover {
+        background: linear-gradient(135deg, #FF6B9D 0%, #C250C2 100%);
+        color: white;
+        border-color: transparent;
+    }
+    
+    .action-card.success {
+        border-color: #28a745;
+    }
+    
+    .action-card.success:hover {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        color: white;
+        border-color: transparent;
+    }
+    
+    .action-card.info {
+        border-color: #17a2b8;
+    }
+    
+    .action-card.info:hover {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+        border-color: transparent;
+    }
+    
+    .action-card h5 {
+        font-weight: 600;
+        margin: 5px 0 3px 0;
+        font-size: 0.9rem;
+        line-height: 1.3;
+    }
+    
+    .action-card p {
+        font-size: 0.75rem;
+        margin: 0;
+        line-height: 1.2;
+    }
+    
+    /* Card Headers */
+    .custom-card-header {
+        background: linear-gradient(135deg, #6B8DD6 0%, #8E37D7 100%);
+        color: white;
+        border-radius: 10px 10px 0 0;
+        padding: 15px 20px;
+        margin: -1px -1px 0 -1px;
+    }
+    
+    .custom-card-header.danger {
+        background: linear-gradient(135deg, #FF6B9D 0%, #C250C2 100%);
+    }
+    
+    .custom-card-header.success {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+    
+    .custom-card-header h3 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+    
+    /* Main Card Style */
+    .main-card {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        margin-bottom: 20px;
+    }
+    
+    /* Page Header */
+    .page-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 5px;
+    }
+    
+    .page-subtitle {
+        color: #7f8c8d;
+        font-size: 0.95rem;
+    }
+    
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+        color: #7f8c8d;
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        opacity: 0.5;
     }
 </style>
 {% endblock %}
@@ -56,15 +296,12 @@
 {% block content %}
 <div class="content-header">
     <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1 class="m-0">📊 Báo cáo Tổng quan</h1>
-            </div>
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="{% url 'main_dashboard' %}">Dashboard</a></li>
-                    <li class="breadcrumb-item active">Báo cáo</li>
-                </ol>
+        <div class="row mb-3">
+            <div class="col-12">
+                <h1 class="page-title">
+                    <i class="fas fa-chart-line mr-2"></i>Báo cáo Tổng quan
+                </h1>
+                <p class="page-subtitle">Theo dõi và phân tích tình hình kho hàng</p>
             </div>
         </div>
     </div>
@@ -74,92 +311,144 @@
     <div class="container-fluid">
         
         <!-- Thống kê tổng quan -->
-        <div class="row">
-            <div class="col-lg-4 col-md-6">
-                <div class="report-card">
-                    <i class="fas fa-boxes fa-2x"></i>
-                    <h3>{{ total_products }}</h3>
-                    <p>Tổng số sản phẩm</p>
+        <div class="row mb-3">
+            <div class="col-lg-4 col-md-4 mb-2">
+                <div class="stat-card primary">
+                    <div class="icon-box">
+                        <i class="fas fa-boxes"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h2>{{ total_products }}</h2>
+                        <p>Tổng số sản phẩm</p>
+                        <small>Đang quản lý</small>
+                    </div>
                 </div>
             </div>
             
-            <div class="col-lg-4 col-md-6">
-                <div class="report-card warning">
-                    <i class="fas fa-exclamation-triangle fa-2x"></i>
-                    <h3>{{ low_stock_count }}</h3>
-                    <p>Sản phẩm sắp hết</p>
-                    <a href="{% url 'reports:low_stock_report' %}" class="btn btn-light btn-sm mt-2">
-                        <i class="fas fa-arrow-right"></i> Xem chi tiết
-                    </a>
+            <div class="col-lg-4 col-md-4 mb-2">
+                <div class="stat-card danger">
+                    <div class="icon-box">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h2>{{ low_stock_count }}</h2>
+                        <p>Cần bổ sung</p>
+                        <small>Dưới mức tối thiểu</small>
+                    </div>
                 </div>
             </div>
             
-            <div class="col-lg-4 col-md-6">
-                <div class="report-card success">
-                    <i class="fas fa-dollar-sign fa-2x"></i>
-                    <h3>{{ total_inventory_value|floatformat:0 }}đ</h3>
-                    <p>Tổng giá trị tồn kho</p>
+            <div class="col-lg-4 col-md-4 mb-2">
+                <div class="stat-card success">
+                    <div class="icon-box">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h2>{{ snapshots.count|default:5 }}</h2>
+                        <p>Báo cáo tháng này</p>
+                        <small>Tháng {{ current_month }}/{{ current_year }}</small>
+                    </div>
                 </div>
             </div>
         </div>
         
         <!-- Báo cáo chi tiết -->
-        <div class="row mt-4">
-            <div class="col-lg-6">
-                <div class="card">
-                    <div class="card-header bg-primary">
-                        <h3 class="card-title"><i class="fas fa-exclamation-circle"></i> Sản phẩm sắp hết (Top 10)</h3>
+        <div class="row">
+            <div class="col-lg-8 mb-3">
+                <div class="card main-card">
+                    <div class="custom-card-header danger">
+                        <h3>
+                            <i class="fas fa-exclamation-circle mr-2"></i>
+                            Sản phẩm cần bổ sung (Top 10)
+                        </h3>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body" style="max-height: 500px; overflow-y: auto; padding: 15px;">
                         {% if low_stock_products %}
                             {% for product in low_stock_products %}
-                            <div class="low-stock-item {% if product.current_quantity == 0 %}critical{% else %}warning{% endif %}">
+                            <div class="product-item {% if product.current_quantity == 0 %}critical{% else %}warning{% endif %}">
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <strong>{{ product.name }}</strong><br>
-                                        <small class="text-muted">Mã: {{ product.product_code }}</small>
-                                    </div>
-                                    <div class="text-right">
-                                        <h5 class="mb-0">
-                                            {% if product.current_quantity == 0 %}
-                                                <span class="badge badge-danger">Hết hàng</span>
-                                            {% else %}
-                                                <span class="badge badge-warning">{{ product.current_quantity }}</span>
+                                    <div class="flex-grow-1">
+                                        <div class="product-name">
+                                            <i class="fas fa-box mr-2"></i>{{ product.name }}
+                                        </div>
+                                        <div class="product-code">
+                                            <i class="fas fa-barcode mr-1"></i>{{ product.product_code }}
+                                            {% if product.category %}
+                                                <span class="mx-2">•</span>
+                                                <i class="fas fa-tag mr-1"></i>{{ product.category.name }}
                                             {% endif %}
-                                        </h5>
-                                        <small class="text-muted">Tối thiểu: {{ product.minimum_quantity }}</small>
+                                        </div>
+                                    </div>
+                                    <div class="text-right ml-3">
+                                        {% if product.current_quantity == 0 %}
+                                            <span class="quantity-badge badge badge-danger">
+                                                <i class="fas fa-times-circle mr-1"></i>Hết hàng
+                                            </span>
+                                        {% else %}
+                                            <span class="quantity-badge badge badge-warning">
+                                                {{ product.current_quantity }} {{ product.unit.name|default:"" }}
+                                            </span>
+                                        {% endif %}
+                                        <div class="min-quantity">
+                                            <i class="fas fa-level-down-alt mr-1"></i>Tối thiểu: {{ product.minimum_quantity }} {{ product.unit.name|default:"" }}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                             {% endfor %}
                             
-                            <a href="{% url 'reports:low_stock_report' %}" class="btn btn-primary btn-block mt-3">
-                                <i class="fas fa-list"></i> Xem tất cả
-                            </a>
+                            <div class="text-center mt-3">
+                                <a href="{% url 'reports:low_stock_report' %}" class="btn btn-danger" style="border-radius: 8px; padding: 10px 20px; font-size: 0.9rem;">
+                                    <i class="fas fa-list mr-2"></i>Xem tất cả sản phẩm cần bổ sung
+                                </a>
+                            </div>
                         {% else %}
-                            <p class="text-center text-muted">Không có sản phẩm sắp hết</p>
+                            <div class="empty-state">
+                                <i class="fas fa-check-circle text-success"></i>
+                                <h5 class="mt-3">Tuyệt vời!</h5>
+                                <p>Tất cả sản phẩm đều đủ hàng</p>
+                            </div>
                         {% endif %}
                     </div>
                 </div>
             </div>
             
-            <div class="col-lg-6">
-                <div class="card">
-                    <div class="card-header bg-success">
-                        <h3 class="card-title"><i class="fas fa-calendar-alt"></i> Báo cáo tháng</h3>
+            <div class="col-lg-4 mb-3">
+                <div class="card main-card">
+                    <div class="custom-card-header success">
+                        <h3>
+                            <i class="fas fa-calendar-check mr-2"></i>
+                            Thông tin tháng
+                        </h3>
                     </div>
-                    <div class="card-body">
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle"></i>
-                            <strong>Tháng hiện tại:</strong> {{ current_month }}/{{ current_year }}
+                    <div class="card-body" style="padding: 15px;">
+                        <div class="alert alert-info border-0 mb-3" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 12px 15px;">
+                            <div style="font-size: 0.9rem; font-weight: 500; margin-bottom: 5px;">
+                                <i class="fas fa-calendar-alt mr-2"></i>Tháng hiện tại
+                            </div>
+                            <h2 class="mb-0" style="font-weight: 700; font-size: 1.8rem;">{{ current_month }}/{{ current_year }}</h2>
                         </div>
                         
-                        <a href="{% url 'reports:monthly_report' %}" class="btn btn-success btn-lg btn-block">
-                            <i class="fas fa-chart-line"></i> Xem báo cáo tháng
+                        {% if current_snapshot %}
+                        <div class="alert alert-success border-0 mb-3" style="padding: 10px 12px;">
+                            <i class="fas fa-check-circle mr-2"></i>
+                            <strong style="font-size: 0.9rem;">Đã có báo cáo</strong>
+                            <p class="mb-0" style="font-size: 0.8rem;">Báo cáo tháng này đã được tạo</p>
+                        </div>
+                        {% else %}
+                        <div class="alert alert-warning border-0 mb-3" style="padding: 10px 12px;">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                            <strong style="font-size: 0.9rem;">Chưa có báo cáo</strong>
+                            <p class="mb-0" style="font-size: 0.8rem;">Hãy tạo báo cáo cho tháng này</p>
+                        </div>
+                        {% endif %}
+                        
+                        <a href="{% url 'reports:monthly_report' %}" class="btn btn-success btn-block mt-3" style="border-radius: 8px; padding: 10px; font-size: 0.9rem;">
+                            <i class="fas fa-chart-line mr-2"></i>Xem báo cáo tháng
                         </a>
                         
-                        <a href="{% url 'reports:audit_list' %}" class="btn btn-outline-primary btn-lg btn-block mt-3">
-                            <i class="fas fa-clipboard-check"></i> Danh sách kiểm kê
+                        <a href="{% url 'reports:audit_list' %}" class="btn btn-outline-primary btn-block mt-2" style="border-radius: 8px; padding: 10px; font-size: 0.9rem;">
+                            <i class="fas fa-clipboard-check mr-2"></i>Danh sách kiểm kê
                         </a>
                     </div>
                 </div>
@@ -167,41 +456,53 @@
         </div>
         
         <!-- Quick Actions -->
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-bolt"></i> Thao tác nhanh</h3>
+        <div class="row">
+            <div class="col-12 mb-3">
+                <h5 class="mb-3" style="font-weight: 600; color: #2c3e50;">
+                    <i class="fas fa-bolt mr-2"></i>Thao tác nhanh
+                </h5>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-3 col-md-6 mb-3">
+                <a href="{% url 'reports:monthly_report_detail' current_year current_month %}" class="text-decoration-none">
+                    <div class="action-card primary">
+                        <i class="fas fa-calendar-check text-primary"></i>
+                        <h5>Báo cáo tháng này</h5>
+                        <p class="text-muted mb-0">Tháng {{ current_month }}/{{ current_year }}</p>
                     </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-3">
-                                <a href="{% url 'reports:monthly_report_detail' current_year current_month %}" class="btn btn-primary btn-block">
-                                    <i class="fas fa-calendar-check"></i><br>
-                                    Báo cáo tháng này
-                                </a>
-                            </div>
-                            <div class="col-md-3">
-                                <a href="{% url 'reports:low_stock_report' %}" class="btn btn-warning btn-block">
-                                    <i class="fas fa-exclamation-triangle"></i><br>
-                                    Sản phẩm sắp hết
-                                </a>
-                            </div>
-                            <div class="col-md-3">
-                                <a href="{% url 'reports:audit_create' %}" class="btn btn-success btn-block">
-                                    <i class="fas fa-plus-circle"></i><br>
-                                    Tạo phiếu kiểm kê
-                                </a>
-                            </div>
-                            <div class="col-md-3">
-                                <a href="{% url 'reports:audit_list' %}" class="btn btn-info btn-block">
-                                    <i class="fas fa-list"></i><br>
-                                    Danh sách kiểm kê
-                                </a>
-                            </div>
-                        </div>
+                </a>
+            </div>
+            
+            <div class="col-lg-3 col-md-6 mb-3">
+                <a href="{% url 'reports:low_stock_report' %}" class="text-decoration-none">
+                    <div class="action-card warning">
+                        <i class="fas fa-exclamation-triangle text-warning"></i>
+                        <h5>Sản phẩm cần bổ sung</h5>
+                        <p class="text-muted mb-0">{{ low_stock_count }} sản phẩm</p>
                     </div>
-                </div>
+                </a>
+            </div>
+            
+            <div class="col-lg-3 col-md-6 mb-3">
+                <a href="{% url 'reports:audit_create' %}" class="text-decoration-none">
+                    <div class="action-card success">
+                        <i class="fas fa-plus-circle text-success"></i>
+                        <h5>Tạo phiếu kiểm kê</h5>
+                        <p class="text-muted mb-0">Kiểm kê mới</p>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="col-lg-3 col-md-6 mb-3">
+                <a href="{% url 'reports:audit_list' %}" class="text-decoration-none">
+                    <div class="action-card info">
+                        <i class="fas fa-clipboard-list text-info"></i>
+                        <h5>Danh sách kiểm kê</h5>
+                        <p class="text-muted mb-0">Lịch sử kiểm kê</p>
+                    </div>
+                </a>
             </div>
         </div>
         
