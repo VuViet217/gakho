@@ -38,30 +38,157 @@
                     <form method="post">
                         {% csrf_token %}
                         <div class="card-body">
+                            <!-- Thông tin cơ bản -->
                             <div class="row">
                                 <div class="col-md-6">
-                                    {{ form.code|as_crispy_field }}
-                                    {{ form.name|as_crispy_field }}
+                                    <div class="form-group">
+                                        <label for="{{ form.code.id_for_label }}">{{ form.code.label }} <span class="text-danger">*</span></label>
+                                        {{ form.code }}
+                                        {% if form.code.help_text %}
+                                        <small class="form-text text-muted">{{ form.code.help_text }}</small>
+                                        {% endif %}
+                                        {% if form.code.errors %}
+                                        <div class="text-danger">{{ form.code.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="{{ form.name.id_for_label }}">{{ form.name.label }} <span class="text-danger">*</span></label>
+                                        {{ form.name }}
+                                        {% if form.name.help_text %}
+                                        <small class="form-text text-muted">{{ form.name.help_text }}</small>
+                                        {% endif %}
+                                        {% if form.name.errors %}
+                                        <div class="text-danger">{{ form.name.errors }}</div>
+                                        {% endif %}
+                                    </div>
                                 </div>
+                                
                                 <div class="col-md-6">
-                                    {{ form.type|as_crispy_field }}
-                                    {{ form.is_active|as_crispy_field }}
-                                    {{ form.is_html|as_crispy_field }}
+                                    <div class="form-group">
+                                        <label for="{{ form.type.id_for_label }}">{{ form.type.label }} <span class="text-danger">*</span></label>
+                                        {{ form.type }}
+                                        {% if form.type.help_text %}
+                                        <small class="form-text text-muted">{{ form.type.help_text }}</small>
+                                        {% endif %}
+                                        {% if form.type.errors %}
+                                        <div class="text-danger">{{ form.type.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <div class="form-check">
+                                            {{ form.is_active }}
+                                            <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                                {{ form.is_active.label }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <div class="form-check">
+                                            {{ form.is_html }}
+                                            <label class="form-check-label" for="{{ form.is_html.id_for_label }}">
+                                                {{ form.is_html.label }}
+                                            </label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+                            
+                            <!-- Tiêu đề email -->
                             <div class="row">
                                 <div class="col-md-12">
-                                    {{ form.subject|as_crispy_field }}
+                                    <div class="form-group">
+                                        <label for="{{ form.subject.id_for_label }}">{{ form.subject.label }} <span class="text-danger">*</span></label>
+                                        {{ form.subject }}
+                                        {% if form.subject.help_text %}
+                                        <small class="form-text text-muted">{{ form.subject.help_text }}</small>
+                                        {% endif %}
+                                        {% if form.subject.errors %}
+                                        <div class="text-danger">{{ form.subject.errors }}</div>
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </div>
+                            
+                            <!-- Nội dung email -->
                             <div class="row">
                                 <div class="col-md-12">
-                                    {{ form.content|as_crispy_field }}
+                                    <div class="form-group">
+                                        <label for="{{ form.content.id_for_label }}">{{ form.content.label }} <span class="text-danger">*</span></label>
+                                        {{ form.content }}
+                                        {% if form.content.help_text %}
+                                        <small class="form-text text-muted">{{ form.content.help_text }}</small>
+                                        {% endif %}
+                                        {% if form.content.errors %}
+                                        <div class="text-danger">{{ form.content.errors }}</div>
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </div>
+                            
+                            <!-- Mô tả -->
                             <div class="row">
                                 <div class="col-md-12">
-                                    {{ form.description|as_crispy_field }}
+                                    <div class="form-group">
+                                        <label for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
+                                        {{ form.description }}
+                                        {% if form.description.help_text %}
+                                        <small class="form-text text-muted">{{ form.description.help_text }}</small>
+                                        {% endif %}
+                                        {% if form.description.errors %}
+                                        <div class="text-danger">{{ form.description.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Người nhận và CC mặc định -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="card bg-light">
+                                        <div class="card-header">
+                                            <h3 class="card-title"><i class="fas fa-envelope"></i> Cấu hình người nhận tự động</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="{{ form.default_recipients.id_for_label }}">
+                                                            <i class="fas fa-users"></i> {{ form.default_recipients.label }}
+                                                        </label>
+                                                        {{ form.default_recipients }}
+                                                        {% if form.default_recipients.help_text %}
+                                                        <small class="form-text text-muted">{{ form.default_recipients.help_text }}</small>
+                                                        {% endif %}
+                                                        {% if form.default_recipients.errors %}
+                                                        <div class="text-danger">{{ form.default_recipients.errors }}</div>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="{{ form.default_cc.id_for_label }}">
+                                                            <i class="fas fa-user-tag"></i> {{ form.default_cc.label }}
+                                                        </label>
+                                                        {{ form.default_cc }}
+                                                        {% if form.default_cc.help_text %}
+                                                        <small class="form-text text-muted">{{ form.default_cc.help_text }}</small>
+                                                        {% endif %}
+                                                        {% if form.default_cc.errors %}
+                                                        <div class="text-danger">{{ form.default_cc.errors }}</div>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="alert alert-info mb-0">
+                                                <i class="icon fas fa-info-circle"></i>
+                                                <strong>Hướng dẫn:</strong> Nhập danh sách email, phân cách bằng dấu phẩy. 
+                                                Ví dụ: <code>user1@example.com,user2@example.com</code>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
