@@ -1,755 +1,253 @@
-{% extends 'base.html' %}{% extends 'base.html' %}{% extends 'base.html' %}
-
+{% extends 'base.html' %}
 {% load static %}
-
-{% load static %}{% load static %}
 
 {% block title %}Danh sách kiểm kê kho - OVNC Inventory{% endblock %}
 
-
-
 {% block extra_css %}
-
-<style>{% block title %}Danh sách kiểm kê kho - OVNC Inventory{% endblock %}{% block title %}Danh sách kiểm kê kho - OVNC Inventory{% endblock %}
-
+<style>
     .audit-card {
-
         background: white;
-
         border-radius: 12px;
-
-        padding: 20px;{% block extra_css %}{% block content_header %}
-
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-
-        transition: all 0.3s ease;<style><section class="content-header">
-
-        height: 100%;
-
-        border: 1px solid #e9ecef;    .audit-card {  <div class="container-fluid">
-
-    }
-
-            background: white;    <div class="row mb-2">
-
-    .audit-card:hover {
-
-        transform: translateY(-4px);        border-radius: 12px;      <div class="col-sm-6">
-
-        box-shadow: 0 6px 20px rgba(0,0,0,0.12);
-
-    }        padding: 20px;        <h1><i class="fas fa-clipboard-check"></i> Kiểm kê kho</h1>
-
-    
-
-    .audit-header {        box-shadow: 0 2px 8px rgba(0,0,0,0.08);      </div>
-
-        display: flex;
-
-        justify-content: space-between;        transition: all 0.3s ease;      <div class="col-sm-6">
-
-        align-items: start;
-
-        margin-bottom: 15px;        height: 100%;        <ol class="breadcrumb float-sm-right">
-
-        padding-bottom: 15px;
-
-        border-bottom: 2px solid #f0f0f0;        border: 1px solid #e9ecef;          <li class="breadcrumb-item"><a href="{% url 'main_dashboard' %}">Trang chủ</a></li>
-
-    }
-
-        }          <li class="breadcrumb-item"><a href="{% url 'reports:dashboard' %}">Báo cáo</a></li>
-
-    .audit-code {
-
-        font-size: 1.1rem;              <li class="breadcrumb-item active">Kiểm kê kho</li>
-
-        font-weight: 700;
-
-        color: #2c3e50;    .audit-card:hover {        </ol>
-
-        margin-bottom: 5px;
-
-    }        transform: translateY(-4px);      </div>
-
-    
-
-    .audit-title {        box-shadow: 0 6px 20px rgba(0,0,0,0.12);    </div>
-
-        font-size: 0.9rem;
-
-        color: #7f8c8d;    }  </div>
-
-        margin-bottom: 0;
-
-    }    </section>
-
-    
-
-    .audit-status {    .audit-header {{% endblock %}
-
-        padding: 6px 14px;
-
-        border-radius: 20px;        display: flex;
-
-        font-size: 0.85rem;
-
-        font-weight: 600;        justify-content: space-between;{% block content %}
-
-        white-space: nowrap;
-
-    }        align-items: start;<div class="container-fluid">
-
-    
-
-    .status-draft {        margin-bottom: 15px;  <div class="row">
-
-        background: linear-gradient(135deg, #95a5a6, #7f8c8d);
-
-        color: white;        padding-bottom: 15px;    <div class="col-12">
-
-    }
-
-            border-bottom: 2px solid #f0f0f0;      <div class="card">
-
-    .status-in_progress {
-
-        background: linear-gradient(135deg, #f39c12, #e67e22);    }        <div class="card-header bg-success">
-
-        color: white;
-
-    }              <h3 class="card-title">Danh sách kiểm kê kho</h3>
-
-    
-
-    .status-completed {    .audit-code {          <div class="card-tools">
-
-        background: linear-gradient(135deg, #11998e, #38ef7d);
-
-        color: white;        font-size: 1.1rem;            <a href="{% url 'reports:audit_create' %}" class="btn btn-primary btn-sm">
-
-    }
-
-            font-weight: 700;              <i class="fas fa-plus-circle"></i> Tạo phiếu kiểm kê mới
-
-    .audit-info {
-
-        margin-bottom: 15px;        color: #2c3e50;            </a>
-
-    }
-
-            margin-bottom: 5px;          </div>
-
-    .info-row {
-
-        display: flex;    }        </div>
-
-        align-items: center;
-
-        margin-bottom: 8px;            <div class="card-body">
-
-        font-size: 0.9rem;
-
-        color: #495057;    .audit-title {          <div class="alert alert-info">
-
-    }
-
-            font-size: 0.9rem;            <i class="fas fa-info-circle"></i> Tính năng kiểm kê kho đang được phát triển và sẽ sớm có mặt trong phiên bản tiếp theo.
-
-    .info-row i {
-
-        width: 20px;        color: #7f8c8d;          </div>
-
-        color: #6B8DD6;
-
-        margin-right: 8px;        margin-bottom: 0;          
-
-    }
-
-        }          <!-- Giả lập dữ liệu mẫu để hiển thị UI -->
-
-    .audit-actions {
-
-        display: flex;              <div class="table-responsive">
-
-        gap: 8px;
-
-        flex-wrap: wrap;    .audit-status {            <table class="table table-hover table-striped">
-
-    }
-
-            padding: 6px 14px;              <thead>
-
-    .action-btn {
-
-        flex: 1;        border-radius: 20px;                <tr>
-
-        min-width: 0;
-
-        padding: 8px 12px;        font-size: 0.85rem;                  <th>Mã kiểm kê</th>
-
-        border-radius: 8px;
-
-        font-size: 0.85rem;        font-weight: 600;                  <th>Tiêu đề</th>
-
-        font-weight: 500;
-
-        text-align: center;        white-space: nowrap;                  <th>Ngày kiểm kê</th>
-
-        transition: all 0.2s;
-
-        border: none;    }                  <th>Trạng thái</th>
-
-        cursor: pointer;
-
-        text-decoration: none;                      <th>Người tạo</th>
-
-        display: inline-block;
-
-    }    .status-draft {                  <th>Thao tác</th>
-
-    
-
-    .action-btn:hover {        background: linear-gradient(135deg, #95a5a6, #7f8c8d);                </tr>
-
-        transform: translateY(-2px);
-
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);        color: white;              </thead>
-
-        text-decoration: none;
-
-    }    }              <tbody>
-
-    
-
-    .btn-view {                    <tr>
-
-        background: linear-gradient(135deg, #667eea, #764ba2);
-
-        color: white;    .status-in_progress {                  <td>AUD-202307-001</td>
-
-    }
-
-            background: linear-gradient(135deg, #f39c12, #e67e22);                  <td>Kiểm kê cuối tháng 7/2023</td>
-
-    .btn-edit {
-
-        background: linear-gradient(135deg, #f093fb, #f5576c);        color: white;                  <td>31/07/2023</td>
-
-        color: white;
-
-    }    }                  <td><span class="badge badge-success">Hoàn thành</span></td>
-
-    
-
-    .btn-pdf {                      <td>Admin</td>
-
-        background: linear-gradient(135deg, #fa709a, #fee140);
-
-        color: white;    .status-completed {                  <td>
-
-    }
-
-            background: linear-gradient(135deg, #11998e, #38ef7d);                    <a href="#" class="btn btn-info btn-sm">
-
-    .btn-complete {
-
-        background: linear-gradient(135deg, #11998e, #38ef7d);        color: white;                      <i class="fas fa-eye"></i> Xem
-
-        color: white;
-
-    }    }                    </a>
-
-    
-
-    .filter-section {                        <a href="#" class="btn btn-secondary btn-sm">
-
-        background: white;
-
-        border-radius: 12px;    .audit-info {                      <i class="fas fa-file-pdf"></i> PDF
-
         padding: 20px;
-
-        margin-bottom: 25px;        margin-bottom: 15px;                    </a>
-
         box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-
-    }    }                  </td>
-
+        transition: all 0.3s ease;
+        height: 100%;
+        border: 1px solid #e9ecef;
+    }
     
-
-    .filter-row {                    </tr>
-
+    .audit-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    }
+    
+    .audit-header {
         display: flex;
-
-        gap: 15px;    .info-row {                <tr>
-
-        align-items: end;
-
-    }        display: flex;                  <td>AUD-202308-001</td>
-
-    
-
-    .filter-group {        align-items: center;                  <td>Kiểm kê cuối tháng 8/2023</td>
-
-        flex: 1;
-
-    }        margin-bottom: 8px;                  <td>31/08/2023</td>
-
-    
-
-    .filter-label {        font-size: 0.9rem;                  <td><span class="badge badge-warning">Đang kiểm kê</span></td>
-
-        font-size: 0.9rem;
-
-        font-weight: 600;        color: #495057;                  <td>Admin</td>
-
-        color: #495057;
-
-        margin-bottom: 8px;    }                  <td>
-
-        display: block;
-
-    }                        <a href="#" class="btn btn-info btn-sm">
-
-    
-
-    .filter-input {    .info-row i {                      <i class="fas fa-eye"></i> Xem
-
-        width: 100%;
-
-        padding: 10px 14px;        width: 20px;                    </a>
-
-        border: 1px solid #dee2e6;
-
-        border-radius: 8px;        color: #6B8DD6;                    <a href="#" class="btn btn-primary btn-sm">
-
-        font-size: 0.9rem;
-
-        transition: all 0.2s;        margin-right: 8px;                      <i class="fas fa-edit"></i> Sửa
-
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #f0f0f0;
     }
-
-        }                    </a>
-
-    .filter-input:focus {
-
-        outline: none;                        <a href="#" class="btn btn-success btn-sm">
-
-        border-color: #6B8DD6;
-
-        box-shadow: 0 0 0 3px rgba(107, 141, 214, 0.1);    .audit-actions {                      <i class="fas fa-check"></i> Hoàn thành
-
-    }
-
-            display: flex;                    </a>
-
-    .filter-btn {
-
-        padding: 10px 20px;        gap: 8px;                  </td>
-
-        border-radius: 8px;
-
-        font-weight: 600;        flex-wrap: wrap;                </tr>
-
-        border: none;
-
-        cursor: pointer;    }                <tr>
-
-        transition: all 0.2s;
-
-    }                      <td>AUD-202309-001</td>
-
     
-
-    .btn-filter {    .action-btn {                  <td>Kiểm kê cuối tháng 9/2023</td>
-
-        background: linear-gradient(135deg, #6B8DD6, #8E37D7);
-
-        color: white;        flex: 1;                  <td>30/09/2023</td>
-
-    }
-
-            min-width: 0;                  <td><span class="badge badge-secondary">Bản nháp</span></td>
-
-    .btn-reset {
-
-        background: #e9ecef;        padding: 8px 12px;                  <td>Admin</td>
-
-        color: #495057;
-
-    }        border-radius: 8px;                  <td>
-
-    
-
-    .header-actions {        font-size: 0.85rem;                    <a href="#" class="btn btn-info btn-sm">
-
-        display: flex;
-
-        justify-content: space-between;        font-weight: 500;                      <i class="fas fa-eye"></i> Xem
-
-        align-items: center;
-
-        margin-bottom: 25px;        text-align: center;                    </a>
-
-    }
-
-            transition: all 0.2s;                    <a href="#" class="btn btn-primary btn-sm">
-
-    .page-title {
-
-        font-size: 1.8rem;        border: none;                      <i class="fas fa-edit"></i> Sửa
-
+    .audit-code {
+        font-size: 1.1rem;
         font-weight: 700;
-
-        color: #2c3e50;        cursor: pointer;                    </a>
-
-        margin: 0;
-
-    }        text-decoration: none;                  </td>
-
+        color: #2c3e50;
+        margin-bottom: 5px;
+    }
     
-
-    .btn-create {        display: inline-block;                </tr>
-
-        padding: 12px 24px;
-
-        background: linear-gradient(135deg, #11998e, #38ef7d);    }              </tbody>
-
-        color: white;
-
-        border-radius: 10px;                </table>
-
+    .audit-title {
+        font-size: 0.9rem;
+        color: #7f8c8d;
+        margin-bottom: 0;
+    }
+    
+    .audit-status {
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.85rem;
         font-weight: 600;
-
-        border: none;    .action-btn:hover {          </div>
-
-        cursor: pointer;
-
-        transition: all 0.3s;        transform: translateY(-2px);          
-
-        text-decoration: none;
-
-        display: inline-flex;        box-shadow: 0 4px 12px rgba(0,0,0,0.15);          <div class="text-center mt-4">
-
+        white-space: nowrap;
+    }
+    
+    .status-draft {
+        background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+        color: white;
+    }
+    
+    .status-in_progress {
+        background: linear-gradient(135deg, #f39c12, #e67e22);
+        color: white;
+    }
+    
+    .status-completed {
+        background: linear-gradient(135deg, #11998e, #38ef7d);
+        color: white;
+    }
+    
+    .audit-info {
+        margin-bottom: 15px;
+    }
+    
+    .info-row {
+        display: flex;
         align-items: center;
-
-        gap: 8px;        text-decoration: none;            <a href="{% url 'reports:audit_create' %}" class="btn btn-primary">
-
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+        color: #495057;
     }
-
-        }              <i class="fas fa-plus mr-1"></i> Tạo phiếu kiểm kê mới
-
-    .btn-create:hover {
-
-        transform: translateY(-2px);                </a>
-
-        box-shadow: 0 6px 20px rgba(17, 153, 142, 0.3);
-
-        color: white;    .btn-view {          </div>
-
-        text-decoration: none;
-
-    }        background: linear-gradient(135deg, #667eea, #764ba2);        </div>
-
     
-
-    .empty-state {        color: white;      </div>
-
+    .info-row i {
+        width: 20px;
+        color: #6B8DD6;
+        margin-right: 8px;
+    }
+    
+    .audit-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    
+    .action-btn {
+        flex: 1;
+        min-width: 0;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 500;
         text-align: center;
-
-        padding: 60px 20px;    }    </div>
-
+        transition: all 0.2s;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        text-decoration: none;
+    }
+    
+    .btn-view {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+    }
+    
+    .btn-edit {
+        background: linear-gradient(135deg, #f093fb, #f5576c);
+        color: white;
+    }
+    
+    .btn-pdf {
+        background: linear-gradient(135deg, #fa709a, #fee140);
+        color: white;
+    }
+    
+    .btn-complete {
+        background: linear-gradient(135deg, #11998e, #38ef7d);
+        color: white;
+    }
+    
+    .filter-section {
         background: white;
-
-        border-radius: 12px;      </div>
-
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 25px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-
-    }    .btn-edit {</div>
-
-    
-
-    .empty-state i {        background: linear-gradient(135deg, #f093fb, #f5576c);{% endblock %}
-
-        font-size: 4rem;
-
-        color: #dee2e6;        color: white;
-
-        margin-bottom: 20px;
-
-    }    }{% block extra_js %}
-
-    
-
-    .empty-state h3 {    <script>
-
-        color: #6c757d;
-
-        margin-bottom: 10px;    .btn-pdf {$(document).ready(function() {
-
     }
-
-            background: linear-gradient(135deg, #fa709a, #fee140);  console.log('Audit list loaded');
-
-    .empty-state p {
-
-        color: #adb5bd;        color: white;});
-
-    }
-
-</style>    }</script>
-
-{% endblock %}
-
-    {% endblock %}
-
-{% block content_header %}    .btn-complete {
-
-<section class="content-header">        background: linear-gradient(135deg, #11998e, #38ef7d);
-
-  <div class="container-fluid">        color: white;
-
-    <div class="header-actions">    }
-
-      <h1 class="page-title">    
-
-        <i class="fas fa-clipboard-check" style="color: #6B8DD6; margin-right: 12px;"></i>    .filter-section {
-
-        Kiểm kê kho        background: white;
-
-      </h1>        border-radius: 12px;
-
-      <a href="{% url 'reports:audit_create' %}" class="btn-create">        padding: 20px;
-
-        <i class="fas fa-plus-circle"></i>        margin-bottom: 25px;
-
-        <span>Tạo phiếu kiểm kê</span>        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-
-      </a>    }
-
-    </div>    
-
-  </div>    .filter-row {
-
-</section>        display: flex;
-
-{% endblock %}        gap: 15px;
-
+    
+    .filter-row {
+        display: flex;
+        gap: 15px;
         align-items: end;
-
-{% block content %}    }
-
-<div class="container-fluid">    
-
-  <!-- Filter -->    .filter-group {
-
-  <div class="filter-section">        flex: 1;
-
-    <form method="get" action="">    }
-
-      <div class="filter-row">    
-
-        <div class="filter-group">    .filter-label {
-
-          <label class="filter-label">Tìm kiếm</label>        font-size: 0.9rem;
-
-          <input type="text" name="search" class="filter-input"         font-weight: 600;
-
-                 placeholder="Tìm mã kiểm kê hoặc tiêu đề..."        color: #495057;
-
-                 value="{{ search }}">        margin-bottom: 8px;
-
-        </div>        display: block;
-
-        <div class="filter-group">    }
-
-          <label class="filter-label">Trạng thái</label>    
-
-          <select name="status" class="filter-input">    .filter-input {
-
-            <option value="">Tất cả trạng thái</option>        width: 100%;
-
-            <option value="draft" {% if selected_status == 'draft' %}selected{% endif %}>Nháp</option>        padding: 10px 14px;
-
-            <option value="in_progress" {% if selected_status == 'in_progress' %}selected{% endif %}>Đang kiểm</option>        border: 1px solid #dee2e6;
-
-            <option value="completed" {% if selected_status == 'completed' %}selected{% endif %}>Hoàn thành</option>        border-radius: 8px;
-
-          </select>        font-size: 0.9rem;
-
-        </div>        transition: all 0.2s;
-
-        <div style="display: flex; gap: 8px;">    }
-
-          <button type="submit" class="filter-btn btn-filter">    
-
-            <i class="fas fa-search"></i> Lọc    .filter-input:focus {
-
-          </button>        outline: none;
-
-          <a href="{% url 'reports:audit_list' %}" class="filter-btn btn-reset">        border-color: #6B8DD6;
-
-            <i class="fas fa-redo"></i> Đặt lại        box-shadow: 0 0 0 3px rgba(107, 141, 214, 0.1);
-
-          </a>    }
-
-        </div>    
-
-      </div>    .filter-btn {
-
-    </form>        padding: 10px 20px;
-
-  </div>        border-radius: 8px;
-
-          font-weight: 600;
-
-  <!-- Audit Cards -->        border: none;
-
-  {% if audits %}        cursor: pointer;
-
-  <div class="row">        transition: all 0.2s;
-
-    {% for audit in audits %}    }
-
-    <div class="col-lg-4 col-md-6 mb-4">    
-
-      <div class="audit-card">    .btn-filter {
-
-        <div class="audit-header">        background: linear-gradient(135deg, #6B8DD6, #8E37D7);
-
-          <div>        color: white;
-
-            <div class="audit-code">{{ audit.audit_code }}</div>    }
-
-            <p class="audit-title">{{ audit.title }}</p>    
-
-          </div>    .btn-reset {
-
-          <span class="audit-status status-{{ audit.status }}">        background: #e9ecef;
-
-            {% if audit.status == 'draft' %}Nháp        color: #495057;
-
-            {% elif audit.status == 'in_progress' %}Đang kiểm    }
-
-            {% else %}Hoàn thành    
-
-            {% endif %}    .header-actions {
-
-          </span>        display: flex;
-
-        </div>        justify-content: space-between;
-
-                align-items: center;
-
-        <div class="audit-info">        margin-bottom: 25px;
-
-          <div class="info-row">    }
-
-            <i class="fas fa-calendar-alt"></i>    
-
-            <span>Ngày KK: {{ audit.audit_date|date:"d/m/Y" }}</span>    .page-title {
-
-          </div>        font-size: 1.8rem;
-
-          <div class="info-row">        font-weight: 700;
-
-            <i class="fas fa-user"></i>        color: #2c3e50;
-
-            <span>Người tạo: {{ audit.created_by.username }}</span>        margin: 0;
-
-          </div>    }
-
-          <div class="info-row">    
-
-            <i class="fas fa-boxes"></i>    .btn-create {
-
-            <span>Sản phẩm: {{ audit.items.count }}</span>        padding: 12px 24px;
-
-          </div>        background: linear-gradient(135deg, #11998e, #38ef7d);
-
-        </div>        color: white;
-
-                border-radius: 10px;
-
-        <div class="audit-actions">        font-weight: 600;
-
-          <a href="{% url 'reports:audit_detail' audit.id %}" class="action-btn btn-view">        border: none;
-
-            <i class="fas fa-eye"></i> Xem        cursor: pointer;
-
-          </a>        transition: all 0.3s;
-
-          {% if audit.status != 'completed' %}        text-decoration: none;
-
-          <a href="{% url 'reports:audit_edit' audit.id %}" class="action-btn btn-edit">        display: inline-flex;
-
-            <i class="fas fa-edit"></i> Sửa        align-items: center;
-
-          </a>        gap: 8px;
-
-          {% endif %}    }
-
-          <a href="{% url 'reports:audit_pdf' audit.id %}" class="action-btn btn-pdf">    
-
-            <i class="fas fa-file-pdf"></i> PDF    .btn-create:hover {
-
-          </a>        transform: translateY(-2px);
-
-          {% if audit.status == 'in_progress' and request.user.role in 'sm,admin' %}        box-shadow: 0 6px 20px rgba(17, 153, 142, 0.3);
-
-          <form method="post" action="{% url 'reports:audit_complete' audit.id %}" style="flex: 1; min-width: 0;">        color: white;
-
-            {% csrf_token %}        text-decoration: none;
-
-            <button type="submit" class="action-btn btn-complete" style="width: 100%;"    }
-
-                    onclick="return confirm('Xác nhận hoàn thành kiểm kê?')">    
-
-              <i class="fas fa-check-circle"></i> Hoàn thành    .empty-state {
-
-            </button>        text-align: center;
-
-          </form>        padding: 60px 20px;
-
-          {% endif %}        background: white;
-
-        </div>        border-radius: 12px;
-
-      </div>        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-
-    </div>    }
-
-    {% endfor %}    
-
-  </div>    .empty-state i {
-
-  {% else %}        font-size: 4rem;
-
-  <div class="empty-state">        color: #dee2e6;
-
-    <i class="fas fa-clipboard-list"></i>        margin-bottom: 20px;
-
-    <h3>Chưa có phiếu kiểm kê nào</h3>    }
-
-    <p>Tạo phiếu kiểm kê đầu tiên để bắt đầu quản lý kiểm kê kho</p>    
-
-    <a href="{% url 'reports:audit_create' %}" class="btn-create" style="margin-top: 20px;">    .empty-state h3 {
-
-      <i class="fas fa-plus-circle"></i>        color: #6c757d;
-
-      <span>Tạo phiếu kiểm kê</span>        margin-bottom: 10px;
-
-    </a>    }
-
-  </div>    
-
-  {% endif %}    .empty-state p {
-
-</div>        color: #adb5bd;
-
-{% endblock %}    }
-
+    }
+    
+    .filter-group {
+        flex: 1;
+    }
+    
+    .filter-label {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 8px;
+        display: block;
+    }
+    
+    .filter-input {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+    }
+    
+    .filter-input:focus {
+        outline: none;
+        border-color: #6B8DD6;
+        box-shadow: 0 0 0 3px rgba(107, 141, 214, 0.1);
+    }
+    
+    .filter-btn {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .btn-filter {
+        background: linear-gradient(135deg, #6B8DD6, #8E37D7);
+        color: white;
+    }
+    
+    .btn-reset {
+        background: #e9ecef;
+        color: #495057;
+    }
+    
+    .header-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+    
+    .page-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin: 0;
+    }
+    
+    .btn-create {
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #11998e, #38ef7d);
+        color: white;
+        border-radius: 10px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .btn-create:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(17, 153, 142, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        color: #dee2e6;
+        margin-bottom: 20px;
+    }
+    
+    .empty-state h3 {
+        color: #6c757d;
+        margin-bottom: 10px;
+    }
+    
+    .empty-state p {
+        color: #adb5bd;
+    }
 </style>
 {% endblock %}
 
@@ -772,7 +270,6 @@
 
 {% block content %}
 <div class="container-fluid">
-  <!-- Filter -->
   <div class="filter-section">
     <form method="get" action="">
       <div class="filter-row">
@@ -803,7 +300,6 @@
     </form>
   </div>
   
-  <!-- Audit Cards -->
   {% if audits %}
   <div class="row">
     {% for audit in audits %}

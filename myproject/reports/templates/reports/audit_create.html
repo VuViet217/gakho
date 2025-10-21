@@ -1,394 +1,198 @@
-{% extends 'base.html' %}{% extends 'base.html' %}
+{% extends 'base.html' %}
+{% load static %}
 
-{% load static %}{% load static %}
+{% block title %}Tạo phiếu kiểm kê - OVNC Inventory{% endblock %}
 
-
-
-{% block title %}Tạo phiếu kiểm kê - OVNC Inventory{% endblock %}{% block title %}Tạo phiếu kiểm kê - OVNC Inventory{% endblock %}
-
-
-
-{% block extra_css %}{% block content_header %}
-
-<style><section class="content-header">
-
-    .create-form {  <div class="container-fluid">
-
-        background: white;    <div class="row mb-2">
-
-        border-radius: 12px;      <div class="col-sm-6">
-
-        padding: 30px;        <h1><i class="fas fa-clipboard-list"></i> Tạo phiếu kiểm kê mới</h1>
-
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);      </div>
-
-    }      <div class="col-sm-6">
-
-            <ol class="breadcrumb float-sm-right">
-
-    .form-section {          <li class="breadcrumb-item"><a href="{% url 'main_dashboard' %}">Trang chủ</a></li>
-
-        margin-bottom: 25px;          <li class="breadcrumb-item"><a href="{% url 'reports:dashboard' %}">Báo cáo</a></li>
-
-    }          <li class="breadcrumb-item"><a href="{% url 'reports:audit_list' %}">Kiểm kê kho</a></li>
-
-              <li class="breadcrumb-item active">Tạo mới</li>
-
-    .section-title {        </ol>
-
-        font-size: 1.2rem;      </div>
-
-        font-weight: 700;    </div>
-
-        color: #2c3e50;  </div>
-
-        margin-bottom: 15px;</section>
-
-        padding-bottom: 10px;{% endblock %}
-
+{% block extra_css %}
+<style>
+    .create-form {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    
+    .form-section {
+        margin-bottom: 25px;
+    }
+    
+    .section-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
         border-bottom: 2px solid #f0f0f0;
-
-    }{% block content %}
-
-    <div class="container-fluid">
-
-    .form-group label {  <div class="row">
-
-        font-weight: 600;    <div class="col-12">
-
-        color: #495057;      <div class="card">
-
-        margin-bottom: 8px;        <div class="card-header bg-info">
-
-    }          <h3 class="card-title">Thông tin phiếu kiểm kê</h3>
-
-            </div>
-
-    .form-control {        <div class="card-body">
-
-        border-radius: 8px;          <div class="alert alert-info">
-
-        border: 1px solid #dee2e6;            <i class="fas fa-info-circle"></i> Tính năng kiểm kê kho đang được phát triển và sẽ sớm có mặt trong phiên bản tiếp theo.
-
-        padding: 10px 14px;          </div>
-
-        transition: all 0.2s;          
-
-    }          <form method="post" id="createAuditForm">
-
-                {% csrf_token %}
-
-    .form-control:focus {            
-
-        outline: none;            <div class="row">
-
-        border-color: #6B8DD6;              <div class="col-md-6">
-
-        box-shadow: 0 0 0 3px rgba(107, 141, 214, 0.1);                <div class="form-group">
-
-    }                  <label for="title">Tiêu đề phiếu kiểm kê <span class="text-danger">*</span></label>
-
-                      <input type="text" class="form-control" id="title" name="title" placeholder="Nhập tiêu đề phiếu kiểm kê" required>
-
-    .product-selection {                </div>
-
-        max-height: 400px;              </div>
-
-        overflow-y: auto;              <div class="col-md-6">
-
-        border: 1px solid #dee2e6;                <div class="form-group">
-
-        border-radius: 8px;                  <label for="audit_date">Ngày kiểm kê <span class="text-danger">*</span></label>
-
-        padding: 15px;                  <input type="date" class="form-control" id="audit_date" name="audit_date" required>
-
-    }                </div>
-
-                  </div>
-
-    .product-item {            </div>
-
-        padding: 12px;            
-
-        border-bottom: 1px solid #f0f0f0;            <div class="form-group">
-
-        display: flex;              <label for="notes">Ghi chú</label>
-
-        align-items: center;              <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Nhập ghi chú cho phiếu kiểm kê (nếu có)"></textarea>
-
-        transition: background 0.2s;            </div>
-
-    }            
-
-                <h5 class="mt-4 mb-3">Chọn sản phẩm kiểm kê</h5>
-
-    .product-item:hover {            <div class="row">
-
-        background: #f8f9fa;              <div class="col-md-4">
-
-    }                <div class="form-group">
-
-                      <label for="category_filter">Lọc theo danh mục</label>
-
-    .product-item:last-child {                  <select class="form-control" id="category_filter">
-
-        border-bottom: none;                    <option value="">Tất cả danh mục</option>
-
-    }                    <option value="1">Văn phòng phẩm</option>
-
-                        <option value="2">Thiết bị điện tử</option>
-
-    .product-checkbox {                    <option value="3">Thiết bị văn phòng</option>
-
-        margin-right: 12px;                  </select>
-
-    }                </div>
-
-                  </div>
-
-    .product-info {              <div class="col-md-4">
-
-        flex: 1;                <div class="form-group">
-
-    }                  <label for="department_filter">Lọc theo bộ phận</label>
-
-                      <select class="form-control" id="department_filter">
-
-    .product-code {                    <option value="">Tất cả bộ phận</option>
-
-        font-weight: 600;                    <option value="1">Kế toán</option>
-
-        color: #2c3e50;                    <option value="2">IT</option>
-
-        margin-bottom: 4px;                    <option value="3">Kinh doanh</option>
-
-    }                  </select>
-
-                    </div>
-
-    .product-name {              </div>
-
-        color: #6c757d;              <div class="col-md-4">
-
-        font-size: 0.9rem;                <div class="form-group">
-
-        margin-bottom: 2px;                  <label for="search_filter">Tìm kiếm</label>
-
-    }                  <input type="text" class="form-control" id="search_filter" placeholder="Tìm theo tên hoặc mã sản phẩm...">
-
-                    </div>
-
-    .product-quantity {              </div>
-
-        font-size: 0.85rem;            </div>
-
-        color: #7f8c8d;            
-
-    }            <div class="table-responsive">
-
-                  <table class="table table-bordered table-hover">
-
-    .btn-submit {                <thead>
-
-        padding: 12px 32px;                  <tr>
-
-        background: linear-gradient(135deg, #11998e, #38ef7d);                    <th style="width: 40px;">
-
-        color: white;                      <div class="icheck-primary">
-
-        border-radius: 8px;                        <input type="checkbox" id="selectAll">
-
-        font-weight: 600;                        <label for="selectAll"></label>
-
-        border: none;                      </div>
-
-        cursor: pointer;                    </th>
-
-        transition: all 0.3s;                    <th>Mã sản phẩm</th>
-
-    }                    <th>Tên sản phẩm</th>
-
-                        <th>Danh mục</th>
-
-    .btn-submit:hover {                    <th>Đơn vị tính</th>
-
-        transform: translateY(-2px);                    <th>Số lượng hệ thống</th>
-
-        box-shadow: 0 6px 20px rgba(17, 153, 142, 0.3);                  </tr>
-
-    }                </thead>
-
-                    <tbody>
-
-    .btn-cancel {                  <tr>
-
-        padding: 12px 32px;                    <td>
-
-        background: #e9ecef;                      <div class="icheck-primary">
-
-        color: #495057;                        <input type="checkbox" name="product_ids[]" value="1" id="product_1">
-
-        border-radius: 8px;                        <label for="product_1"></label>
-
-        font-weight: 600;                      </div>
-
-        border: none;                    </td>
-
-        cursor: pointer;                    <td>SP001</td>
-
-        transition: all 0.3s;                    <td>Giấy A4</td>
-
-        text-decoration: none;                    <td>Văn phòng phẩm</td>
-
-        display: inline-block;                    <td>Ram</td>
-
-    }                    <td>50</td>
-
-                      </tr>
-
-    .btn-cancel:hover {                  <tr>
-
-        background: #dee2e6;                    <td>
-
-        text-decoration: none;                      <div class="icheck-primary">
-
-        color: #495057;                        <input type="checkbox" name="product_ids[]" value="2" id="product_2">
-
-    }                        <label for="product_2"></label>
-
-                          </div>
-
-    .select-all-btn {                    </td>
-
-        padding: 8px 16px;                    <td>SP002</td>
-
-        background: linear-gradient(135deg, #6B8DD6, #8E37D7);                    <td>Bút bi</td>
-
-        color: white;                    <td>Văn phòng phẩm</td>
-
-        border-radius: 6px;                    <td>Cái</td>
-
-        font-weight: 600;                    <td>100</td>
-
-        border: none;                  </tr>
-
-        cursor: pointer;                  <tr>
-
-        font-size: 0.9rem;                    <td>
-
-        margin-bottom: 10px;                      <div class="icheck-primary">
-
-    }                        <input type="checkbox" name="product_ids[]" value="3" id="product_3">
-
-                            <label for="product_3"></label>
-
-    .filter-products {                      </div>
-
-        margin-bottom: 15px;                    </td>
-
-        padding: 10px 14px;                    <td>SP003</td>
-
-        border: 1px solid #dee2e6;                    <td>Chuột không dây</td>
-
-        border-radius: 8px;                    <td>Thiết bị điện tử</td>
-
-        width: 100%;                    <td>Cái</td>
-
-    }                    <td>20</td>
-
-</style>                  </tr>
-
-{% endblock %}                </tbody>
-
-              </table>
-
-{% block content_header %}            </div>
-
-<section class="content-header">            
-
-  <div class="container-fluid">            <div class="text-center mt-4">
-
-    <div class="row mb-2">              <button type="submit" class="btn btn-primary" disabled>
-
-      <div class="col-sm-6">                <i class="fas fa-save"></i> Tạo phiếu kiểm kê
-
-        <h1><i class="fas fa-plus-circle"></i> Tạo phiếu kiểm kê mới</h1>              </button>
-
-      </div>              <a href="{% url 'reports:audit_list' %}" class="btn btn-secondary">
-
-      <div class="col-sm-6">                <i class="fas fa-times"></i> Hủy bỏ
-
-        <ol class="breadcrumb float-sm-right">              </a>
-
-          <li class="breadcrumb-item"><a href="{% url 'main_dashboard' %}">Trang chủ</a></li>            </div>
-
-          <li class="breadcrumb-item"><a href="{% url 'reports:dashboard' %}">Báo cáo</a></li>          </form>
-
-          <li class="breadcrumb-item"><a href="{% url 'reports:audit_list' %}">Kiểm kê</a></li>        </div>
-
-          <li class="breadcrumb-item active">Tạo mới</li>      </div>
-
-        </ol>    </div>
-
-      </div>  </div>
-
-    </div></div>
-
-  </div>{% endblock %}
-
+    }
+    
+    .form-group label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 8px;
+    }
+    
+    .form-control {
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        padding: 10px 14px;
+        transition: all 0.2s;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: #6B8DD6;
+        box-shadow: 0 0 0 3px rgba(107, 141, 214, 0.1);
+    }
+    
+    .product-selection {
+        max-height: 400px;
+        overflow-y: auto;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 15px;
+    }
+    
+    .product-item {
+        padding: 12px;
+        border-bottom: 1px solid #f0f0f0;
+        display: flex;
+        align-items: center;
+        transition: background 0.2s;
+    }
+    
+    .product-item:hover {
+        background: #f8f9fa;
+    }
+    
+    .product-item:last-child {
+        border-bottom: none;
+    }
+    
+    .product-checkbox {
+        margin-right: 12px;
+    }
+    
+    .product-info {
+        flex: 1;
+    }
+    
+    .product-code {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 4px;
+    }
+    
+    .product-name {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 2px;
+    }
+    
+    .product-quantity {
+        font-size: 0.85rem;
+        color: #7f8c8d;
+    }
+    
+    .btn-submit {
+        padding: 12px 32px;
+        background: linear-gradient(135deg, #11998e, #38ef7d);
+        color: white;
+        border-radius: 8px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(17, 153, 142, 0.3);
+    }
+    
+    .btn-cancel {
+        padding: 12px 32px;
+        background: #e9ecef;
+        color: #495057;
+        border-radius: 8px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .btn-cancel:hover {
+        background: #dee2e6;
+        text-decoration: none;
+        color: #495057;
+    }
+    
+    .select-all-btn {
+        padding: 8px 16px;
+        background: linear-gradient(135deg, #6B8DD6, #8E37D7);
+        color: white;
+        border-radius: 6px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+    }
+    
+    .filter-products {
+        margin-bottom: 15px;
+        padding: 10px 14px;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        width: 100%;
+    }
+</style>
+{% endblock %}
+
+{% block content_header %}
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1><i class="fas fa-plus-circle"></i> Tạo phiếu kiểm kê mới</h1>
+      </div>
+      <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+          <li class="breadcrumb-item"><a href="{% url 'main_dashboard' %}">Trang chủ</a></li>
+          <li class="breadcrumb-item"><a href="{% url 'reports:dashboard' %}">Báo cáo</a></li>
+          <li class="breadcrumb-item"><a href="{% url 'reports:audit_list' %}">Kiểm kê</a></li>
+          <li class="breadcrumb-item active">Tạo mới</li>
+        </ol>
+      </div>
+    </div>
+  </div>
 </section>
-
-{% endblock %}{% block extra_js %}
-
-<script>
-
-{% block content %}$(document).ready(function() {
-
-<div class="container-fluid">  console.log('Audit create form loaded');
-
-  <div class="create-form">  
-
-    <form method="post" action="{% url 'reports:audit_create' %}">  // Set default date to today
-
-      {% csrf_token %}  var today = new Date();
-
-        var dd = String(today.getDate()).padStart(2, '0');
-
-      <div class="form-section">  var mm = String(today.getMonth() + 1).padStart(2, '0');
-
-        <div class="section-title">Thông tin kiểm kê</div>  var yyyy = today.getFullYear();
-
-          today = yyyy + '-' + mm + '-' + dd;
-
-        <div class="row">  document.getElementById('audit_date').value = today;
-
-          <div class="col-md-8">  
-
-            <div class="form-group">  // Select all products checkbox
-
-              <label>Tiêu đề <span class="text-danger">*</span></label>  $('#selectAll').change(function() {
-
-              <input type="text" name="title" class="form-control" required    $('input[name="product_ids[]"]').prop('checked', $(this).prop('checked'));
-
-                     placeholder="VD: Kiểm kê định kỳ tháng 10/2025">  });
-
-            </div>  
-
-          </div>  // Disable form submission (placeholder functionality)
-
-            $('#createAuditForm').submit(function(e) {
-
-          <div class="col-md-4">    e.preventDefault();
-
-            <div class="form-group">    alert('Tính năng này đang được phát triển và sẽ sớm có mặt trong phiên bản tiếp theo.');
-
-              <label>Ngày kiểm kê <span class="text-danger">*</span></label>  });
-
-              <input type="date" name="audit_date" class="form-control" required});
-
-                     value="{{ today|date:'Y-m-d' }}"></script>
-
-            </div>{% endblock %}
+{% endblock %}
+{% block content %}
+<div class="container-fluid">
+  <div class="create-form">
+    <form method="post" action="{% url 'reports:audit_create' %}">
+      {% csrf_token %}
+      
+      <div class="form-section">
+        <div class="section-title">Thông tin kiểm kê</div>
+        
+        <div class="row">
+          <div class="col-md-8">
+            <div class="form-group">
+              <label>Tiêu đề <span class="text-danger">*</span></label>
+              <input type="text" name="title" class="form-control" required
+                     placeholder="VD: Kiểm kê định kỳ tháng 10/2025">
+            </div>
+          </div>
+          
+          <div class="col-md-4">
+            <div class="form-group">
+              <label>Ngày kiểm kê <span class="text-danger">*</span></label>
+              <input type="date" name="audit_date" class="form-control" required
+                     value="{{ today|date:'Y-m-d' }}">
+            </div>
           </div>
         </div>
         
@@ -442,7 +246,6 @@
 </div>
 
 <script>
-  // Filter products
   document.getElementById('filterProducts').addEventListener('input', function(e) {
     const search = e.target.value.toLowerCase();
     const items = document.querySelectorAll('.product-item');
@@ -458,7 +261,6 @@
     });
   });
   
-  // Toggle all checkboxes
   function toggleAll() {
     const checkboxes = document.querySelectorAll('.product-checkbox');
     const visibleCheckboxes = Array.from(checkboxes).filter(cb => 
