@@ -855,6 +855,10 @@ def inventory_request_complete(request, request_id):
                 issued_quantity = int(request.POST.get(field_name, 0))
                 
                 if issued_quantity > 0:
+                    # Cập nhật issued_quantity cho employee_product
+                    employee_product.issued_quantity = issued_quantity
+                    employee_product.save()
+                    
                     # Giảm số lượng tồn kho
                     product = employee_product.product
                     product.current_quantity -= issued_quantity

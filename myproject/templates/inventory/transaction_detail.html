@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Chi tiết giao dịch{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">Chi tiết giao dịch</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Trang chủ</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'inventory:transaction_list' %}">Giao dịch kho</a></li>
+                    <li class="breadcrumb-item active">Chi tiết</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-file-invoice"></i> {{ transaction.transaction_code }}
+                        </h3>
+                        <div class="card-tools">
+                            {% if transaction.transaction_type == 'IN' %}
+                            <span class="badge badge-success badge-lg">
+                                <i class="fas fa-arrow-down"></i> Nhập kho
+                            </span>
+                            {% elif transaction.transaction_type == 'OUT' %}
+                            <span class="badge badge-danger badge-lg">
+                                <i class="fas fa-arrow-up"></i> Xuất kho
+                            </span>
+                            {% else %}
+                            <span class="badge badge-warning badge-lg">
+                                <i class="fas fa-adjust"></i> Điều chỉnh
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered">
+                            <tr>
+                                <th style="width: 200px;">Mã giao dịch</th>
+                                <td><strong>{{ transaction.transaction_code }}</strong></td>
+                            </tr>
+                            <tr>
+                                <th>Sản phẩm</th>
+                                <td>
+                                    <a href="{% url 'inventory:product_detail' transaction.product.pk %}">
+                                        {{ transaction.product.name }}
+                                    </a>
+                                    <br>
+                                    <small class="text-muted">Mã: {{ transaction.product.product_code }}</small>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Loại giao dịch</th>
+                                <td>
+                                    {% if transaction.transaction_type == 'IN' %}
+                                    <span class="badge badge-success">
+                                        <i class="fas fa-arrow-down"></i> Nhập kho
+                                    </span>
+                                    {% elif transaction.transaction_type == 'OUT' %}
+                                    <span class="badge badge-danger">
+                                        <i class="fas fa-arrow-up"></i> Xuất kho
+                                    </span>
+                                    {% else %}
+                                    <span class="badge badge-warning">
+                                        <i class="fas fa-adjust"></i> Điều chỉnh
+                                    </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Số lượng</th>
+                                <td>
+                                    <strong class="h5">
+                                        {% if transaction.transaction_type == 'IN' %}
+                                        <span class="text-success">+{{ transaction.quantity }}</span>
+                                        {% elif transaction.transaction_type == 'OUT' %}
+                                        <span class="text-danger">-{{ transaction.quantity }}</span>
+                                        {% else %}
+                                        {{ transaction.quantity }}
+                                        {% endif %}
+                                        {{ transaction.product.unit.name }}
+                                    </strong>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Ngày giao dịch</th>
+                                <td>{{ transaction.transaction_date|date:"d/m/Y H:i:s" }}</td>
+                            </tr>
+                            <tr>
+                                <th>Người tạo</th>
+                                <td>
+                                    <i class="fas fa-user"></i> 
+                                    {{ transaction.created_by.get_full_name|default:transaction.created_by.username }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Mã tham chiếu</th>
+                                <td>{{ transaction.reference_code|default:"-" }}</td>
+                            </tr>
+                            <tr>
+                                <th>Ghi chú</th>
+                                <td>{{ transaction.notes|default:"-"|linebreaks }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="card-footer">
+                        <a href="{% url 'inventory:transaction_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Quay lại danh sách
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card card-primary card-outline">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-box"></i> Thông tin sản phẩm</h3>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Tên sản phẩm:</strong><br>{{ transaction.product.name }}</p>
+                        <p><strong>Mã sản phẩm:</strong><br>{{ transaction.product.product_code }}</p>
+                        <p><strong>Danh mục:</strong><br>{{ transaction.product.category.name }}</p>
+                        <p><strong>Đơn vị tính:</strong><br>{{ transaction.product.unit.name }}</p>
+                        <p><strong>Tồn kho hiện tại:</strong><br>
+                            <span class="badge badge-lg 
+                                {% if transaction.product.current_quantity <= transaction.product.minimum_quantity %}
+                                badge-danger
+                                {% else %}
+                                badge-success
+                                {% endif %}">
+                                {{ transaction.product.current_quantity }} {{ transaction.product.unit.name }}
+                            </span>
+                        </p>
+                        <a href="{% url 'inventory:product_detail' transaction.product.pk %}" class="btn btn-sm btn-primary btn-block">
+                            <i class="fas fa-eye"></i> Xem chi tiết sản phẩm
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

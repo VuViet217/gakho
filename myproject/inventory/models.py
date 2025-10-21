@@ -182,3 +182,69 @@ class Product(models.Model):
         from suppliers.models import PurchaseOrderItem
         items = PurchaseOrderItem.objects.filter(product=self)
         return sum(item.quantity for item in items)
+
+
+class StockTransaction(models.Model):
+    """Ghi nhận các giao dịch nhập/xuất kho"""
+    TRANSACTION_TYPES = (
+        ('IN', 'Nhập kho'),
+        ('OUT', 'Xuất kho'),
+        ('ADJUST', 'Điều chỉnh'),
+    )
+    
+    transaction_code = models.CharField(_("Mã giao dịch"), max_length=50, unique=True)
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name='transactions',
+        verbose_name=_("Sản phẩm")
+    )
+    transaction_type = models.CharField(
+        _("Loại giao dịch"),
+        max_length=10,
+        choices=TRANSACTION_TYPES
+    )
+    quantity = models.IntegerField(_("Số lượng"))
+    transaction_date = models.DateTimeField(_("Ngày giao dịch"), auto_now_add=True)
+    created_by = models.ForeignKey(
+        'accounts.User',
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name=_("Người tạo")
+    )
+    notes = models.TextField(_("Ghi chú"), blank=True, null=True)
+    reference_code = models.CharField(
+        _("Mã tham chiếu"),
+        max_length=100,
+        blank=True,
+        null=True,
+        help_text="Mã PO hoặc mã xuất kho"
+    )
+    
+    class Meta:
+        verbose_name = _("Giao dịch kho")
+        verbose_name_plural = _("Giao dịch kho")
+        ordering = ['-transaction_date']
+    
+    def __str__(self):
+        return f"{self.transaction_code} - {self.get_transaction_type_display()} - {self.product.name}"
+    
+    def save(self, *args, **kwargs):
+        # Auto generate transaction code if not exists
+        if not self.transaction_code:
+            from django.utils import timezone
+            prefix = 'IN' if self.transaction_type == 'IN' else 'OUT' if self.transaction_type == 'OUT' else 'ADJ'
+            timestamp = timezone.now().strftime('%Y%m%d%H%M%S')
+            self.transaction_code = f"{prefix}-{timestamp}"
+        
+        # Update product quantity
+        if self.pk is None:  # Only on create
+            if self.transaction_type == 'IN':
+                self.product.current_quantity += self.quantity
+            elif self.transaction_type == 'OUT':
+                self.product.current_quantity -= self.quantity
+            elif self.transaction_type == 'ADJUST':
+                self.product.current_quantity = self.quantity
+            self.product.save()
+        
+        super().save(*args, **kwargs)

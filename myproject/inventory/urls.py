@@ -48,6 +48,11 @@ urlpatterns = [
     # Other URLs
     path('products/low-stock/', views.LowStockProductsView.as_view(), name='low_stock_products'),
     
+    # Stock Transaction URLs
+    path('transactions/', views.StockTransactionListView.as_view(), name='transaction_list'),
+    path('transactions/create/', views.StockTransactionCreateView.as_view(), name='transaction_create'),
+    path('transactions/<int:pk>/', views.StockTransactionDetailView.as_view(), name='transaction_detail'),
+    
     # Stock Receipt URLs
     path('stock-receipts/', stock_views.stock_receipt_list, name='stock_receipt_list'),
     path('stock-receipts/create/', stock_views.stock_receipt_create, name='stock_receipt_create'),

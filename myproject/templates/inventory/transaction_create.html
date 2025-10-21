@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Thêm giao dịch kho{% endblock %}
+
+{% block extra_css %}
+<style>
+.product-info {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+    margin-top: 15px;
+    display: none;
+}
+.product-info.show {
+    display: block;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">Thêm giao dịch kho</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Trang chủ</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'inventory:transaction_list' %}">Giao dịch kho</a></li>
+                    <li class="breadcrumb-item active">Thêm mới</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-plus"></i> Thông tin giao dịch</h3>
+                    </div>
+                    <form method="post" id="transactionForm">
+                        {% csrf_token %}
+                        <div class="card-body">
+                            {% if messages %}
+                            {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="close" data-dismiss="alert">
+                                    <span>&times;</span>
+                                </button>
+                            </div>
+                            {% endfor %}
+                            {% endif %}
+
+                            <div class="form-group">
+                                <label for="product">Sản phẩm <span class="text-danger">*</span></label>
+                                <select name="product" id="product" class="form-control select2" required>
+                                    <option value="">-- Chọn sản phẩm --</option>
+                                    {% for product in products %}
+                                    <option value="{{ product.id }}" 
+                                            data-current="{{ product.current_quantity }}"
+                                            data-unit="{{ product.unit.name }}">
+                                        {{ product.name }} ({{ product.product_code }})
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div id="productInfo" class="product-info">
+                                <h5>Thông tin sản phẩm</h5>
+                                <p><strong>Tồn kho hiện tại:</strong> <span id="currentStock">0</span> <span id="unitName"></span></p>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="transaction_type">Loại giao dịch <span class="text-danger">*</span></label>
+                                <select name="transaction_type" id="transaction_type" class="form-control" required>
+                                    <option value="">-- Chọn loại --</option>
+                                    <option value="IN">Nhập kho</option>
+                                    <option value="OUT">Xuất kho</option>
+                                    <option value="ADJUST">Điều chỉnh</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="quantity">Số lượng <span class="text-danger">*</span></label>
+                                <input type="number" name="quantity" id="quantity" class="form-control" 
+                                       min="1" required placeholder="Nhập số lượng">
+                                <small id="quantityHelp" class="form-text text-muted"></small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="reference_code">Mã tham chiếu</label>
+                                <input type="text" name="reference_code" id="reference_code" 
+                                       class="form-control" placeholder="VD: PO-2024-001, SO-2024-001">
+                                <small class="form-text text-muted">Mã đơn hàng, phiếu xuất hoặc tham chiếu khác</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="notes">Ghi chú</label>
+                                <textarea name="notes" id="notes" class="form-control" rows="3" 
+                                          placeholder="Thông tin bổ sung..."></textarea>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Lưu giao dịch
+                            </button>
+                            <a href="{% url 'inventory:transaction_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Hủy
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card card-info">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-info-circle"></i> Hướng dẫn</h3>
+                    </div>
+                    <div class="card-body">
+                        <h6><i class="fas fa-arrow-down text-success"></i> Nhập kho</h6>
+                        <p class="text-sm">Sử dụng khi nhận hàng từ nhà cung cấp hoặc nhập từ nguồn khác.</p>
+                        
+                        <h6><i class="fas fa-arrow-up text-danger"></i> Xuất kho</h6>
+                        <p class="text-sm">Sử dụng khi xuất hàng cho khách hàng, sử dụng nội bộ hoặc chuyển kho.</p>
+                        
+                        <h6><i class="fas fa-adjust text-warning"></i> Điều chỉnh</h6>
+                        <p class="text-sm">Sử dụng khi cần điều chỉnh số lượng tồn kho (kiểm kê, mất mát, hỏng hóc).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    $('.select2').select2({
+        theme: 'bootstrap4',
+        placeholder: '-- Chọn sản phẩm --'
+    });
+
+    $('#product').change(function() {
+        const selected = $(this).find(':selected');
+        const currentStock = selected.data('current');
+        const unitName = selected.data('unit');
+        
+        if (selected.val()) {
+            $('#currentStock').text(currentStock);
+            $('#unitName').text(unitName);
+            $('#productInfo').addClass('show');
+        } else {
+            $('#productInfo').removeClass('show');
+        }
+    });
+
+    $('#transaction_type, #quantity').on('change input', function() {
+        const type = $('#transaction_type').val();
+        const quantity = parseInt($('#quantity').val()) || 0;
+        const currentStock = parseInt($('#currentStock').text()) || 0;
+        
+        if (type === 'OUT' && quantity > currentStock) {
+            $('#quantityHelp').html('<span class="text-danger">⚠ Số lượng xuất vượt quá tồn kho!</span>');
+        } else if (type === 'IN') {
+            $('#quantityHelp').html('<span class="text-success">Sau nhập: ' + (currentStock + quantity) + '</span>');
+        } else if (type === 'OUT') {
+            $('#quantityHelp').html('<span class="text-info">Sau xuất: ' + (currentStock - quantity) + '</span>');
+        } else {
+            $('#quantityHelp').text('');
+        }
+    });
+});
+</script>
+{% endblock %}

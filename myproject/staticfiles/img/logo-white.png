@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <circle cx="100" cy="100" r="95" fill="white" stroke="#0073e6" stroke-width="5"/>
+  <text x="50%" y="50%" font-family="Arial, sans-serif" font-size="70" font-weight="bold" text-anchor="middle" alignment-baseline="central" fill="#0073e6">OVNC</text>
+</svg>

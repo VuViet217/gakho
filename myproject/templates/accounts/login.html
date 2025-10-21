@@ -7,10 +7,34 @@
 
 {% block stylesheet %}
 <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+<style>
+.login-logo img {
+    max-width: 100%;
+    height: auto;
+}
+.login-logo .ovnc-logo {
+    max-width: 300px;
+    margin-bottom: 10px;
+}
+.login-logo .olympus-logo {
+    max-width: 250px;
+    margin-top: 10px;
+}
+.login-logo .brand-text {
+    font-size: 1.5rem;
+    margin: 15px 0;
+}
+</style>
 {% endblock %}
 
 {% block logo_text %}
-<b>OVNC</b> Inventory
+<div class="text-center">
+    <img src="{% static 'images/ovnc-logo.png' %}" alt="OVNC Logo" class="ovnc-logo mb-2">
+    <div class="brand-text">
+        <b>OVNC</b> Inventory
+    </div>
+    <img src="{% static 'images/olympus-logo.png' %}" alt="Olympus Logo" class="olympus-logo mt-2">
+</div>
 {% endblock %}
 
 {% block login_message %}
