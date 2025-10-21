@@ -9,7 +9,7 @@
 <link href="{% static 'plugins/summernote/summernote-bs4.min.css' %}" rel="stylesheet">
 {% endblock %}
 
-{% block content %}
+{% block content_header %}
 <section class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
@@ -26,7 +26,9 @@
         </div>
     </div>
 </section>
+{% endblock %}
 
+{% block content %}
 <section class="content">
     <div class="container-fluid">
         <div class="row">
@@ -293,4 +295,5 @@
         });
     });
 </script>
+{% endblock %}
 {% endblock %}
