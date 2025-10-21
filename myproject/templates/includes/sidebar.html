@@ -25,6 +25,7 @@
     <!-- Sidebar Menu -->
     <nav class="mt-2">
       <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+        <!-- Dashboard -->
         <li class="nav-item">
           <a href="{% url 'main_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'main_dashboard' %}active{% endif %}">
             <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -35,219 +36,42 @@
           </a>
         </li>
         
-        <li class="nav-header">NHÂN SỰ</li>
-        <li class="nav-item has-treeview {% if 'employee' in request.path or 'department' in request.path %}menu-open{% endif %}">
-          <a href="#" class="nav-link {% if 'employee' in request.path or 'department' in request.path %}active{% endif %}">
-            <i class="nav-icon fas fa-users"></i>
-            <p>
-              Quản lý nhân viên
-              <i class="right fas fa-angle-left"></i>
-            </p>
-          </a>
-          <ul class="nav nav-treeview">
-            <li class="nav-item">
-              <a href="{% url 'employee_list' %}" class="nav-link {% if request.resolver_match.url_name == 'employee_list' %}active{% endif %}">
-                <i class="fas fa-user-friends nav-icon"></i>
-                <p>Danh sách nhân viên</p>
+        <!-- Menu items from context processor -->
+        {% for key, item in menu_items.items %}
+          <li class="nav-header">{{ item.header }}</li>
+          {% for submenu in item.items %}
+            <li class="nav-item has-treeview {% if submenu.active_check in request.path %}menu-open{% endif %}">
+              <a href="#" class="nav-link {% if submenu.active_check in request.path %}active{% endif %}">
+                <i class="nav-icon {{ submenu.icon }}"></i>
+                <p>
+                  {{ submenu.title }}
+                  <i class="right fas fa-angle-left"></i>
+                </p>
               </a>
+              <ul class="nav nav-treeview">
+                {% for link in submenu.links %}
+                  {% if link.permission %}
+                    {% if request.user.role == 'admin' or request.user.role in link.permission %}
+                      <li class="nav-item">
+                        <a href="{% url link.url %}" class="nav-link {% if request.resolver_match.url_name == link.url or link.active_check in request.path %}active{% endif %}">
+                          <i class="{{ link.icon }} nav-icon"></i>
+                          <p>{{ link.title }}</p>
+                        </a>
+                      </li>
+                    {% endif %}
+                  {% else %}
+                    <li class="nav-item">
+                      <a href="{% url link.url %}" class="nav-link {% if request.resolver_match.url_name == link.url or link.active_check in request.path %}active{% endif %}">
+                        <i class="{{ link.icon }} nav-icon"></i>
+                        <p>{{ link.title }}</p>
+                      </a>
+                    </li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
             </li>
-            <li class="nav-item">
-              <a href="{% url 'department_list' %}" class="nav-link {% if request.resolver_match.url_name == 'department_list' %}active{% endif %}">
-                <i class="fas fa-building nav-icon"></i>
-                <p>Danh sách bộ phận</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="{% url 'import_employees' %}" class="nav-link {% if request.resolver_match.url_name == 'import_employees' %}active{% endif %}">
-                <i class="fas fa-file-import nav-icon"></i>
-                <p>Nhập xuất dữ liệu</p>
-              </a>
-            </li>
-          </ul>
-        </li>
-        
-        <li class="nav-header">QUẢN LÝ NHÀ CUNG CẤP</li>
-        <li class="nav-item has-treeview {% if 'procurement/supplier' in request.path or 'procurement/purchase-order' in request.path %}menu-open{% endif %}">
-          <a href="#" class="nav-link {% if 'procurement/supplier' in request.path or 'procurement/purchase-order' in request.path %}active{% endif %}">
-            <i class="nav-icon fas fa-truck"></i>
-            <p>
-              Quản lý nhà cung cấp
-              <i class="right fas fa-angle-left"></i>
-            </p>
-          </a>
-          <ul class="nav nav-treeview">
-            <li class="nav-item">
-              <a href="{% url 'supplier_list' %}" class="nav-link {% if request.resolver_match.url_name == 'supplier_list' %}active{% endif %}">
-                <i class="fas fa-list nav-icon"></i>
-                <p>Danh sách nhà cung cấp</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="{% url 'supplier_create' %}" class="nav-link {% if request.resolver_match.url_name == 'supplier_create' %}active{% endif %}">
-                <i class="fas fa-plus-circle nav-icon"></i>
-                <p>Thêm nhà cung cấp</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="{% url 'po_list' %}" class="nav-link {% if request.resolver_match.url_name == 'po_list' %}active{% endif %}">
-                <i class="fas fa-file-invoice nav-icon"></i>
-                <p>Danh sách đơn hàng</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="{% url 'po_create' %}" class="nav-link {% if request.resolver_match.url_name == 'po_create' %}active{% endif %}">
-                <i class="fas fa-plus-square nav-icon"></i>
-                <p>Tạo đơn hàng mới</p>
-              </a>
-            </li>
-          </ul>
-        </li>
-        
-        <li class="nav-header">QUẢN LÝ KHO</li>
-        <!-- Menu Yêu cầu cấp phát -->
-        <li class="nav-item has-treeview {% if 'inventory/requests/' in request.path %}menu-open{% endif %}">
-          <a href="#" class="nav-link {% if 'inventory/requests/' in request.path %}active{% endif %}">
-            <i class="nav-icon fas fa-clipboard-list"></i>
-            <p>
-              Yêu cầu cấp phát
-              <i class="right fas fa-angle-left"></i>
-            </p>
-          </a>
-          <ul class="nav nav-treeview">
-            <li class="nav-item">
-              <a href="{% url 'inventory_requests:inventory_request_create' %}" class="nav-link {% if 'inventory/requests/create' in request.path %}active{% endif %}">
-                <i class="fas fa-plus nav-icon"></i>
-                <p>Tạo yêu cầu mới</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="{% url 'inventory_requests:my_requests' %}" class="nav-link {% if 'inventory/requests/my-requests' in request.path %}active{% endif %}">
-                <i class="fas fa-clipboard-list nav-icon"></i>
-                <p>Yêu cầu của tôi</p>
-              </a>
-            </li>
-            {% if request.user.role == 'admin' or request.user.role == 'manager' %}
-            <li class="nav-item">
-              <a href="{% url 'inventory_requests:my_approval_requests' %}" class="nav-link {% if 'inventory/requests/my-approvals' in request.path %}active{% endif %}">
-                <i class="fas fa-check-double nav-icon"></i>
-                <p>Phê duyệt của tôi</p>
-              </a>
-            </li>
-            {% endif %}
-            {% if request.user.role == 'admin' or request.user.role == 'sm' or request.user.role == 'manager' %}
-            <li class="nav-item">
-              <a href="{% url 'inventory_requests:warehouse_requests_list' %}" class="nav-link {% if 'inventory/requests/warehouse-requests' in request.path %}active{% endif %}">
-                <i class="fas fa-dolly nav-icon"></i>
-                <p>Quản lý kho</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="{% url 'inventory_requests:inventory_request_list' %}" class="nav-link {% if request.path == '/inventory/requests/' %}active{% endif %}">
-                <i class="fas fa-list nav-icon"></i>
-                <p>Tất cả yêu cầu</p>
-              </a>
-            </li>
-            {% endif %}
-            <li class="nav-item">
-              <a href="{% url 'inventory_requests:employee_delivery_history' %}" class="nav-link {% if 'inventory/requests/employee-delivery-history' in request.path %}active{% endif %}">
-                <i class="fas fa-history nav-icon"></i>
-                <p>Lịch sử giao nhận</p>
-              </a>
-            </li>
-          </ul>
-        </li>
-        <li class="nav-item has-treeview {% if 'inventory/' in request.path and not 'inventory/requests/' in request.path %}menu-open{% endif %}">
-          <a href="#" class="nav-link {% if 'inventory/' in request.path and not 'inventory/requests/' in request.path %}active{% endif %}">
-            <i class="nav-icon fas fa-warehouse"></i>
-            <p>
-              Quản lý kho
-              <i class="right fas fa-angle-left"></i>
-            </p>
-          </a>
-          <ul class="nav nav-treeview">
-            <li class="nav-item">
-              <a href="{% url 'product_list' %}" class="nav-link {% if request.resolver_match.url_name == 'product_list' %}active{% endif %}">
-                <i class="fas fa-boxes nav-icon"></i>
-                <p>Danh sách sản phẩm</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="{% url 'product_create' %}" class="nav-link {% if request.resolver_match.url_name == 'product_create' %}active{% endif %}">
-                <i class="fas fa-plus-circle nav-icon"></i>
-                <p>Thêm sản phẩm</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="{% url 'low_stock_products' %}" class="nav-link {% if request.resolver_match.url_name == 'low_stock_products' %}active{% endif %}">
-                <i class="fas fa-exclamation-triangle nav-icon"></i>
-                <p>Sản phẩm sắp hết</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="{% url 'category_list' %}" class="nav-link {% if request.resolver_match.url_name == 'category_list' %}active{% endif %}">
-                <i class="fas fa-tags nav-icon"></i>
-                <p>Danh mục</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="{% url 'unit_list' %}" class="nav-link {% if request.resolver_match.url_name == 'unit_list' %}active{% endif %}">
-                <i class="fas fa-balance-scale nav-icon"></i>
-                <p>Đơn vị tính</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="{% url 'warehouse_list' %}" class="nav-link {% if request.resolver_match.url_name == 'warehouse_list' %}active{% endif %}">
-                <i class="fas fa-warehouse nav-icon"></i>
-                <p>Quản lý kho</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="{% url 'warehouse_row_list' %}" class="nav-link {% if request.resolver_match.url_name == 'warehouse_row_list' %}active{% endif %}">
-                <i class="fas fa-th-list nav-icon"></i>
-                <p>Vị trí dãy</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="{% url 'warehouse_column_list' %}" class="nav-link {% if request.resolver_match.url_name == 'warehouse_column_list' %}active{% endif %}">
-                <i class="fas fa-columns nav-icon"></i>
-                <p>Vị trí cột</p>
-              </a>
-            </li>
-          </ul>
-        </li>
-        
-
-        
-        <li class="nav-header">QUẢN LÝ NGƯỜI DÙNG</li>
-        <li class="nav-item has-treeview {% if '/users/' in request.path or '/profile' in request.path %}menu-open{% endif %}">
-          <a href="#" class="nav-link {% if '/users/' in request.path or '/profile' in request.path %}active{% endif %}">
-            <i class="nav-icon fas fa-users-cog"></i>
-            <p>
-              Quản lý người dùng
-              <i class="right fas fa-angle-left"></i>
-            </p>
-          </a>
-          <ul class="nav nav-treeview">
-            <li class="nav-item">
-              <a href="{% url 'user_list' %}" class="nav-link {% if request.resolver_match.url_name == 'user_list' %}active{% endif %}">
-                <i class="fas fa-users nav-icon"></i>
-                <p>Danh sách người dùng</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="{% url 'user_create' %}" class="nav-link {% if request.resolver_match.url_name == 'user_create' %}active{% endif %}">
-                <i class="fas fa-user-plus nav-icon"></i>
-                <p>Thêm người dùng</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="{% url 'profile_view' %}" class="nav-link {% if request.resolver_match.url_name == 'profile_view' %}active{% endif %}">
-                <i class="fas fa-user-circle nav-icon"></i>
-                <p>Hồ sơ cá nhân</p>
-              </a>
-            </li>
-          </ul>
-        </li>
+          {% endfor %}
+        {% endfor %}
       </ul>
     </nav>
     <!-- /.sidebar-menu -->

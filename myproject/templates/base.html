@@ -96,33 +96,8 @@
             </a>
           </li>
           
-          <!-- Employees -->
-          {% if not menu.employees.roles or request.user.role in menu.employees.roles or request.user.is_superuser %}
-          <li class="nav-header">NHÂN SỰ</li>
-          <li class="nav-item has-treeview {% if menu.employees.open %}menu-open{% endif %}">
-            <a href="#" class="nav-link {% if menu.employees.active %}active{% endif %}">
-              <i class="{{ menu.employees.icon }} nav-icon"></i>
-              <p>
-                {{ menu.employees.name }}
-                <i class="right fas fa-angle-left"></i>
-              </p>
-            </a>
-            <ul class="nav nav-treeview">
-              {% for item in menu.employees.items %}
-              <li class="nav-item">
-                <a href="{% url item.url %}" class="nav-link {% if item.active %}active{% endif %}">
-                  <i class="{{ item.icon }} nav-icon"></i>
-                  <p>{{ item.name }}</p>
-                </a>
-              </li>
-              {% endfor %}
-            </ul>
-          </li>
-          {% endif %}
-          
-          <!-- Suppliers -->
+          <!-- Suppliers (Đầu tiên - quan trọng nhất) -->
           {% if not menu.suppliers.roles or request.user.role in menu.suppliers.roles or request.user.is_superuser %}
-          <li class="nav-header">QUẢN LÝ NHÀ CUNG CẤP</li>
           <li class="nav-item has-treeview {% if menu.suppliers.open %}menu-open{% endif %}">
             <a href="#" class="nav-link {% if menu.suppliers.active %}active{% endif %}">
               <i class="{{ menu.suppliers.icon }} nav-icon"></i>
@@ -144,32 +119,7 @@
           </li>
           {% endif %}
           
-          <!-- Inventory -->
-          <li class="nav-header">QUẢN LÝ KHO</li>
-          <!-- Inventory Requests -->
-          <li class="nav-item has-treeview {% if menu.inventory_requests.open %}menu-open{% endif %}">
-            <a href="#" class="nav-link {% if menu.inventory_requests.active %}active{% endif %}">
-              <i class="{{ menu.inventory_requests.icon }} nav-icon"></i>
-              <p>
-                {{ menu.inventory_requests.name }}
-                <i class="right fas fa-angle-left"></i>
-              </p>
-            </a>
-            <ul class="nav nav-treeview">
-              {% for item in menu.inventory_requests.items %}
-                {% if not item.roles or request.user.role in item.roles or request.user.is_superuser %}
-                <li class="nav-item">
-                  <a href="{% if item.url != '#' %}{% url item.url %}{% else %}#{% endif %}" class="nav-link {% if item.active %}active{% endif %}">
-                    <i class="{{ item.icon }} nav-icon"></i>
-                    <p>{{ item.name }}</p>
-                  </a>
-                </li>
-                {% endif %}
-              {% endfor %}
-            </ul>
-          </li>
-          
-          <!-- Inventory Management -->
+          <!-- Inventory (Kho) -->
           {% if not menu.inventory.roles or request.user.role in menu.inventory.roles or request.user.is_superuser %}
           <li class="nav-item has-treeview {% if menu.inventory.open %}menu-open{% endif %}">
             <a href="#" class="nav-link {% if menu.inventory.active %}active{% endif %}">
@@ -192,19 +142,18 @@
           </li>
           {% endif %}
           
-          <!-- Reports -->
-          {% if not menu.reports.roles or request.user.role in menu.reports.roles or request.user.is_superuser %}
-          <li class="nav-header">BÁO CÁO</li>
-          <li class="nav-item has-treeview {% if menu.reports.open %}menu-open{% endif %}">
-            <a href="#" class="nav-link {% if menu.reports.active %}active{% endif %}">
-              <i class="{{ menu.reports.icon }} nav-icon"></i>
+          <!-- Employees (Nhân sự) -->
+          {% if not menu.employees.roles or request.user.role in menu.employees.roles or request.user.is_superuser %}
+          <li class="nav-item has-treeview {% if menu.employees.open %}menu-open{% endif %}">
+            <a href="#" class="nav-link {% if menu.employees.active %}active{% endif %}">
+              <i class="{{ menu.employees.icon }} nav-icon"></i>
               <p>
-                {{ menu.reports.name }}
+                {{ menu.employees.name }}
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
             <ul class="nav nav-treeview">
-              {% for item in menu.reports.items %}
+              {% for item in menu.employees.items %}
               <li class="nav-item">
                 <a href="{% url item.url %}" class="nav-link {% if item.active %}active{% endif %}">
                   <i class="{{ item.icon }} nav-icon"></i>
@@ -216,9 +165,8 @@
           </li>
           {% endif %}
           
-          <!-- User Management -->
+          <!-- User Management (Người dùng) -->
           {% if not menu.user_management.roles or request.user.role in menu.user_management.roles or request.user.is_superuser %}
-          <li class="nav-header">QUẢN LÝ NGƯỜI DÙNG</li>
           <li class="nav-item has-treeview {% if menu.user_management.open %}menu-open{% endif %}">
             <a href="#" class="nav-link {% if menu.user_management.active %}active{% endif %}">
               <i class="{{ menu.user_management.icon }} nav-icon"></i>
@@ -240,9 +188,54 @@
           </li>
           {% endif %}
           
-          <!-- System Settings -->
+          <!-- Inventory Requests (Yêu cầu cấp phát) -->
+          <li class="nav-item has-treeview {% if menu.inventory_requests.open %}menu-open{% endif %}">
+            <a href="#" class="nav-link {% if menu.inventory_requests.active %}active{% endif %}">
+              <i class="{{ menu.inventory_requests.icon }} nav-icon"></i>
+              <p>
+                {{ menu.inventory_requests.name }}
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              {% for item in menu.inventory_requests.items %}
+                {% if not item.roles or request.user.role in item.roles or request.user.is_superuser %}
+                <li class="nav-item">
+                  <a href="{% if item.url != '#' %}{% url item.url %}{% else %}#{% endif %}" class="nav-link {% if item.active %}active{% endif %}">
+                    <i class="{{ item.icon }} nav-icon"></i>
+                    <p>{{ item.name }}</p>
+                  </a>
+                </li>
+                {% endif %}
+              {% endfor %}
+            </ul>
+          </li>
+          
+          <!-- Reports (Báo cáo) -->
+          {% if not menu.reports.roles or request.user.role in menu.reports.roles or request.user.is_superuser %}
+          <li class="nav-item has-treeview {% if menu.reports.open %}menu-open{% endif %}">
+            <a href="#" class="nav-link {% if menu.reports.active %}active{% endif %}">
+              <i class="{{ menu.reports.icon }} nav-icon"></i>
+              <p>
+                {{ menu.reports.name }}
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              {% for item in menu.reports.items %}
+              <li class="nav-item">
+                <a href="{% url item.url %}" class="nav-link {% if item.active %}active{% endif %}">
+                  <i class="{{ item.icon }} nav-icon"></i>
+                  <p>{{ item.name }}</p>
+                </a>
+              </li>
+              {% endfor %}
+            </ul>
+          </li>
+          {% endif %}
+          
+          <!-- System Settings (Cuối cùng) -->
           {% if not menu.system_settings.roles or request.user.role in menu.system_settings.roles or request.user.is_superuser %}
-          <li class="nav-header">CẤU HÌNH HỆ THỐNG</li>
           <li class="nav-item has-treeview {% if menu.system_settings.open %}menu-open{% endif %}">
             <a href="#" class="nav-link {% if menu.system_settings.active %}active{% endif %}">
               <i class="{{ menu.system_settings.icon }} nav-icon"></i>
