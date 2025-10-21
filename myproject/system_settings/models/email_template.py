@@ -73,6 +73,22 @@ class EmailTemplate(models.Model):
         verbose_name=_('Danh sách biến'),
         help_text=_('Danh sách các biến có thể sử dụng trong mẫu này ở định dạng JSON')
     )
+
+    # Danh sách email mặc định (dấu phẩy phân tách). Người nhận sẽ được gửi thông báo tự động nếu mẫu này được sử dụng.
+    default_recipients = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name=_('Người nhận mặc định'),
+        help_text=_('Danh sách địa chỉ email, phân tách bằng dấu phẩy. Ví dụ: a@x.com,b@y.com')
+    )
+
+    # Danh sách CC mặc định (dấu phẩy phân tách)
+    default_cc = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name=_('CC mặc định'),
+        help_text=_('Danh sách địa chỉ email CC, phân tách bằng dấu phẩy')
+    )
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

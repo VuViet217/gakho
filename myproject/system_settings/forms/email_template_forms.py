@@ -10,7 +10,7 @@ class EmailTemplateForm(forms.ModelForm):
     """
     class Meta:
         model = EmailTemplate
-        fields = ['code', 'type', 'name', 'subject', 'content', 'description', 'is_html', 'is_active']
+        fields = ['code', 'type', 'name', 'subject', 'content', 'description', 'is_html', 'is_active', 'default_recipients', 'default_cc']
         widgets = {
             'code': forms.TextInput(attrs={'class': 'form-control'}),
             'type': forms.Select(attrs={'class': 'form-control'}),
@@ -25,6 +25,8 @@ class EmailTemplateForm(forms.ModelForm):
                 ['view', ['fullscreen', 'codeview']],
             ]}}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'default_recipients': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'a@x.com,b@y.com'}),
+            'default_cc': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'cc1@x.com,cc2@y.com'}),
             'is_html': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
