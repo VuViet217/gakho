@@ -53,10 +53,12 @@ class Command(BaseCommand):
             })
 
         context = {
-            'date': timezone.now(),
+            'date': timezone.now().strftime('%d/%m/%Y %H:%M:%S'),
             'products': products_info,
             'count': low_products.count()
         }
+        
+        self.stdout.write(self.style.WARNING(f'Tìm thấy {low_products.count()} sản phẩm dưới ngưỡng tối thiểu.'))
 
         # Gửi email
         success, err = send_template_email(recipient_list=recipients, template_code=template_code, context_data=context, cc_list=cc_list)
