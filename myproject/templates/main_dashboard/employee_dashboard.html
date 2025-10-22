@@ -316,11 +316,11 @@
                                         <i class="far fa-calendar mr-1"></i>
                                         {{ request.completed_date|date:"d/m/Y H:i" }}
                                     </small>
-                                    {% if request.warehouse_handler %}
+                                    {% if request.warehouse_manager %}
                                     <br>
                                     <small class="text-muted">
                                         <i class="fas fa-user mr-1"></i>
-                                        {% trans "Người xuất kho" %}: {{ request.warehouse_handler.get_full_name|default:request.warehouse_handler.username }}
+                                        {% trans "Người xuất kho" %}: {{ request.warehouse_manager.get_full_name|default:request.warehouse_manager.username }}
                                     </small>
                                     {% endif %}
                                 </div>

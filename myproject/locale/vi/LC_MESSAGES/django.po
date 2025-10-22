@@ -698,3 +698,73 @@ msgstr "Bạn có chắc chắn muốn tạo backup"
 msgid "Yêu cầu của bạn sẽ được tự động phê duyệt và chuyển thẳng đến kho để xử lý mà không cần qua bước phê duyệt từ người quản lý."
 msgstr "Yêu cầu của bạn sẽ được tự động phê duyệt và chuyển thẳng đến kho để xử lý mà không cần qua bước phê duyệt từ người quản lý."
 
+# Employee Dashboard translations
+msgid "Xin chào"
+msgstr "Xin chào"
+
+msgid "Chào mừng bạn đến với hệ thống quản lý kho OVNC. Hãy theo dõi các yêu cầu cấp phát của bạn tại đây."
+msgstr "Chào mừng bạn đến với hệ thống quản lý kho OVNC. Hãy theo dõi các yêu cầu cấp phát của bạn tại đây."
+
+msgid "Tạo yêu cầu mới"
+msgstr "Tạo yêu cầu mới"
+
+msgid "Tổng yêu cầu"
+msgstr "Tổng yêu cầu"
+
+msgid "Đang chờ xử lý"
+msgstr "Đang chờ xử lý"
+
+msgid "Đã hoàn thành"
+msgstr "Đã hoàn thành"
+
+msgid "Bị từ chối"
+msgstr "Bị từ chối"
+
+msgid "Thống kê tháng này"
+msgstr "Thống kê tháng này"
+
+msgid "Yêu cầu tạo mới"
+msgstr "Yêu cầu tạo mới"
+
+msgid "Sản phẩm đã nhận"
+msgstr "Sản phẩm đã nhận"
+
+msgid "Tỷ lệ phê duyệt"
+msgstr "Tỷ lệ phê duyệt"
+
+msgid "Xu hướng yêu cầu 6 tháng gần đây"
+msgstr "Xu hướng yêu cầu 6 tháng gần đây"
+
+msgid "Yêu cầu gần đây"
+msgstr "Yêu cầu gần đây"
+
+msgid "Xem tất cả"
+msgstr "Xem tất cả"
+
+msgid "Mã yêu cầu"
+msgstr "Mã yêu cầu"
+
+msgid "Ngày tạo"
+msgstr "Ngày tạo"
+
+msgid "Trạng thái"
+msgstr "Trạng thái"
+
+msgid "Chưa có yêu cầu nào"
+msgstr "Chưa có yêu cầu nào"
+
+msgid "Lịch sử cấp phát"
+msgstr "Lịch sử cấp phát"
+
+msgid "Người xuất kho"
+msgstr "Người xuất kho"
+
+msgid "Chưa có lịch sử cấp phát"
+msgstr "Chưa có lịch sử cấp phát"
+
+msgid "Đã duyệt"
+msgstr "Đã duyệt"
+
+msgid "Còn lại"
+msgstr "Còn lại"
+

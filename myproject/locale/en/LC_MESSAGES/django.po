@@ -698,3 +698,73 @@ msgstr "Are you sure you want to create backup"
 msgid "Yêu cầu của bạn sẽ được tự động phê duyệt và chuyển thẳng đến kho để xử lý mà không cần qua bước phê duyệt từ người quản lý."
 msgstr "Your request will be automatically approved and sent directly to the warehouse for processing without requiring manager approval."
 
+# Employee Dashboard translations
+msgid "Xin chào"
+msgstr "Hello"
+
+msgid "Chào mừng bạn đến với hệ thống quản lý kho OVNC. Hãy theo dõi các yêu cầu cấp phát của bạn tại đây."
+msgstr "Welcome to OVNC Warehouse Management System. Track your allocation requests here."
+
+msgid "Tạo yêu cầu mới"
+msgstr "Create New Request"
+
+msgid "Tổng yêu cầu"
+msgstr "Total Requests"
+
+msgid "Đang chờ xử lý"
+msgstr "Pending"
+
+msgid "Đã hoàn thành"
+msgstr "Completed"
+
+msgid "Bị từ chối"
+msgstr "Rejected"
+
+msgid "Thống kê tháng này"
+msgstr "This Month Statistics"
+
+msgid "Yêu cầu tạo mới"
+msgstr "New Requests"
+
+msgid "Sản phẩm đã nhận"
+msgstr "Items Received"
+
+msgid "Tỷ lệ phê duyệt"
+msgstr "Approval Rate"
+
+msgid "Xu hướng yêu cầu 6 tháng gần đây"
+msgstr "Request Trend - Last 6 Months"
+
+msgid "Yêu cầu gần đây"
+msgstr "Recent Requests"
+
+msgid "Xem tất cả"
+msgstr "View All"
+
+msgid "Mã yêu cầu"
+msgstr "Request Code"
+
+msgid "Ngày tạo"
+msgstr "Created Date"
+
+msgid "Trạng thái"
+msgstr "Status"
+
+msgid "Chưa có yêu cầu nào"
+msgstr "No requests yet"
+
+msgid "Lịch sử cấp phát"
+msgstr "Allocation History"
+
+msgid "Người xuất kho"
+msgstr "Warehouse Handler"
+
+msgid "Chưa có lịch sử cấp phát"
+msgstr "No allocation history yet"
+
+msgid "Đã duyệt"
+msgstr "Approved"
+
+msgid "Còn lại"
+msgstr "Remaining"
+
