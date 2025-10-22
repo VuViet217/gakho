@@ -11,3 +11,10 @@ from .email_template_views import (
     email_template_test,
     get_template_variables
 )
+from .backup_views import (
+    backup_settings,
+    create_backup,
+    download_backup,
+    restore_backup,
+    delete_backup
+)

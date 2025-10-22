@@ -526,3 +526,172 @@ msgstr "New Audit"
 msgid "Lịch sử kiểm kê"
 msgstr "Audit History"
 
+# ================== BACKUP TRANSLATIONS ==================
+msgid "Quản lý Backup"
+msgstr "Backup Management"
+
+msgid "Cấu hình Backup"
+msgstr "Backup Configuration"
+
+msgid "Tần suất Backup"
+msgstr "Backup Frequency"
+
+msgid "Thủ công"
+msgstr "Manual"
+
+msgid "Hàng ngày"
+msgstr "Daily"
+
+msgid "Hàng tuần"
+msgstr "Weekly"
+
+msgid "Hàng tháng"
+msgstr "Monthly"
+
+msgid "Thời gian Backup (cho tự động)"
+msgstr "Backup Time (for automatic)"
+
+msgid "Chỉ áp dụng khi chọn backup tự động"
+msgstr "Only applies when selecting automatic backup"
+
+msgid "Backup Database"
+msgstr "Backup Database"
+
+msgid "Backup Media Files"
+msgstr "Backup Media Files"
+
+msgid "Số lượng Backup giữ lại"
+msgstr "Number of Backups to Keep"
+
+msgid "Các backup cũ sẽ tự động bị xóa khi vượt quá số lượng này"
+msgstr "Old backups will be automatically deleted when exceeding this number"
+
+msgid "Kích hoạt Backup tự động"
+msgstr "Enable Automatic Backup"
+
+msgid "Lần backup cuối"
+msgstr "Last Backup"
+
+msgid "Trạng thái"
+msgstr "Status"
+
+msgid "Thành công"
+msgstr "Success"
+
+msgid "Thất bại"
+msgstr "Failed"
+
+msgid "Lưu Cấu hình"
+msgstr "Save Configuration"
+
+msgid "Tạo Backup Mới"
+msgstr "Create New Backup"
+
+msgid "Chọn loại backup bạn muốn tạo:"
+msgstr "Select the type of backup you want to create:"
+
+msgid "Backup Toàn bộ"
+msgstr "Full Backup"
+
+msgid "Backup cả database và media files"
+msgstr "Backup both database and media files"
+
+msgid "Chỉ Backup Database"
+msgstr "Database Only Backup"
+
+msgid "Chỉ Backup Media Files"
+msgstr "Media Files Only Backup"
+
+msgid "Lưu ý: Quá trình backup có thể mất vài phút tùy thuộc vào dung lượng dữ liệu."
+msgstr "Note: The backup process may take several minutes depending on data size."
+
+msgid "Lịch sử Backup"
+msgstr "Backup History"
+
+msgid "Tên File"
+msgstr "File Name"
+
+msgid "Loại"
+msgstr "Type"
+
+msgid "Kích thước"
+msgstr "Size"
+
+msgid "Ngày tạo"
+msgstr "Created Date"
+
+msgid "Người tạo"
+msgstr "Created By"
+
+msgid "Thao tác"
+msgstr "Actions"
+
+msgid "Toàn bộ"
+msgstr "Full"
+
+msgid "Database"
+msgstr "Database"
+
+msgid "Media"
+msgstr "Media"
+
+msgid "Tự động"
+msgstr "Automatic"
+
+msgid "Đang xử lý"
+msgstr "Processing"
+
+msgid "Tải xuống"
+msgstr "Download"
+
+msgid "Phục hồi"
+msgstr "Restore"
+
+msgid "Xóa"
+msgstr "Delete"
+
+msgid "Xác nhận Phục hồi"
+msgstr "Confirm Restore"
+
+msgid "CẢNH BÁO: Thao tác này sẽ ghi đè lên dữ liệu hiện tại!"
+msgstr "WARNING: This action will overwrite current data!"
+
+msgid "Bạn có chắc chắn muốn phục hồi từ backup:"
+msgstr "Are you sure you want to restore from backup:"
+
+msgid "Nhập"
+msgstr "Enter"
+
+msgid "để xác nhận:"
+msgstr "to confirm:"
+
+msgid "Hủy"
+msgstr "Cancel"
+
+msgid "Xác nhận Xóa"
+msgstr "Confirm Delete"
+
+msgid "Bạn có chắc chắn muốn xóa backup:"
+msgstr "Are you sure you want to delete backup:"
+
+msgid "Thao tác này không thể hoàn tác!"
+msgstr "This action cannot be undone!"
+
+msgid "Chưa có backup nào được tạo."
+msgstr "No backups have been created yet."
+
+msgid "Hệ thống"
+msgstr "System"
+
+msgid "toàn bộ (database + media)"
+msgstr "full (database + media)"
+
+msgid "database"
+msgstr "database"
+
+msgid "media files"
+msgstr "media files"
+
+msgid "Bạn có chắc chắn muốn tạo backup"
+msgstr "Are you sure you want to create backup"
+

@@ -108,6 +108,7 @@ def menu_context(request):
             'items': [
                 {'name': _('Cấu hình Email'), 'url': 'email_settings', 'icon': 'fas fa-envelope-open-text', 'active': False},
                 {'name': _('Quản lý mẫu email'), 'url': 'email_template_list', 'icon': 'fas fa-file-alt', 'active': False},
+                {'name': _('Quản lý Backup'), 'url': 'backup_settings', 'icon': 'fas fa-database', 'active': False},
             ]
         }),
     ])
@@ -220,10 +221,12 @@ def menu_context(request):
         menu_items['system_settings']['active'] = True
         menu_items['system_settings']['open'] = True
         
-        if 'email_settings' in path or ('email' in path and 'template' not in path):
+        if 'email_settings' in path or ('email' in path and 'template' not in path and 'backup' not in path):
             menu_items['system_settings']['items'][0]['active'] = True
         elif 'email_template' in path or 'templates' in path:
             menu_items['system_settings']['items'][1]['active'] = True
+        elif 'backup' in path:
+            menu_items['system_settings']['items'][2]['active'] = True
     
     return {
         'menu': menu_items,  # Giữ tên 'menu' cho compatibility với code cũ

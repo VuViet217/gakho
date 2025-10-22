@@ -1,0 +1,435 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block extra_css %}
+<style>
+    .backup-card {
+        border-left: 4px solid #007bff;
+    }
+    .backup-history-card {
+        border-left: 4px solid #6c757d;
+    }
+    .status-badge {
+        font-size: 0.9rem;
+    }
+    .backup-item {
+        border-bottom: 1px solid #e9ecef;
+        padding: 12px 0;
+    }
+    .backup-item:last-child {
+        border-bottom: none;
+    }
+    .backup-actions .btn {
+        margin-right: 5px;
+        margin-bottom: 5px;
+    }
+    .file-size {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    .backup-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .warning-text {
+        color: #dc3545;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    
+    {% if messages %}
+    <div class="row">
+        <div class="col-12">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    
+    <div class="row">
+        <!-- Cấu hình Backup -->
+        <div class="col-md-6">
+            <div class="card card-outline card-primary backup-card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-cog mr-2"></i> {% trans "Cấu hình Backup" %}
+                    </h3>
+                </div>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="backup_frequency">{% trans "Tần suất Backup" %}</label>
+                            <select class="form-control" id="backup_frequency" name="backup_frequency">
+                                <option value="manual" {% if config.backup_frequency == 'manual' %}selected{% endif %}>
+                                    {% trans "Thủ công" %}
+                                </option>
+                                <option value="daily" {% if config.backup_frequency == 'daily' %}selected{% endif %}>
+                                    {% trans "Hàng ngày" %}
+                                </option>
+                                <option value="weekly" {% if config.backup_frequency == 'weekly' %}selected{% endif %}>
+                                    {% trans "Hàng tuần" %}
+                                </option>
+                                <option value="monthly" {% if config.backup_frequency == 'monthly' %}selected{% endif %}>
+                                    {% trans "Hàng tháng" %}
+                                </option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group" id="backup_time_group" style="display: none;">
+                            <label for="backup_time">{% trans "Thời gian Backup (cho tự động)" %}</label>
+                            <input type="time" class="form-control" id="backup_time" name="backup_time" 
+                                   value="{{ config.backup_time|default:'' }}">
+                            <small class="form-text text-muted">
+                                {% trans "Chỉ áp dụng khi chọn backup tự động" %}
+                            </small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="include_database" 
+                                       name="include_database" {% if config.include_database %}checked{% endif %}>
+                                <label class="custom-control-label" for="include_database">
+                                    {% trans "Backup Database" %}
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="include_media" 
+                                       name="include_media" {% if config.include_media %}checked{% endif %}>
+                                <label class="custom-control-label" for="include_media">
+                                    {% trans "Backup Media Files" %}
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="max_backups_keep">{% trans "Số lượng Backup giữ lại" %}</label>
+                            <input type="number" class="form-control" id="max_backups_keep" 
+                                   name="max_backups_keep" value="{{ config.max_backups_keep }}" min="1" max="100">
+                            <small class="form-text text-muted">
+                                {% trans "Các backup cũ sẽ tự động bị xóa khi vượt quá số lượng này" %}
+                            </small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="is_active" 
+                                       name="is_active" {% if config.is_active %}checked{% endif %}>
+                                <label class="custom-control-label" for="is_active">
+                                    {% trans "Kích hoạt Backup tự động" %}
+                                </label>
+                            </div>
+                        </div>
+                        
+                        {% if config.last_backup_date %}
+                        <div class="alert alert-info">
+                            <strong>{% trans "Lần backup cuối" %}:</strong> {{ config.last_backup_date|date:"d/m/Y H:i" }}<br>
+                            <strong>{% trans "Trạng thái" %}:</strong> 
+                            {% if config.last_backup_success %}
+                                <span class="badge badge-success">{% trans "Thành công" %}</span>
+                            {% else %}
+                                <span class="badge badge-danger">{% trans "Thất bại" %}</span>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save mr-2"></i> {% trans "Lưu Cấu hình" %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Tạo Backup Mới -->
+        <div class="col-md-6">
+            <div class="card card-outline card-success">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-plus-circle mr-2"></i> {% trans "Tạo Backup Mới" %}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <p>{% trans "Chọn loại backup bạn muốn tạo:" %}</p>
+                    
+                    <form method="post" action="{% url 'create_backup' %}" class="mb-3">
+                        {% csrf_token %}
+                        <input type="hidden" name="backup_type" value="full">
+                        <button type="submit" class="btn btn-success btn-block btn-lg">
+                            <i class="fas fa-database mr-2"></i> {% trans "Backup Toàn bộ" %}
+                        </button>
+                        <small class="form-text text-muted text-center">
+                            {% trans "Backup cả database và media files" %}
+                        </small>
+                    </form>
+                    
+                    <form method="post" action="{% url 'create_backup' %}" class="mb-3">
+                        {% csrf_token %}
+                        <input type="hidden" name="backup_type" value="database">
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fas fa-database mr-2"></i> {% trans "Chỉ Backup Database" %}
+                        </button>
+                    </form>
+                    
+                    <form method="post" action="{% url 'create_backup' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="backup_type" value="media">
+                        <button type="submit" class="btn btn-info btn-block">
+                            <i class="fas fa-images mr-2"></i> {% trans "Chỉ Backup Media Files" %}
+                        </button>
+                    </form>
+                    
+                    <div class="alert alert-warning mt-3">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        {% trans "Lưu ý: Quá trình backup có thể mất vài phút tùy thuộc vào dung lượng dữ liệu." %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Lịch sử Backup -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card card-outline card-secondary backup-history-card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-history mr-2"></i> {% trans "Lịch sử Backup" %}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    {% if backup_list %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>{% trans "Tên File" %}</th>
+                                    <th>{% trans "Loại" %}</th>
+                                    <th>{% trans "Kích thước" %}</th>
+                                    <th>{% trans "Trạng thái" %}</th>
+                                    <th>{% trans "Ngày tạo" %}</th>
+                                    <th>{% trans "Người tạo" %}</th>
+                                    <th>{% trans "Thao tác" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for backup in backup_list %}
+                                <tr>
+                                    <td>
+                                        <i class="fas fa-file-archive mr-2"></i>
+                                        {{ backup.backup_name }}
+                                    </td>
+                                    <td>
+                                        {% if backup.backup_type == 'full' %}
+                                            <span class="badge badge-success">{% trans "Toàn bộ" %}</span>
+                                        {% elif backup.backup_type == 'database' %}
+                                            <span class="badge badge-primary">{% trans "Database" %}</span>
+                                        {% else %}
+                                            <span class="badge badge-info">{% trans "Media" %}</span>
+                                        {% endif %}
+                                        {% if backup.is_auto %}
+                                            <span class="badge badge-secondary">{% trans "Tự động" %}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="file-size">{{ backup.get_file_size_display }}</td>
+                                    <td>
+                                        {% if backup.status == 'success' %}
+                                            <span class="badge badge-success">{% trans "Thành công" %}</span>
+                                        {% elif backup.status == 'failed' %}
+                                            <span class="badge badge-danger" data-toggle="tooltip" 
+                                                  title="{{ backup.error_message }}">{% trans "Thất bại" %}</span>
+                                        {% else %}
+                                            <span class="badge badge-warning">{% trans "Đang xử lý" %}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ backup.created_at|date:"d/m/Y H:i" }}</td>
+                                    <td>
+                                        {% if backup.created_by %}
+                                            {{ backup.created_by.get_full_name|default:backup.created_by.username }}
+                                        {% else %}
+                                            <em>{% trans "Hệ thống" %}</em>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if backup.status == 'success' %}
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'download_backup' backup.id %}" 
+                                               class="btn btn-sm btn-info" 
+                                               data-toggle="tooltip" 
+                                               title="{% trans 'Tải xuống' %}">
+                                                <i class="fas fa-download"></i>
+                                            </a>
+                                            <button type="button" 
+                                                    class="btn btn-sm btn-warning" 
+                                                    data-toggle="modal" 
+                                                    data-target="#restoreModal{{ backup.id }}"
+                                                    title="{% trans 'Phục hồi' %}">
+                                                <i class="fas fa-undo"></i>
+                                            </button>
+                                            <button type="button" 
+                                                    class="btn btn-sm btn-danger" 
+                                                    data-toggle="modal" 
+                                                    data-target="#deleteModal{{ backup.id }}"
+                                                    title="{% trans 'Xóa' %}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Restore Modal -->
+                                        <div class="modal fade" id="restoreModal{{ backup.id }}" tabindex="-1">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header bg-warning">
+                                                        <h5 class="modal-title">
+                                                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                                                            {% trans "Xác nhận Phục hồi" %}
+                                                        </h5>
+                                                        <button type="button" class="close" data-dismiss="modal">
+                                                            <span>&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <form method="post" action="{% url 'restore_backup' backup.id %}">
+                                                        {% csrf_token %}
+                                                        <div class="modal-body">
+                                                            <p class="warning-text">
+                                                                {% trans "CẢNH BÁO: Thao tác này sẽ ghi đè lên dữ liệu hiện tại!" %}
+                                                            </p>
+                                                            <p>
+                                                                {% trans "Bạn có chắc chắn muốn phục hồi từ backup:" %}<br>
+                                                                <strong>{{ backup.backup_name }}</strong>
+                                                            </p>
+                                                            <p>
+                                                                {% trans "Ngày tạo:" %} {{ backup.created_at|date:"d/m/Y H:i" }}
+                                                            </p>
+                                                            <hr>
+                                                            <div class="form-group">
+                                                                <label>
+                                                                    {% trans "Nhập" %} <strong>RESTORE</strong> {% trans "để xác nhận:" %}
+                                                                </label>
+                                                                <input type="text" 
+                                                                       class="form-control" 
+                                                                       name="confirm_restore" 
+                                                                       placeholder="RESTORE" 
+                                                                       required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                                                {% trans "Hủy" %}
+                                                            </button>
+                                                            <button type="submit" class="btn btn-warning">
+                                                                <i class="fas fa-undo mr-2"></i> {% trans "Phục hồi" %}
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Delete Modal -->
+                                        <div class="modal fade" id="deleteModal{{ backup.id }}" tabindex="-1">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header bg-danger">
+                                                        <h5 class="modal-title">
+                                                            <i class="fas fa-trash mr-2"></i>
+                                                            {% trans "Xác nhận Xóa" %}
+                                                        </h5>
+                                                        <button type="button" class="close" data-dismiss="modal">
+                                                            <span>&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <form method="post" action="{% url 'delete_backup' backup.id %}">
+                                                        {% csrf_token %}
+                                                        <div class="modal-body">
+                                                            <p>
+                                                                {% trans "Bạn có chắc chắn muốn xóa backup:" %}<br>
+                                                                <strong>{{ backup.backup_name }}</strong>
+                                                            </p>
+                                                            <p class="text-muted">
+                                                                {% trans "Thao tác này không thể hoàn tác!" %}
+                                                            </p>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                                                {% trans "Hủy" %}
+                                                            </button>
+                                                            <button type="submit" class="btn btn-danger">
+                                                                <i class="fas fa-trash mr-2"></i> {% trans "Xóa" %}
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info text-center">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        {% trans "Chưa có backup nào được tạo." %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Hiển thị/ẩn thời gian backup tùy theo tần suất
+        function toggleBackupTime() {
+            var frequency = $('#backup_frequency').val();
+            if (frequency !== 'manual') {
+                $('#backup_time_group').show();
+            } else {
+                $('#backup_time_group').hide();
+            }
+        }
+        
+        toggleBackupTime();
+        $('#backup_frequency').change(toggleBackupTime);
+        
+        // Enable tooltips
+        $('[data-toggle="tooltip"]').tooltip();
+        
+        // Confirm before creating backup
+        $('form[action="{% url "create_backup" %}"]').submit(function(e) {
+            var backupType = $(this).find('input[name="backup_type"]').val();
+            var typeText = '';
+            
+            if (backupType === 'full') {
+                typeText = '{% trans "toàn bộ (database + media)" %}';
+            } else if (backupType === 'database') {
+                typeText = '{% trans "database" %}';
+            } else {
+                typeText = '{% trans "media files" %}';
+            }
+            
+            return confirm('{% trans "Bạn có chắc chắn muốn tạo backup" %} ' + typeText + '?');
+        });
+    });
+</script>
+{% endblock %}

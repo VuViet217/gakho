@@ -526,3 +526,172 @@ msgstr "Kiểm kê mới"
 msgid "Lịch sử kiểm kê"
 msgstr "Lịch sử kiểm kê"
 
+# ================== BACKUP TRANSLATIONS ==================
+msgid "Quản lý Backup"
+msgstr "Quản lý Backup"
+
+msgid "Cấu hình Backup"
+msgstr "Cấu hình Backup"
+
+msgid "Tần suất Backup"
+msgstr "Tần suất Backup"
+
+msgid "Thủ công"
+msgstr "Thủ công"
+
+msgid "Hàng ngày"
+msgstr "Hàng ngày"
+
+msgid "Hàng tuần"
+msgstr "Hàng tuần"
+
+msgid "Hàng tháng"
+msgstr "Hàng tháng"
+
+msgid "Thời gian Backup (cho tự động)"
+msgstr "Thời gian Backup (cho tự động)"
+
+msgid "Chỉ áp dụng khi chọn backup tự động"
+msgstr "Chỉ áp dụng khi chọn backup tự động"
+
+msgid "Backup Database"
+msgstr "Backup Database"
+
+msgid "Backup Media Files"
+msgstr "Backup Media Files"
+
+msgid "Số lượng Backup giữ lại"
+msgstr "Số lượng Backup giữ lại"
+
+msgid "Các backup cũ sẽ tự động bị xóa khi vượt quá số lượng này"
+msgstr "Các backup cũ sẽ tự động bị xóa khi vượt quá số lượng này"
+
+msgid "Kích hoạt Backup tự động"
+msgstr "Kích hoạt Backup tự động"
+
+msgid "Lần backup cuối"
+msgstr "Lần backup cuối"
+
+msgid "Trạng thái"
+msgstr "Trạng thái"
+
+msgid "Thành công"
+msgstr "Thành công"
+
+msgid "Thất bại"
+msgstr "Thất bại"
+
+msgid "Lưu Cấu hình"
+msgstr "Lưu Cấu hình"
+
+msgid "Tạo Backup Mới"
+msgstr "Tạo Backup Mới"
+
+msgid "Chọn loại backup bạn muốn tạo:"
+msgstr "Chọn loại backup bạn muốn tạo:"
+
+msgid "Backup Toàn bộ"
+msgstr "Backup Toàn bộ"
+
+msgid "Backup cả database và media files"
+msgstr "Backup cả database và media files"
+
+msgid "Chỉ Backup Database"
+msgstr "Chỉ Backup Database"
+
+msgid "Chỉ Backup Media Files"
+msgstr "Chỉ Backup Media Files"
+
+msgid "Lưu ý: Quá trình backup có thể mất vài phút tùy thuộc vào dung lượng dữ liệu."
+msgstr "Lưu ý: Quá trình backup có thể mất vài phút tùy thuộc vào dung lượng dữ liệu."
+
+msgid "Lịch sử Backup"
+msgstr "Lịch sử Backup"
+
+msgid "Tên File"
+msgstr "Tên File"
+
+msgid "Loại"
+msgstr "Loại"
+
+msgid "Kích thước"
+msgstr "Kích thước"
+
+msgid "Ngày tạo"
+msgstr "Ngày tạo"
+
+msgid "Người tạo"
+msgstr "Người tạo"
+
+msgid "Thao tác"
+msgstr "Thao tác"
+
+msgid "Toàn bộ"
+msgstr "Toàn bộ"
+
+msgid "Database"
+msgstr "Database"
+
+msgid "Media"
+msgstr "Media"
+
+msgid "Tự động"
+msgstr "Tự động"
+
+msgid "Đang xử lý"
+msgstr "Đang xử lý"
+
+msgid "Tải xuống"
+msgstr "Tải xuống"
+
+msgid "Phục hồi"
+msgstr "Phục hồi"
+
+msgid "Xóa"
+msgstr "Xóa"
+
+msgid "Xác nhận Phục hồi"
+msgstr "Xác nhận Phục hồi"
+
+msgid "CẢNH BÁO: Thao tác này sẽ ghi đè lên dữ liệu hiện tại!"
+msgstr "CẢNH BÁO: Thao tác này sẽ ghi đè lên dữ liệu hiện tại!"
+
+msgid "Bạn có chắc chắn muốn phục hồi từ backup:"
+msgstr "Bạn có chắc chắn muốn phục hồi từ backup:"
+
+msgid "Nhập"
+msgstr "Nhập"
+
+msgid "để xác nhận:"
+msgstr "để xác nhận:"
+
+msgid "Hủy"
+msgstr "Hủy"
+
+msgid "Xác nhận Xóa"
+msgstr "Xác nhận Xóa"
+
+msgid "Bạn có chắc chắn muốn xóa backup:"
+msgstr "Bạn có chắc chắn muốn xóa backup:"
+
+msgid "Thao tác này không thể hoàn tác!"
+msgstr "Thao tác này không thể hoàn tác!"
+
+msgid "Chưa có backup nào được tạo."
+msgstr "Chưa có backup nào được tạo."
+
+msgid "Hệ thống"
+msgstr "Hệ thống"
+
+msgid "toàn bộ (database + media)"
+msgstr "toàn bộ (database + media)"
+
+msgid "database"
+msgstr "database"
+
+msgid "media files"
+msgstr "media files"
+
+msgid "Bạn có chắc chắn muốn tạo backup"
+msgstr "Bạn có chắc chắn muốn tạo backup"
+
