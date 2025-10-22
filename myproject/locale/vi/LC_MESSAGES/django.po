@@ -428,3 +428,28 @@ msgstr "Lên lịch cấp phát"
 msgid "Xác nhận"
 msgstr "Xác nhận"
 
+# Warehouse requests page
+msgid "Quản lý kho - Xử lý"
+msgstr "Quản lý kho - Xử lý"
+
+msgid "Danh sách yêu cầu đã được phê duyệt"
+msgstr "Danh sách yêu cầu đã được phê duyệt"
+
+msgid "Ngày phê duyệt"
+msgstr "Ngày phê duyệt"
+
+msgid "Xem"
+msgstr "Xem"
+
+msgid "Không có yêu cầu nào đã được phê duyệt"
+msgstr "Không có yêu cầu nào đã được phê duyệt"
+
+msgid "Danh sách yêu cầu đã lên lịch"
+msgstr "Danh sách yêu cầu đã lên lịch"
+
+msgid "Ngày lên lịch"
+msgstr "Ngày lên lịch"
+
+msgid "Không có yêu cầu nào đã lên lịch"
+msgstr "Không có yêu cầu nào đã lên lịch"
+

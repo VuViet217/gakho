@@ -428,3 +428,28 @@ msgstr "Schedule Delivery"
 msgid "Xác nhận"
 msgstr "Confirm"
 
+# Warehouse requests page
+msgid "Quản lý kho - Xử lý"
+msgstr "Warehouse Management - Processing"
+
+msgid "Danh sách yêu cầu đã được phê duyệt"
+msgstr "Approved Requests List"
+
+msgid "Ngày phê duyệt"
+msgstr "Approval Date"
+
+msgid "Xem"
+msgstr "View"
+
+msgid "Không có yêu cầu nào đã được phê duyệt"
+msgstr "No approved requests yet"
+
+msgid "Danh sách yêu cầu đã lên lịch"
+msgstr "Scheduled Requests List"
+
+msgid "Ngày lên lịch"
+msgstr "Schedule Date"
+
+msgid "Không có yêu cầu nào đã lên lịch"
+msgstr "No scheduled requests yet"
+
