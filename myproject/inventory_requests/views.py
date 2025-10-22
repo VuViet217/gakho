@@ -195,7 +195,7 @@ def inventory_request_create(request):
                         
                         # Gửi email thông báo cho người tạo yêu cầu
                         try:
-                            send_template_email(
+                            success, error_message = send_template_email(
                                 recipient_list=[request.user.email],
                                 template_code='request_created',
                                 context_data={
@@ -204,8 +204,47 @@ def inventory_request_create(request):
                                     'employee_products_with_history': employee_products_with_history,
                                 }
                             )
+                            if success:
+                                logger.info(f"Đã gửi email request_created cho người tạo: {request.user.email}")
+                            else:
+                                logger.error(f"Không thể gửi email request_created: {error_message}")
                         except Exception as e:
-                            logger.error(f"Không thể gửi email thông báo: {str(e)}")
+                            logger.error(f"Lỗi exception khi gửi email request_created: {e}")
+                        
+                        # Chờ 2 giây trước khi gửi email tiếp theo để tránh rate limit
+                        import time
+                        time.sleep(2)
+                        
+                        # Gửi email thông báo cho quản lý kho (SM/Admin) để xử lý xuất kho
+                        from accounts.models import User
+                        warehouse_managers = User.objects.filter(
+                            role__in=['sm', 'admin'],
+                            is_active=True,
+                            email__isnull=False
+                        ).exclude(email='')
+                        
+                        warehouse_manager_emails = [wm.email for wm in warehouse_managers]
+                        
+                        logger.info(f"Tìm thấy {warehouse_managers.count()} quản lý kho")
+                        logger.info(f"Danh sách email: {warehouse_manager_emails}")
+                        
+                        if warehouse_manager_emails:
+                            try:
+                                success, error_message = send_template_email(
+                                    recipient_list=warehouse_manager_emails,
+                                    template_code='warehouse_approval_required',
+                                    context_data={
+                                        'request': request_obj,
+                                        'user': warehouse_managers.first(),  # User đại diện cho email
+                                        'approver': request.user,
+                                    }
+                                )
+                                if success:
+                                    logger.info(f"Đã gửi email thành công cho quản lý kho: {warehouse_manager_emails}")
+                                else:
+                                    logger.error(f"Không thể gửi email cho quản lý kho: {error_message}")
+                            except Exception as e:
+                                logger.error(f"Lỗi exception khi gửi email cho quản lý kho: {e}")
                         
                         messages.success(request, 'Yêu cầu cấp phát đã được tự động phê duyệt và chuyển đến kho để xử lý.')
                         return redirect('inventory_requests:my_requests')
