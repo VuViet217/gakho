@@ -1,0 +1,49 @@
+# Vietnamese translations for OVNC Inventory
+# Copyright (C) 2025
+# This file is distributed under the same license as the OVNC Inventory package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: OVNC Inventory 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-22 08:00+0700\n"
+"PO-Revision-Date: 2025-10-22 08:00+0700\n"
+"Last-Translator: \n"
+"Language-Team: Vietnamese\n"
+"Language: vi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Đăng nhập"
+msgstr "Đăng nhập"
+
+msgid "Hệ Thống Quản Lý Kho Chuyên Nghiệp"
+msgstr "Hệ Thống Quản Lý Kho Chuyên Nghiệp"
+
+msgid "Tối ưu hóa hoạt động kho hàng với giải pháp quản lý toàn diện"
+msgstr "Tối ưu hóa hoạt động kho hàng với giải pháp quản lý toàn diện"
+
+msgid "Quản lý hàng tồn kho"
+msgstr "Quản lý hàng tồn kho"
+
+msgid "Theo dõi nhà cung cấp"
+msgstr "Theo dõi nhà cung cấp"
+
+msgid "Báo cáo thống kê"
+msgstr "Báo cáo thống kê"
+
+msgid "Đăng Nhập"
+msgstr "Đăng Nhập"
+
+msgid "Đăng nhập để bắt đầu phiên làm việc"
+msgstr "Đăng nhập để bắt đầu phiên làm việc"
+
+msgid "Tên đăng nhập hoặc mật khẩu không đúng. Vui lòng thử lại."
+msgstr "Tên đăng nhập hoặc mật khẩu không đúng. Vui lòng thử lại."
+
+msgid "Nhớ mật khẩu"
+msgstr "Nhớ mật khẩu"
+
+msgid "Quên mật khẩu?"
+msgstr "Quên mật khẩu?"

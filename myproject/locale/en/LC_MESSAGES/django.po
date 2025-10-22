@@ -1,0 +1,49 @@
+# English translations for OVNC Inventory
+# Copyright (C) 2025
+# This file is distributed under the same license as the OVNC Inventory package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: OVNC Inventory 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-22 08:00+0700\n"
+"PO-Revision-Date: 2025-10-22 08:00+0700\n"
+"Last-Translator: \n"
+"Language-Team: English\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Đăng nhập"
+msgstr "Login"
+
+msgid "Hệ Thống Quản Lý Kho Chuyên Nghiệp"
+msgstr "Professional Inventory Management System"
+
+msgid "Tối ưu hóa hoạt động kho hàng với giải pháp quản lý toàn diện"
+msgstr "Optimize warehouse operations with comprehensive management solutions"
+
+msgid "Quản lý hàng tồn kho"
+msgstr "Inventory Management"
+
+msgid "Theo dõi nhà cung cấp"
+msgstr "Supplier Tracking"
+
+msgid "Báo cáo thống kê"
+msgstr "Statistical Reports"
+
+msgid "Đăng Nhập"
+msgstr "Login"
+
+msgid "Đăng nhập để bắt đầu phiên làm việc"
+msgstr "Login to start your session"
+
+msgid "Tên đăng nhập hoặc mật khẩu không đúng. Vui lòng thử lại."
+msgstr "Invalid username or password. Please try again."
+
+msgid "Nhớ mật khẩu"
+msgstr "Remember me"
+
+msgid "Quên mật khẩu?"
+msgstr "Forgot password?"

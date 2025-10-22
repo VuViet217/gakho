@@ -18,10 +18,15 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.conf.urls.i18n import i18n_patterns
 from django.views.generic import RedirectView
 from accounts.custom_views import LogoutView
 
 urlpatterns = [
+    path('i18n/', include('django.conf.urls.i18n')),  # URL cho chuyển đổi ngôn ngữ
+]
+
+urlpatterns += i18n_patterns(
     path('', RedirectView.as_view(pattern_name='main_dashboard'), name='home'),
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
@@ -34,7 +39,7 @@ urlpatterns = [
     path('system/', include('system_settings.urls')),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('summernote/', include('django_summernote.urls')),
-]
+)
 
 # Serve media and static files in development
 if settings.DEBUG:

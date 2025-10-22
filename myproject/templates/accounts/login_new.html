@@ -1,7 +1,8 @@
 {% extends 'adminlte/base.html' %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Đăng nhập{% endblock %}
+{% block title %}{% trans "Đăng nhập" %}{% endblock %}
 
 {% block body_class %}login-page{% endblock body_class %}
 
@@ -15,20 +16,20 @@
                     <h1><b>OVNC</b> Inventory</h1>
                 </div>
                 <div class="login-description">
-                    <h2>Hệ Thống Quản Lý Kho Chuyên Nghiệp</h2>
-                    <p>Tối ưu hóa hoạt động kho hàng với giải pháp quản lý toàn diện</p>
+                    <h2>{% trans "Hệ Thống Quản Lý Kho Chuyên Nghiệp" %}</h2>
+                    <p>{% trans "Tối ưu hóa hoạt động kho hàng với giải pháp quản lý toàn diện" %}</p>
                     <div class="login-features">
                         <div class="feature-item">
                             <i class="fas fa-boxes"></i>
-                            <span>Quản lý hàng tồn kho</span>
+                            <span>{% trans "Quản lý hàng tồn kho" %}</span>
                         </div>
                         <div class="feature-item">
                             <i class="fas fa-truck"></i>
-                            <span>Theo dõi nhà cung cấp</span>
+                            <span>{% trans "Theo dõi nhà cung cấp" %}</span>
                         </div>
                         <div class="feature-item">
                             <i class="fas fa-chart-line"></i>
-                            <span>Báo cáo thống kê</span>
+                            <span>{% trans "Báo cáo thống kê" %}</span>
                         </div>
                     </div>
                 </div>
@@ -38,8 +39,8 @@
         <div class="login-right">
             <div class="login-form-container">
                 <div class="login-header">
-                    <h3>Đăng Nhập</h3>
-                    <p>Đăng nhập để bắt đầu phiên làm việc</p>
+                    <h3>{% trans "Đăng Nhập" %}</h3>
+                    <p>{% trans "Đăng nhập để bắt đầu phiên làm việc" %}</p>
                 </div>
 
                 <form method="post" class="login-form">
@@ -59,31 +60,60 @@
 
                     {% if form.errors %}
                     <div class="alert alert-danger">
-                        <i class="fas fa-exclamation-circle"></i> Tên đăng nhập hoặc mật khẩu không đúng. Vui lòng thử lại.
+                        <i class="fas fa-exclamation-circle"></i> {% trans "Tên đăng nhập hoặc mật khẩu không đúng. Vui lòng thử lại." %}
                     </div>
                     {% endif %}
 
                     <div class="login-options">
                         <div class="remember-me">
                             <input type="checkbox" id="remember">
-                            <label for="remember">Nhớ mật khẩu</label>
+                            <label for="remember">{% trans "Nhớ mật khẩu" %}</label>
                         </div>
-                        <a href="{% url 'password_reset' %}" class="forgot-password">Quên mật khẩu?</a>
+                        <a href="{% url 'password_reset' %}" class="forgot-password">{% trans "Quên mật khẩu?" %}</a>
                     </div>
 
                     <button type="submit" class="login-button">
-                        <span>Đăng Nhập</span>
+                        <span>{% trans "Đăng Nhập" %}</span>
                         <i class="fas fa-sign-in-alt"></i>
                     </button>
                 </form>
 
                 <div class="login-footer">
                     <p>© 2025 OVNC Inventory Management System</p>
+                    
+                    <!-- Language Switcher in footer -->
+                    <div class="language-switcher-footer">
+                        <form action="{% url 'set_language' %}" method="post" id="language-form">
+                            {% csrf_token %}
+                            <input name="next" type="hidden" value="{{ request.get_full_path }}">
+                            <input type="hidden" name="language" id="language-input">
+                        </form>
+                        {% get_current_language as CURRENT_LANGUAGE %}
+                        <div class="language-tabs">
+                            <button type="button" class="lang-tab {% if CURRENT_LANGUAGE == 'vi' %}active{% endif %}" 
+                                    onclick="changeLanguage('vi')" title="Tiếng Việt">
+                                <span class="flag">🇻🇳</span>
+                                <span>VN</span>
+                            </button>
+                            <button type="button" class="lang-tab {% if CURRENT_LANGUAGE == 'en' %}active{% endif %}" 
+                                    onclick="changeLanguage('en')" title="English">
+                                <span class="flag">🇬🇧</span>
+                                <span>EN</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    function changeLanguage(lang) {
+        document.getElementById('language-input').value = lang;
+        document.getElementById('language-form').submit();
+    }
+</script>
 
 <link rel="stylesheet" href="{% static 'admin-lte/plugins/fontawesome-free/css/all.min.css' %}">
 <link rel="stylesheet" href="{% static 'admin-lte/dist/css/adminlte.min.css' %}">
