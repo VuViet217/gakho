@@ -127,30 +127,66 @@ class ProductForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_method = 'post'
-        self.helper.layout = Layout(
-            Row(
-                Column('product_code', css_class='form-group col-md-6 mb-0'),
-                Column('name', css_class='form-group col-md-6 mb-0'),
-                css_class='form-row'
-            ),
-            Row(
-                Column('category', css_class='form-group col-md-6 mb-0'),      
-                Column('unit', css_class='form-group col-md-6 mb-0'),
-                css_class='form-row'
-            ),
-            Row(
-                Column('column', css_class='form-group col-md-4 mb-0'),
-                Column('current_quantity', css_class='form-group col-md-4 mb-0'),
-                Column('minimum_quantity', css_class='form-group col-md-4 mb-0'),
-                css_class='form-row'
-            ),
-            Row(
-                Column('description', css_class='form-group col-md-12 mb-0'),
-                css_class='form-row'
-            ),
-            HTML("<hr>"),
-            Submit('submit', 'Lưu', css_class='btn btn-success')
-        )
+        
+        # Kiểm tra xem đang tạo mới hay edit
+        is_editing = self.instance and self.instance.pk
+        
+        if is_editing:
+            # Khi edit: hiển thị current_quantity nhưng disabled (chỉ xem)
+            self.fields['current_quantity'].disabled = True
+            self.fields['current_quantity'].help_text = 'Số lượng này được cập nhật tự động khi nhập/xuất kho'
+            
+            self.helper.layout = Layout(
+                Row(
+                    Column('product_code', css_class='form-group col-md-6 mb-0'),
+                    Column('name', css_class='form-group col-md-6 mb-0'),
+                    css_class='form-row'
+                ),
+                Row(
+                    Column('category', css_class='form-group col-md-6 mb-0'),      
+                    Column('unit', css_class='form-group col-md-6 mb-0'),
+                    css_class='form-row'
+                ),
+                Row(
+                    Column('column', css_class='form-group col-md-4 mb-0'),
+                    Column('current_quantity', css_class='form-group col-md-4 mb-0'),
+                    Column('minimum_quantity', css_class='form-group col-md-4 mb-0'),
+                    css_class='form-row'
+                ),
+                Row(
+                    Column('description', css_class='form-group col-md-12 mb-0'),
+                    css_class='form-row'
+                ),
+                HTML("<hr>"),
+                Submit('submit', 'Lưu', css_class='btn btn-success')
+            )
+        else:
+            # Khi tạo mới: bỏ current_quantity khỏi form
+            self.fields.pop('current_quantity', None)
+            
+            self.helper.layout = Layout(
+                Row(
+                    Column('product_code', css_class='form-group col-md-6 mb-0'),
+                    Column('name', css_class='form-group col-md-6 mb-0'),
+                    css_class='form-row'
+                ),
+                Row(
+                    Column('category', css_class='form-group col-md-6 mb-0'),      
+                    Column('unit', css_class='form-group col-md-6 mb-0'),
+                    css_class='form-row'
+                ),
+                Row(
+                    Column('column', css_class='form-group col-md-6 mb-0'),
+                    Column('minimum_quantity', css_class='form-group col-md-6 mb-0'),
+                    css_class='form-row'
+                ),
+                Row(
+                    Column('description', css_class='form-group col-md-12 mb-0'),
+                    css_class='form-row'
+                ),
+                HTML("<hr>"),
+                Submit('submit', 'Lưu', css_class='btn btn-success')
+            )
         
         # Tùy chỉnh form fields
         if 'column' in self.fields:

@@ -252,6 +252,9 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('product_list')
     
     def form_valid(self, form):
+        # Set số lượng hiện tại = 0 khi tạo mới
+        # Số lượng sẽ được cập nhật tự động khi nhập kho
+        form.instance.current_quantity = 0
         messages.success(self.request, "Sản phẩm đã được tạo thành công.")
         return super().form_valid(form)
 
