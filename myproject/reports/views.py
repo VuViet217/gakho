@@ -254,19 +254,22 @@ def monthly_report_pdf(request, year, month):
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from reportlab.pdfbase import pdfmetrics
     from reportlab.pdfbase.ttfonts import TTFont
-    from reportlab.lib.enums import TA_CENTER, TA_LEFT
+    from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
     from io import BytesIO
     import os
     from django.conf import settings
     
-    # Đăng ký font Arial cho tiếng Việt
+    # Đăng ký font tiếng Việt
     arial_font_path = os.path.join(settings.BASE_DIR, 'static', 'fonts', 'Arial.ttf')
-    arial_bold_path = os.path.join(settings.BASE_DIR, 'static', 'fonts', 'Arial_Bold.ttf')
+    arial_bold_path = os.path.join(settings.BASE_DIR, 'static', 'fonts', 'Arial-Bold.ttf')
     
-    if os.path.exists(arial_font_path):
-        pdfmetrics.registerFont(TTFont('Arial', arial_font_path))
-    if os.path.exists(arial_bold_path):
-        pdfmetrics.registerFont(TTFont('Arial-Bold', arial_bold_path))
+    try:
+        if os.path.exists(arial_font_path):
+            pdfmetrics.registerFont(TTFont('ArialUnicode', arial_font_path))
+        if os.path.exists(arial_bold_path):
+            pdfmetrics.registerFont(TTFont('ArialUnicode-Bold', arial_bold_path))
+    except:
+        pass
     
     # Lấy dữ liệu báo cáo
     snapshots = MonthlyInventorySnapshot.objects.filter(
@@ -285,7 +288,14 @@ def monthly_report_pdf(request, year, month):
     
     # Tạo PDF
     buffer = BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=landscape(A4), topMargin=15*mm, bottomMargin=15*mm)
+    doc = SimpleDocTemplate(
+        buffer, 
+        pagesize=landscape(A4), 
+        topMargin=10*mm, 
+        bottomMargin=15*mm,
+        leftMargin=10*mm,
+        rightMargin=10*mm
+    )
     
     # Container cho các elements
     elements = []
@@ -295,63 +305,103 @@ def monthly_report_pdf(request, year, month):
     title_style = ParagraphStyle(
         'CustomTitle',
         parent=styles['Heading1'],
-        fontName='Arial-Bold' if os.path.exists(arial_bold_path) else 'Helvetica-Bold',
+        fontName='ArialUnicode-Bold',
         fontSize=16,
-        textColor=colors.HexColor('#2c3e50'),
-        spaceAfter=5*mm,
-        alignment=TA_CENTER
+        textColor=colors.HexColor('#1a237e'),
+        spaceAfter=3*mm,
+        alignment=TA_CENTER,
+        leading=20
     )
     
     subtitle_style = ParagraphStyle(
         'CustomSubtitle',
         parent=styles['Normal'],
-        fontName='Arial' if os.path.exists(arial_font_path) else 'Helvetica',
+        fontName='ArialUnicode',
         fontSize=11,
-        textColor=colors.HexColor('#7f8c8d'),
-        spaceAfter=8*mm,
-        alignment=TA_CENTER
+        textColor=colors.HexColor('#424242'),
+        spaceAfter=2*mm,
+        alignment=TA_CENTER,
+        leading=14
     )
     
+    info_style = ParagraphStyle(
+        'InfoStyle',
+        parent=styles['Normal'],
+        fontName='ArialUnicode',
+        fontSize=10,
+        textColor=colors.HexColor('#212121'),
+        leading=14
+    )
+    
+    signature_style = ParagraphStyle(
+        'SignatureStyle',
+        parent=styles['Normal'],
+        fontName='ArialUnicode',
+        fontSize=10,
+        textColor=colors.HexColor('#212121'),
+        alignment=TA_CENTER,
+        leading=14,
+        spaceAfter=2*mm
+    )
+    
+    # Header
+    company_header = Paragraph("CÔNG TY TNHH OLYMPUS VIỆT NAM", title_style)
+    elements.append(company_header)
+    elements.append(Spacer(1, 2*mm))
+    
     # Title
-    title = Paragraph(f"BÁO CÁO TỒN KHO THÁNG {month}/{year}", title_style)
+    title = Paragraph(f"<b>BÁO CÁO TỒN KHO THÁNG {month}/{year}</b>", title_style)
     elements.append(title)
     
-    subtitle = Paragraph(f"OVNC Inventory - Ngày xuất: {timezone.now().strftime('%d/%m/%Y %H:%M')}", subtitle_style)
-    elements.append(subtitle)
+    # Thông tin
+    report_info = Paragraph(
+        f"Ngày xuất báo cáo: <b>{timezone.now().strftime('%d/%m/%Y %H:%M')}</b>",
+        subtitle_style
+    )
+    elements.append(report_info)
+    elements.append(Spacer(1, 5*mm))
     
     # Thông tin tổng quan
     summary_data = [
-        ['Tồn đầu tháng', 'Nhập trong tháng', 'Xuất trong tháng', 'Tồn cuối tháng'],
-        [f'{total_opening:,}', f'{total_received:,}', f'{total_issued:,}', f'{total_closing:,}']
+        ['<b>Tồn đầu tháng</b>', '<b>Nhập trong tháng</b>', '<b>Xuất trong tháng</b>', '<b>Tồn cuối tháng</b>'],
+        [f'<b>{total_opening:,}</b>', f'<b>{total_received:,}</b>', f'<b>{total_issued:,}</b>', f'<b>{total_closing:,}</b>']
     ]
     
-    summary_table = Table(summary_data, colWidths=[60*mm, 60*mm, 60*mm, 60*mm])
+    summary_table_data = []
+    for row in summary_data:
+        summary_table_data.append([Paragraph(cell, info_style) for cell in row])
+    
+    summary_table = Table(summary_table_data, colWidths=[65*mm, 65*mm, 65*mm, 65*mm])
     summary_table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#6B8DD6')),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1565c0')),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('FONTNAME', (0, 0), (-1, 0), 'Arial-Bold' if os.path.exists(arial_bold_path) else 'Helvetica-Bold'),
+        ('FONTNAME', (0, 0), (-1, 0), 'ArialUnicode-Bold'),
         ('FONTSIZE', (0, 0), (-1, 0), 11),
-        ('FONTNAME', (0, 1), (-1, -1), 'Arial' if os.path.exists(arial_font_path) else 'Helvetica'),
-        ('FONTSIZE', (0, 1), (-1, -1), 10),
+        ('FONTNAME', (0, 1), (-1, -1), 'ArialUnicode-Bold'),
+        ('FONTSIZE', (0, 1), (-1, -1), 11),
         ('BOTTOMPADDING', (0, 0), (-1, -1), 10),
         ('TOPPADDING', (0, 0), (-1, -1), 10),
-        ('GRID', (0, 0), (-1, -1), 1, colors.grey),
-        ('BACKGROUND', (0, 1), (-1, 1), colors.HexColor('#f8f9fa')),
+        ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#1565c0')),
+        ('BACKGROUND', (0, 1), (-1, 1), colors.HexColor('#e3f2fd')),
     ]))
     elements.append(summary_table)
-    elements.append(Spacer(1, 10*mm))
+    elements.append(Spacer(1, 7*mm))
     
     # Chi tiết sản phẩm
     data = [['STT', 'Mã SP', 'Tên sản phẩm', 'Danh mục', 'ĐVT', 'Tồn đầu', 'Nhập', 'Xuất', 'Tồn cuối']]
     
     for idx, snapshot in enumerate(snapshots, 1):
+        product_name = snapshot.product.name
+        if len(product_name) > 35:
+            product_name = product_name[:32] + '...'
+        
         data.append([
             str(idx),
             snapshot.product.product_code[:15],
-            snapshot.product.name[:30] + '...' if len(snapshot.product.name) > 30 else snapshot.product.name,
-            snapshot.product.category.name[:15] if snapshot.product.category else '-',
-            snapshot.product.unit.name[:10] if snapshot.product.unit else '-',
+            product_name,
+            snapshot.product.category.name[:12] if snapshot.product.category else '-',
+            snapshot.product.unit.name[:8] if snapshot.product.unit else '-',
             f'{snapshot.opening_stock:,}',
             f'{snapshot.total_received:,}',
             f'{snapshot.total_issued:,}',
@@ -359,21 +409,21 @@ def monthly_report_pdf(request, year, month):
         ])
     
     # Tạo bảng
-    col_widths = [12*mm, 25*mm, 60*mm, 30*mm, 20*mm, 22*mm, 22*mm, 22*mm, 22*mm]
+    col_widths = [12*mm, 25*mm, 62*mm, 28*mm, 18*mm, 23*mm, 23*mm, 23*mm, 26*mm]
     table = Table(data, colWidths=col_widths)
     
     table.setStyle(TableStyle([
         # Header
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#6B8DD6')),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1565c0')),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
         ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
-        ('FONTNAME', (0, 0), (-1, 0), 'Arial-Bold' if os.path.exists(arial_bold_path) else 'Helvetica-Bold'),
+        ('FONTNAME', (0, 0), (-1, 0), 'ArialUnicode-Bold'),
         ('FONTSIZE', (0, 0), (-1, 0), 9),
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
-        ('TOPPADDING', (0, 0), (-1, 0), 8),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 6),
+        ('TOPPADDING', (0, 0), (-1, 0), 6),
         
         # Body
-        ('FONTNAME', (0, 1), (-1, -1), 'Arial' if os.path.exists(arial_font_path) else 'Helvetica'),
+        ('FONTNAME', (0, 1), (-1, -1), 'ArialUnicode'),
         ('FONTSIZE', (0, 1), (-1, -1), 8),
         ('ALIGN', (0, 1), (0, -1), 'CENTER'),  # STT
         ('ALIGN', (1, 1), (1, -1), 'LEFT'),    # Mã SP
@@ -384,12 +434,37 @@ def monthly_report_pdf(request, year, month):
         
         # Grid
         ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f8f9fa')]),
-        ('BOTTOMPADDING', (0, 1), (-1, -1), 6),
-        ('TOPPADDING', (0, 1), (-1, -1), 6),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f5f5f5')]),
+        ('BOTTOMPADDING', (0, 1), (-1, -1), 4),
+        ('TOPPADDING', (0, 1), (-1, -1), 4),
     ]))
     
     elements.append(table)
+    elements.append(Spacer(1, 8*mm))
+    
+    # Phần ký nhận
+    signature_data = [
+        ['', 'Người lập', '', 'Kế toán', '', 'Trưởng phòng'],
+        ['', '(Ký, họ tên)', '', '(Ký, họ tên)', '', '(Ký, họ tên)'],
+    ]
+    
+    signature_table = Table(signature_data, colWidths=[15*mm, 70*mm, 15*mm, 70*mm, 15*mm, 75*mm])
+    signature_table.setStyle(TableStyle([
+        ('FONTNAME', (1, 0), (1, 0), 'ArialUnicode-Bold'),
+        ('FONTNAME', (3, 0), (3, 0), 'ArialUnicode-Bold'),
+        ('FONTNAME', (5, 0), (5, 0), 'ArialUnicode-Bold'),
+        ('FONTNAME', (1, 1), (1, 1), 'ArialUnicode'),
+        ('FONTNAME', (3, 1), (3, 1), 'ArialUnicode'),
+        ('FONTNAME', (5, 1), (5, 1), 'ArialUnicode'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('ALIGN', (1, 0), (1, 1), 'CENTER'),
+        ('ALIGN', (3, 0), (3, 1), 'CENTER'),
+        ('ALIGN', (5, 0), (5, 1), 'CENTER'),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 35),
+        ('TOPPADDING', (0, 0), (-1, 0), 8),
+    ]))
+    
+    elements.append(signature_table)
     
     # Build PDF
     doc.build(elements)
@@ -397,7 +472,7 @@ def monthly_report_pdf(request, year, month):
     # Trả về response
     buffer.seek(0)
     response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="Bao_cao_thang_{month}_{year}.pdf"'
+    response['Content-Disposition'] = f'inline; filename="Bao_cao_ton_kho_thang_{month}_{year}.pdf"'
     
     return response
 
