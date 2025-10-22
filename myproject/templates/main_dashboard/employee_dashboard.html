@@ -1,0 +1,424 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+{% load dashboard_filters %}
+
+{% block title %}{% trans "Dashboard" %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stat-card {
+        border-radius: 10px;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    .stat-icon {
+        font-size: 3rem;
+        opacity: 0.8;
+    }
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin: 10px 0;
+    }
+    .stat-label {
+        font-size: 0.9rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .welcome-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 20px;
+    }
+    .welcome-card h2 {
+        font-size: 2rem;
+        margin-bottom: 10px;
+    }
+    .welcome-card p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+    .request-status {
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    .status-pending {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+    .status-approved {
+        background-color: #d1ecf1;
+        color: #0c5460;
+    }
+    .status-scheduled {
+        background-color: #cfe2ff;
+        color: #084298;
+    }
+    .status-completed {
+        background-color: #d1e7dd;
+        color: #0f5132;
+    }
+    .status-rejected {
+        background-color: #f8d7da;
+        color: #842029;
+    }
+    .timeline-item {
+        border-left: 3px solid #e9ecef;
+        padding-left: 20px;
+        margin-bottom: 20px;
+        position: relative;
+    }
+    .timeline-item::before {
+        content: '';
+        width: 12px;
+        height: 12px;
+        background: #007bff;
+        border-radius: 50%;
+        position: absolute;
+        left: -7.5px;
+        top: 5px;
+    }
+    .timeline-item.completed::before {
+        background: #28a745;
+    }
+    .timeline-item.rejected::before {
+        background: #dc3545;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Welcome Card -->
+    <div class="welcome-card">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h2><i class="fas fa-hand-sparkles mr-2"></i>{% trans "Xin chào" %}, {{ user.get_full_name|default:user.username }}!</h2>
+                <p class="mb-0">{% trans "Chào mừng bạn đến với hệ thống quản lý kho OVNC. Hãy theo dõi các yêu cầu cấp phát của bạn tại đây." %}</p>
+            </div>
+            <div class="col-md-4 text-right">
+                <a href="{% url 'inventory_requests:inventory_request_create' %}" class="btn btn-light btn-lg">
+                    <i class="fas fa-plus-circle mr-2"></i>{% trans "Tạo yêu cầu mới" %}
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row">
+        <!-- Tổng yêu cầu -->
+        <div class="col-lg-3 col-md-6">
+            <div class="card stat-card bg-gradient-primary text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-clipboard-list stat-icon"></i>
+                    <div class="stat-number">{{ total_requests }}</div>
+                    <div class="stat-label text-white-50">{% trans "Tổng yêu cầu" %}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Đang chờ xử lý -->
+        <div class="col-lg-3 col-md-6">
+            <div class="card stat-card bg-gradient-warning text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-clock stat-icon"></i>
+                    <div class="stat-number">{{ pending_requests }}</div>
+                    <div class="stat-label text-white-50">{% trans "Đang chờ xử lý" %}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Đã hoàn thành -->
+        <div class="col-lg-3 col-md-6">
+            <div class="card stat-card bg-gradient-success text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-check-circle stat-icon"></i>
+                    <div class="stat-number">{{ completed_requests }}</div>
+                    <div class="stat-label text-white-50">{% trans "Đã hoàn thành" %}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bị từ chối -->
+        <div class="col-lg-3 col-md-6">
+            <div class="card stat-card bg-gradient-danger text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-times-circle stat-icon"></i>
+                    <div class="stat-number">{{ rejected_requests }}</div>
+                    <div class="stat-label text-white-50">{% trans "Bị từ chối" %}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Thống kê tháng này -->
+    <div class="row mt-4">
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-calendar-alt mr-2"></i>{% trans "Thống kê tháng này" %}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span><i class="fas fa-file-alt text-primary mr-2"></i>{% trans "Yêu cầu tạo mới" %}</span>
+                            <strong>{{ requests_this_month }}</strong>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-primary" role="progressbar" 
+                                 style="width: {% if requests_this_month > 0 %}100{% else %}0{% endif %}%"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span><i class="fas fa-check text-success mr-2"></i>{% trans "Đã hoàn thành" %}</span>
+                            <strong>{{ completed_this_month }}</strong>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-success" role="progressbar" 
+                                 style="width: {% if requests_this_month > 0 %}{{ completed_this_month|mul:100|div:requests_this_month }}{% else %}0{% endif %}%"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span><i class="fas fa-box text-info mr-2"></i>{% trans "Sản phẩm đã nhận" %}</span>
+                            <strong>{{ total_items_received }}</strong>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-info" role="progressbar" 
+                                 style="width: {% if total_items_received > 0 %}100{% else %}0{% endif %}%"></div>
+                        </div>
+                    </div>
+
+                    <hr>
+                    
+                    <div class="text-center">
+                        <div class="mb-2">{% trans "Tỷ lệ phê duyệt" %}</div>
+                        <div class="position-relative" style="height: 120px;">
+                            <canvas id="approvalChart"></canvas>
+                        </div>
+                        <h3 class="mt-2 mb-0">{{ approval_rate }}%</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Biểu đồ xu hướng -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-chart-line mr-2"></i>{% trans "Xu hướng yêu cầu 6 tháng gần đây" %}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <canvas id="trendChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Yêu cầu gần đây & Lịch sử -->
+    <div class="row mt-4">
+        <!-- Yêu cầu gần đây -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-history mr-2"></i>{% trans "Yêu cầu gần đây" %}
+                    </h3>
+                    <div class="card-tools">
+                        <a href="{% url 'inventory_requests:my_requests' %}" class="btn btn-sm btn-primary">
+                            <i class="fas fa-eye mr-1"></i>{% trans "Xem tất cả" %}
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    {% if recent_requests %}
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>{% trans "Mã yêu cầu" %}</th>
+                                        <th>{% trans "Ngày tạo" %}</th>
+                                        <th>{% trans "Trạng thái" %}</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for request in recent_requests %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ request.request_code }}</strong>
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">
+                                                {{ request.created_at|date:"d/m/Y H:i" }}
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <span class="request-status status-{{ request.status }}">
+                                                {{ request.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td class="text-right">
+                                            <a href="{% url 'inventory_requests:inventory_request_detail' request.id %}" 
+                                               class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5 text-muted">
+                            <i class="fas fa-inbox fa-3x mb-3"></i>
+                            <p>{% trans "Chưa có yêu cầu nào" %}</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Lịch sử cấp phát -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-box-open mr-2"></i>{% trans "Lịch sử cấp phát" %}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    {% if recent_completed %}
+                        {% for request in recent_completed %}
+                        <div class="timeline-item completed">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1">
+                                        <strong>{{ request.request_code }}</strong>
+                                    </h6>
+                                    <small class="text-muted">
+                                        <i class="far fa-calendar mr-1"></i>
+                                        {{ request.completed_date|date:"d/m/Y H:i" }}
+                                    </small>
+                                    {% if request.warehouse_handler %}
+                                    <br>
+                                    <small class="text-muted">
+                                        <i class="fas fa-user mr-1"></i>
+                                        {% trans "Người xuất kho" %}: {{ request.warehouse_handler.get_full_name|default:request.warehouse_handler.username }}
+                                    </small>
+                                    {% endif %}
+                                </div>
+                                <a href="{% url 'inventory_requests:inventory_request_detail' request.id %}" 
+                                   class="btn btn-sm btn-outline-success">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4 text-muted">
+                            <i class="fas fa-inbox fa-2x mb-2"></i>
+                            <p class="mb-0">{% trans "Chưa có lịch sử cấp phát" %}</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Biểu đồ tỷ lệ phê duyệt (Doughnut)
+    const approvalCtx = document.getElementById('approvalChart').getContext('2d');
+    new Chart(approvalCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['{% trans "Đã duyệt" %}', '{% trans "Còn lại" %}'],
+            datasets: [{
+                data: [{{ approval_rate }}, {{ 100|add:approval_rate|mul:-1 }}],
+                backgroundColor: ['#28a745', '#e9ecef'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            cutout: '75%'
+        }
+    });
+
+    // Biểu đồ xu hướng (Line Chart)
+    const trendCtx = document.getElementById('trendChart').getContext('2d');
+    new Chart(trendCtx, {
+        type: 'line',
+        data: {
+            labels: {{ chart_months|safe }},
+            datasets: [
+                {
+                    label: '{% trans "Yêu cầu tạo mới" %}',
+                    data: {{ chart_created_data|safe }},
+                    borderColor: '#007bff',
+                    backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                },
+                {
+                    label: '{% trans "Đã hoàn thành" %}',
+                    data: {{ chart_completed_data|safe }},
+                    borderColor: '#28a745',
+                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

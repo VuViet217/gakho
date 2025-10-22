@@ -12,12 +12,146 @@ import json
 
 @method_decorator(login_required, name='dispatch')
 class MainDashboardView(TemplateView):
-    template_name = 'main_dashboard/dashboard.html'
+    
+    def get_template_names(self):
+        """Chọn template dựa trên role của user"""
+        user = self.request.user
+        
+        # Nếu là staff (nhân viên) hoặc viewer, hiển thị dashboard nhân viên
+        if user.role in ['staff', 'viewer']:
+            return ['main_dashboard/employee_dashboard.html']
+        
+        # Các role khác (sm, admin, manager) hiển thị dashboard quản lý
+        return ['main_dashboard/dashboard.html']
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'OVNC - Trang chủ'
+        user = self.request.user
         
+        # Nếu là nhân viên, hiển thị thông tin cá nhân
+        if user.role in ['staff', 'viewer']:
+            return self.get_employee_context(context)
+        
+        # Nếu là quản lý, hiển thị thông tin quản lý
+        return self.get_manager_context(context)
+    
+    def get_employee_context(self, context):
+        """Context cho dashboard nhân viên"""
+        user = self.request.user
+        today = timezone.now()
+        current_month_start = datetime(today.year, today.month, 1)
+        
+        from inventory_requests.models import InventoryRequest, EmployeeProductRequest
+        
+        # 1. Tổng số yêu cầu của nhân viên
+        total_requests = InventoryRequest.objects.filter(requester=user).count()
+        context['total_requests'] = total_requests
+        
+        # 2. Yêu cầu đang chờ xử lý
+        pending_requests = InventoryRequest.objects.filter(
+            requester=user,
+            status__in=['pending', 'approved', 'scheduled']
+        ).count()
+        context['pending_requests'] = pending_requests
+        
+        # 3. Yêu cầu đã hoàn thành
+        completed_requests = InventoryRequest.objects.filter(
+            requester=user,
+            status='completed'
+        ).count()
+        context['completed_requests'] = completed_requests
+        
+        # 4. Yêu cầu bị từ chối
+        rejected_requests = InventoryRequest.objects.filter(
+            requester=user,
+            status='rejected'
+        ).count()
+        context['rejected_requests'] = rejected_requests
+        
+        # 5. Thống kê theo tháng này
+        requests_this_month = InventoryRequest.objects.filter(
+            requester=user,
+            created_at__gte=current_month_start
+        ).count()
+        context['requests_this_month'] = requests_this_month
+        
+        completed_this_month = InventoryRequest.objects.filter(
+            requester=user,
+            status='completed',
+            completed_date__gte=current_month_start
+        ).count()
+        context['completed_this_month'] = completed_this_month
+        
+        # 6. Tổng số lượng sản phẩm đã nhận (tháng này)
+        total_items_received = EmployeeProductRequest.objects.filter(
+            request__requester=user,
+            request__status='completed',
+            request__completed_date__gte=current_month_start
+        ).aggregate(total=Sum('issued_quantity'))['total'] or 0
+        context['total_items_received'] = total_items_received
+        
+        # 7. Yêu cầu gần đây (5 yêu cầu mới nhất)
+        recent_requests = InventoryRequest.objects.filter(
+            requester=user
+        ).select_related('approver', 'warehouse_manager').order_by('-created_at')[:5]
+        context['recent_requests'] = recent_requests
+        
+        # 8. Lịch sử cấp phát gần đây (5 yêu cầu đã hoàn thành)
+        recent_completed = InventoryRequest.objects.filter(
+            requester=user,
+            status='completed'
+        ).select_related('approver', 'warehouse_manager').order_by('-completed_date')[:5]
+        context['recent_completed'] = recent_completed
+        
+        # 9. Biểu đồ yêu cầu 6 tháng gần nhất
+        months = []
+        created_data = []
+        completed_data = []
+        
+        for i in range(5, -1, -1):
+            month_date = today - timedelta(days=30*i)
+            month_start = datetime(month_date.year, month_date.month, 1)
+            if month_date.month == 12:
+                month_end = datetime(month_date.year + 1, 1, 1)
+            else:
+                month_end = datetime(month_date.year, month_date.month + 1, 1)
+            
+            month_label = f"T{month_date.month}"
+            months.append(month_label)
+            
+            # Số yêu cầu tạo trong tháng
+            created_count = InventoryRequest.objects.filter(
+                requester=user,
+                created_at__gte=month_start,
+                created_at__lt=month_end
+            ).count()
+            created_data.append(created_count)
+            
+            # Số yêu cầu hoàn thành trong tháng
+            completed_count = InventoryRequest.objects.filter(
+                requester=user,
+                status='completed',
+                completed_date__gte=month_start,
+                completed_date__lt=month_end
+            ).count()
+            completed_data.append(completed_count)
+        
+        context['chart_months'] = json.dumps(months)
+        context['chart_created_data'] = json.dumps(created_data)
+        context['chart_completed_data'] = json.dumps(completed_data)
+        
+        # 10. Tỷ lệ phê duyệt
+        if total_requests > 0:
+            approval_rate = int((completed_requests / total_requests) * 100)
+        else:
+            approval_rate = 0
+        context['approval_rate'] = approval_rate
+        
+        return context
+    
+    def get_manager_context(self, context):
+        """Context cho dashboard quản lý (code cũ)"""
         # Lấy thời gian hiện tại
         today = timezone.now()
         
