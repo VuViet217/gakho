@@ -321,3 +321,34 @@ msgstr "Mô tả"
 msgid "Ngày mong muốn nhận"
 msgstr "Ngày mong muốn nhận"
 
+# My Requests page translations
+msgid "Danh sách yêu cầu"
+msgstr "Danh sách yêu cầu"
+
+msgid "Mã yêu cầu"
+msgstr "Mã yêu cầu"
+
+msgid "Tiêu đề"
+msgstr "Tiêu đề"
+
+msgid "Ngày tạo"
+msgstr "Ngày tạo"
+
+msgid "Bản nháp"
+msgstr "Bản nháp"
+
+msgid "Chờ phê duyệt"
+msgstr "Chờ phê duyệt"
+
+msgid "Đã phê duyệt"
+msgstr "Đã phê duyệt"
+
+msgid "Bị từ chối"
+msgstr "Bị từ chối"
+
+msgid "Đã lên lịch"
+msgstr "Đã lên lịch"
+
+msgid "Đã hoàn thành"
+msgstr "Đã hoàn thành"
+

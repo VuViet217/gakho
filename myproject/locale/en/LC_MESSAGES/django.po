@@ -321,3 +321,34 @@ msgstr "Description"
 msgid "Ngày mong muốn nhận"
 msgstr "Expected Delivery Date"
 
+# My Requests page translations
+msgid "Danh sách yêu cầu"
+msgstr "Request List"
+
+msgid "Mã yêu cầu"
+msgstr "Request Code"
+
+msgid "Tiêu đề"
+msgstr "Title"
+
+msgid "Ngày tạo"
+msgstr "Created Date"
+
+msgid "Bản nháp"
+msgstr "Draft"
+
+msgid "Chờ phê duyệt"
+msgstr "Pending Approval"
+
+msgid "Đã phê duyệt"
+msgstr "Approved"
+
+msgid "Bị từ chối"
+msgstr "Rejected"
+
+msgid "Đã lên lịch"
+msgstr "Scheduled"
+
+msgid "Đã hoàn thành"
+msgstr "Completed"
+
