@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}{% if form.instance.pk %}Chỉnh sửa{% else %}Tạo yêu cầu{% endif %}{% endblock %}
+{% block title %}{% if form.instance.pk %}{% trans "Chỉnh sửa" %}{% else %}{% trans "Tạo yêu cầu" %}{% endif %}{% endblock %}
 
 {% block extra_css %}
 <!-- Select2 -->
@@ -26,13 +27,13 @@
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1>{% if form.instance.pk %}Chỉnh sửa{% else %}Tạo yêu cầu cấp phát mới{% endif %}</h1>
+                <h1>{% if form.instance.pk %}{% trans "Chỉnh sửa" %}{% else %}{% trans "Tạo yêu cầu cấp phát mới" %}{% endif %}</h1>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="{% url 'home' %}">Trang chủ</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'inventory_requests:my_requests' %}">Yêu cầu của tôi</a></li>
-                    <li class="breadcrumb-item active">{% if form.instance.pk %}Chỉnh sửa{% else %}Tạo mới{% endif %}</li>
+                    <li class="breadcrumb-item"><a href="{% url 'home' %}">{% trans "Trang chủ" %}</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'inventory_requests:my_requests' %}">{% trans "Yêu cầu của tôi" %}</a></li>
+                    <li class="breadcrumb-item active">{% if form.instance.pk %}{% trans "Chỉnh sửa" %}{% else %}{% trans "Tạo mới" %}{% endif %}</li>
                 </ol>
             </div>
         </div>
@@ -48,7 +49,7 @@
             {% csrf_token %}
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Chi tiết yêu cầu</h3>
+                    <h3 class="card-title">{% trans "Chi tiết yêu cầu" %}</h3>
                 </div>
                 <div class="card-body">
                     {% if form.errors %}
@@ -98,10 +99,10 @@
                     {% if use_employee_product %}
                     <div class="card mt-4">
                         <div class="card-header">
-                            <h3 class="card-title">Danh sách cấp phát</h3>
+                            <h3 class="card-title">{% trans "Danh sách cấp phát" %}</h3>
                             <div class="card-tools">
                                 <button type="button" class="btn btn-primary btn-sm" id="addEmployeeProductBtn">
-                                    <i class="fas fa-plus"></i> Thêm phân bổ
+                                    <i class="fas fa-plus"></i> {% trans "Thêm phân bổ" %}
                                 </button>
                             </div>
                         </div>
@@ -111,11 +112,11 @@
                                 <table class="table table-bordered" id="employeeProductTable">
                                     <thead>
                                         <tr>
-                                            <th>Nhân viên</th>
-                                            <th>Sản phẩm</th>
-                                            <th>Số lượng</th>
-                                            <th>Ghi chú</th>
-                                            <th style="width: 100px">Thao tác</th>
+                                            <th>{% trans "Nhân viên" %}</th>
+                                            <th>{% trans "Sản phẩm" %}</th>
+                                            <th>{% trans "Số lượng" %}</th>
+                                            <th>{% trans "Ghi chú" %}</th>
+                                            <th style="width: 100px">{% trans "Thao tác" %}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -211,13 +212,13 @@
                 </div>
                 <div class="card-footer">
                     <button type="submit" name="save_draft" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Lưu nháp
+                        <i class="fas fa-save"></i> {% trans "Lưu nháp" %}
                     </button>
                     <button type="submit" name="submit" class="btn btn-success">
-                        <i class="fas fa-paper-plane"></i> Gửi yêu cầu
+                        <i class="fas fa-paper-plane"></i> {% trans "Gửi yêu cầu" %}
                     </button>
                     <a href="{% if request.META.HTTP_REFERER %}{{ request.META.HTTP_REFERER }}{% else %}{% url 'inventory_requests:my_requests' %}{% endif %}" class="btn btn-secondary">
-                        <i class="fas fa-times"></i> Hủy
+                        <i class="fas fa-times"></i> {% trans "Hủy" %}
                     </a>
                 </div>
             </div>
@@ -287,10 +288,10 @@
         $.fn.select2.defaults.set("theme", "bootstrap4");
         $.fn.select2.defaults.set("language", {
             noResults: function() {
-                return "Không tìm thấy kết quả";
+                return "{% trans 'Không tìm thấy kết quả' %}";
             },
             searching: function() {
-                return "Đang tìm kiếm...";
+                return "{% trans 'Đang tìm kiếm...' %}";
             },
             inputTooShort: function() {
                 return ""; // Xóa thông báo "Please enter X or more characters"
@@ -300,7 +301,7 @@
         // Initialize Select2 Elements với khả năng tìm kiếm
         $('.select2').select2({
             theme: 'bootstrap4',
-            placeholder: "Chọn một giá trị",
+            placeholder: "{% trans 'Chọn một giá trị' %}",
             allowClear: true,
             width: '100%',
             minimumInputLength: 0,
@@ -315,7 +316,7 @@
         // Cấu hình riêng cho select nhân viên và sản phẩm
         $('select[name*="employee"]').select2({
             theme: 'bootstrap4',
-            placeholder: "Chọn nhân viên",
+            placeholder: "{% trans 'Chọn nhân viên' %}",
             allowClear: true,
             width: '100%',
             minimumInputLength: 0, // Hiển thị tất cả các lựa chọn khi mở dropdown
@@ -324,7 +325,7 @@
         
         $('select[name*="product"]').select2({
             theme: 'bootstrap4',
-            placeholder: "Chọn sản phẩm",
+            placeholder: "{% trans 'Chọn sản phẩm' %}",
             allowClear: true,
             width: '100%',
             minimumInputLength: 0, // Hiển thị tất cả các lựa chọn khi mở dropdown
@@ -407,7 +408,7 @@
             // Khởi tạo select2 cho các dropdown trong hàng mới vừa thêm
             $('#employeeProductTable tbody tr:last select[name*="employee"]').select2({
                 theme: 'bootstrap4',
-                placeholder: "Chọn nhân viên",
+                placeholder: "{% trans 'Chọn nhân viên' %}",
                 allowClear: true,
                 width: '100%',
                 minimumInputLength: 0,
@@ -416,7 +417,7 @@
             
             $('#employeeProductTable tbody tr:last select[name*="product"]').select2({
                 theme: 'bootstrap4',
-                placeholder: "Chọn sản phẩm",
+                placeholder: "{% trans 'Chọn sản phẩm' %}",
                 allowClear: true,
                 width: '100%',
                 minimumInputLength: 0,
@@ -448,7 +449,7 @@
             let isValid = true;
             
             if (employeeProductCount === 0) {
-                alert('Vui lòng thêm ít nhất một phân bổ sản phẩm.');
+                alert("{% trans 'Vui lòng thêm ít nhất một phân bổ sản phẩm.' %}");
                 isValid = false;
             }
             

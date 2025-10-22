@@ -144,3 +144,180 @@ msgstr "No low stock products"
 
 msgid "Xem tất cả sản phẩm"
 msgstr "View All Products"
+
+# Sidebar menu translations
+msgid "Quản lý nhà cung cấp"
+msgstr "Supplier Management"
+
+msgid "Danh sách nhà cung cấp"
+msgstr "Supplier List"
+
+msgid "Thêm nhà cung cấp"
+msgstr "Add Supplier"
+
+msgid "Danh sách đơn hàng"
+msgstr "Purchase Order List"
+
+msgid "Tạo đơn hàng mới"
+msgstr "Create New Order"
+
+msgid "Quản lý kho"
+msgstr "Warehouse Management"
+
+msgid "Danh sách sản phẩm"
+msgstr "Product List"
+
+msgid "Thêm sản phẩm"
+msgstr "Add Product"
+
+msgid "Phiếu nhập kho"
+msgstr "Stock Receipts"
+
+msgid "Tạo phiếu nhập kho"
+msgstr "Create Stock Receipt"
+
+msgid "Vị trí dãy"
+msgstr "Row Locations"
+
+msgid "Vị trí cột"
+msgstr "Column Locations"
+
+msgid "Danh mục sản phẩm"
+msgstr "Product Categories"
+
+msgid "Đơn vị tính"
+msgstr "Units of Measure"
+
+msgid "Quản lý nhân viên"
+msgstr "Employee Management"
+
+msgid "Danh sách nhân viên"
+msgstr "Employee List"
+
+msgid "Danh sách bộ phận"
+msgstr "Department List"
+
+msgid "Nhập xuất dữ liệu"
+msgstr "Import/Export Data"
+
+msgid "Quản lý người dùng"
+msgstr "User Management"
+
+msgid "Danh sách người dùng"
+msgstr "User List"
+
+msgid "Thêm người dùng"
+msgstr "Add User"
+
+msgid "Hồ sơ cá nhân"
+msgstr "Personal Profile"
+
+msgid "Yêu cầu cấp phát"
+msgstr "Request Management"
+
+msgid "Tạo yêu cầu mới"
+msgstr "Create New Request"
+
+msgid "Yêu cầu của tôi"
+msgstr "My Requests"
+
+msgid "Phê duyệt của tôi"
+msgstr "My Approvals"
+
+msgid "Quản lý kho - Xử lý"
+msgstr "Warehouse Processing"
+
+msgid "Tất cả yêu cầu"
+msgstr "All Requests"
+
+msgid "Lịch sử giao nhận"
+msgstr "Delivery History"
+
+msgid "Báo cáo"
+msgstr "Reports"
+
+msgid "Tổng quan"
+msgstr "Overview"
+
+msgid "Báo cáo tháng"
+msgstr "Monthly Report"
+
+msgid "Kiểm kê kho"
+msgstr "Inventory Audit"
+
+msgid "Cấu hình hệ thống"
+msgstr "System Settings"
+
+msgid "Cấu hình Email"
+msgstr "Email Configuration"
+
+msgid "Quản lý mẫu email"
+msgstr "Email Template Management"
+
+# Request form translations
+msgid "Chỉnh sửa"
+msgstr "Edit"
+
+msgid "Tạo yêu cầu"
+msgstr "Create Request"
+
+msgid "Tạo yêu cầu cấp phát mới"
+msgstr "Create New Supply Request"
+
+msgid "Trang chủ"
+msgstr "Home"
+
+msgid "Tạo mới"
+msgstr "Create New"
+
+msgid "Chi tiết yêu cầu"
+msgstr "Request Details"
+
+msgid "Danh sách cấp phát"
+msgstr "Supply List"
+
+msgid "Thêm phân bổ"
+msgstr "Add Allocation"
+
+msgid "Nhân viên"
+msgstr "Employee"
+
+msgid "Ghi chú"
+msgstr "Notes"
+
+msgid "Thao tác"
+msgstr "Actions"
+
+msgid "Lưu nháp"
+msgstr "Save Draft"
+
+msgid "Gửi yêu cầu"
+msgstr "Submit Request"
+
+msgid "Hủy"
+msgstr "Cancel"
+
+msgid "Không tìm thấy kết quả"
+msgstr "No results found"
+
+msgid "Đang tìm kiếm..."
+msgstr "Searching..."
+
+msgid "Chọn một giá trị"
+msgstr "Select a value"
+
+msgid "Chọn nhân viên"
+msgstr "Select Employee"
+
+msgid "Vui lòng thêm ít nhất một phân bổ sản phẩm."
+msgstr "Please add at least one product allocation."
+
+msgid "Tiêu đề yêu cầu"
+msgstr "Request Title"
+
+msgid "Mô tả"
+msgstr "Description"
+
+msgid "Ngày mong muốn nhận"
+msgstr "Expected Delivery Date"
+

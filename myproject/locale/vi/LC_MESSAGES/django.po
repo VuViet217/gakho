@@ -144,3 +144,180 @@ msgstr "Chưa có sản phẩm nào sắp hết hàng"
 
 msgid "Xem tất cả sản phẩm"
 msgstr "Xem tất cả sản phẩm"
+
+# Sidebar menu translations
+msgid "Quản lý nhà cung cấp"
+msgstr "Quản lý nhà cung cấp"
+
+msgid "Danh sách nhà cung cấp"
+msgstr "Danh sách nhà cung cấp"
+
+msgid "Thêm nhà cung cấp"
+msgstr "Thêm nhà cung cấp"
+
+msgid "Danh sách đơn hàng"
+msgstr "Danh sách đơn hàng"
+
+msgid "Tạo đơn hàng mới"
+msgstr "Tạo đơn hàng mới"
+
+msgid "Quản lý kho"
+msgstr "Quản lý kho"
+
+msgid "Danh sách sản phẩm"
+msgstr "Danh sách sản phẩm"
+
+msgid "Thêm sản phẩm"
+msgstr "Thêm sản phẩm"
+
+msgid "Phiếu nhập kho"
+msgstr "Phiếu nhập kho"
+
+msgid "Tạo phiếu nhập kho"
+msgstr "Tạo phiếu nhập kho"
+
+msgid "Vị trí dãy"
+msgstr "Vị trí dãy"
+
+msgid "Vị trí cột"
+msgstr "Vị trí cột"
+
+msgid "Danh mục sản phẩm"
+msgstr "Danh mục sản phẩm"
+
+msgid "Đơn vị tính"
+msgstr "Đơn vị tính"
+
+msgid "Quản lý nhân viên"
+msgstr "Quản lý nhân viên"
+
+msgid "Danh sách nhân viên"
+msgstr "Danh sách nhân viên"
+
+msgid "Danh sách bộ phận"
+msgstr "Danh sách bộ phận"
+
+msgid "Nhập xuất dữ liệu"
+msgstr "Nhập xuất dữ liệu"
+
+msgid "Quản lý người dùng"
+msgstr "Quản lý người dùng"
+
+msgid "Danh sách người dùng"
+msgstr "Danh sách người dùng"
+
+msgid "Thêm người dùng"
+msgstr "Thêm người dùng"
+
+msgid "Hồ sơ cá nhân"
+msgstr "Hồ sơ cá nhân"
+
+msgid "Yêu cầu cấp phát"
+msgstr "Yêu cầu cấp phát"
+
+msgid "Tạo yêu cầu mới"
+msgstr "Tạo yêu cầu mới"
+
+msgid "Yêu cầu của tôi"
+msgstr "Yêu cầu của tôi"
+
+msgid "Phê duyệt của tôi"
+msgstr "Phê duyệt của tôi"
+
+msgid "Quản lý kho - Xử lý"
+msgstr "Quản lý kho - Xử lý"
+
+msgid "Tất cả yêu cầu"
+msgstr "Tất cả yêu cầu"
+
+msgid "Lịch sử giao nhận"
+msgstr "Lịch sử giao nhận"
+
+msgid "Báo cáo"
+msgstr "Báo cáo"
+
+msgid "Tổng quan"
+msgstr "Tổng quan"
+
+msgid "Báo cáo tháng"
+msgstr "Báo cáo tháng"
+
+msgid "Kiểm kê kho"
+msgstr "Kiểm kê kho"
+
+msgid "Cấu hình hệ thống"
+msgstr "Cấu hình hệ thống"
+
+msgid "Cấu hình Email"
+msgstr "Cấu hình Email"
+
+msgid "Quản lý mẫu email"
+msgstr "Quản lý mẫu email"
+
+# Request form translations
+msgid "Chỉnh sửa"
+msgstr "Chỉnh sửa"
+
+msgid "Tạo yêu cầu"
+msgstr "Tạo yêu cầu"
+
+msgid "Tạo yêu cầu cấp phát mới"
+msgstr "Tạo yêu cầu cấp phát mới"
+
+msgid "Trang chủ"
+msgstr "Trang chủ"
+
+msgid "Tạo mới"
+msgstr "Tạo mới"
+
+msgid "Chi tiết yêu cầu"
+msgstr "Chi tiết yêu cầu"
+
+msgid "Danh sách cấp phát"
+msgstr "Danh sách cấp phát"
+
+msgid "Thêm phân bổ"
+msgstr "Thêm phân bổ"
+
+msgid "Nhân viên"
+msgstr "Nhân viên"
+
+msgid "Ghi chú"
+msgstr "Ghi chú"
+
+msgid "Thao tác"
+msgstr "Thao tác"
+
+msgid "Lưu nháp"
+msgstr "Lưu nháp"
+
+msgid "Gửi yêu cầu"
+msgstr "Gửi yêu cầu"
+
+msgid "Hủy"
+msgstr "Hủy"
+
+msgid "Không tìm thấy kết quả"
+msgstr "Không tìm thấy kết quả"
+
+msgid "Đang tìm kiếm..."
+msgstr "Đang tìm kiếm..."
+
+msgid "Chọn một giá trị"
+msgstr "Chọn một giá trị"
+
+msgid "Chọn nhân viên"
+msgstr "Chọn nhân viên"
+
+msgid "Vui lòng thêm ít nhất một phân bổ sản phẩm."
+msgstr "Vui lòng thêm ít nhất một phân bổ sản phẩm."
+
+msgid "Tiêu đề yêu cầu"
+msgstr "Tiêu đề yêu cầu"
+
+msgid "Mô tả"
+msgstr "Mô tả"
+
+msgid "Ngày mong muốn nhận"
+msgstr "Ngày mong muốn nhận"
+
