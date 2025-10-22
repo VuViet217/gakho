@@ -453,3 +453,76 @@ msgstr "Schedule Date"
 msgid "Không có yêu cầu nào đã lên lịch"
 msgstr "No scheduled requests yet"
 
+# Reports dashboard page
+msgid "Báo cáo Tổng quan"
+msgstr "Overview Report"
+
+msgid "Theo dõi và phân tích tình hình kho hàng"
+msgstr "Track and analyze warehouse situation"
+
+msgid "Tổng số sản phẩm"
+msgstr "Total Products"
+
+msgid "Đang quản lý"
+msgstr "Currently Managing"
+
+msgid "Cần bổ sung"
+msgstr "Need Replenishment"
+
+msgid "Dưới mức tối thiểu"
+msgstr "Below Minimum Level"
+
+msgid "Tháng"
+msgstr "Month"
+
+msgid "Sản phẩm cần bổ sung (Top 10)"
+msgstr "Products Need Replenishment (Top 10)"
+
+msgid "Hết hàng"
+msgstr "Out of Stock"
+
+msgid "Xem tất cả sản phẩm cần bổ sung"
+msgstr "View All Products Need Replenishment"
+
+msgid "Tuyệt vời!"
+msgstr "Excellent!"
+
+msgid "Tất cả sản phẩm đều đủ hàng"
+msgstr "All products are in stock"
+
+msgid "Thông tin tháng"
+msgstr "Monthly Information"
+
+msgid "Tháng hiện tại"
+msgstr "Current Month"
+
+msgid "Đã có báo cáo"
+msgstr "Report Available"
+
+msgid "Báo cáo tháng này đã được tạo"
+msgstr "This month's report has been created"
+
+msgid "Chưa có báo cáo"
+msgstr "No Report Yet"
+
+msgid "Hãy tạo báo cáo cho tháng này"
+msgstr "Please create report for this month"
+
+msgid "Xem báo cáo tháng"
+msgstr "View Monthly Report"
+
+msgid "Thao tác nhanh"
+msgstr "Quick Actions"
+
+msgid "sản phẩm"
+msgstr "products"
+
+msgid "Tạo phiếu kiểm kê"
+msgstr "Create Audit Sheet"
+
+msgid "Kiểm kê mới"
+msgstr "New Audit"
+
+msgid "Lịch sử kiểm kê"
+msgstr "Audit History"
+

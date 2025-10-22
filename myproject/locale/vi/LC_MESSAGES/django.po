@@ -453,3 +453,76 @@ msgstr "Ngày lên lịch"
 msgid "Không có yêu cầu nào đã lên lịch"
 msgstr "Không có yêu cầu nào đã lên lịch"
 
+# Reports dashboard page
+msgid "Báo cáo Tổng quan"
+msgstr "Báo cáo Tổng quan"
+
+msgid "Theo dõi và phân tích tình hình kho hàng"
+msgstr "Theo dõi và phân tích tình hình kho hàng"
+
+msgid "Tổng số sản phẩm"
+msgstr "Tổng số sản phẩm"
+
+msgid "Đang quản lý"
+msgstr "Đang quản lý"
+
+msgid "Cần bổ sung"
+msgstr "Cần bổ sung"
+
+msgid "Dưới mức tối thiểu"
+msgstr "Dưới mức tối thiểu"
+
+msgid "Tháng"
+msgstr "Tháng"
+
+msgid "Sản phẩm cần bổ sung (Top 10)"
+msgstr "Sản phẩm cần bổ sung (Top 10)"
+
+msgid "Hết hàng"
+msgstr "Hết hàng"
+
+msgid "Xem tất cả sản phẩm cần bổ sung"
+msgstr "Xem tất cả sản phẩm cần bổ sung"
+
+msgid "Tuyệt vời!"
+msgstr "Tuyệt vời!"
+
+msgid "Tất cả sản phẩm đều đủ hàng"
+msgstr "Tất cả sản phẩm đều đủ hàng"
+
+msgid "Thông tin tháng"
+msgstr "Thông tin tháng"
+
+msgid "Tháng hiện tại"
+msgstr "Tháng hiện tại"
+
+msgid "Đã có báo cáo"
+msgstr "Đã có báo cáo"
+
+msgid "Báo cáo tháng này đã được tạo"
+msgstr "Báo cáo tháng này đã được tạo"
+
+msgid "Chưa có báo cáo"
+msgstr "Chưa có báo cáo"
+
+msgid "Hãy tạo báo cáo cho tháng này"
+msgstr "Hãy tạo báo cáo cho tháng này"
+
+msgid "Xem báo cáo tháng"
+msgstr "Xem báo cáo tháng"
+
+msgid "Thao tác nhanh"
+msgstr "Thao tác nhanh"
+
+msgid "sản phẩm"
+msgstr "sản phẩm"
+
+msgid "Tạo phiếu kiểm kê"
+msgstr "Tạo phiếu kiểm kê"
+
+msgid "Kiểm kê mới"
+msgstr "Kiểm kê mới"
+
+msgid "Lịch sử kiểm kê"
+msgstr "Lịch sử kiểm kê"
+
