@@ -768,3 +768,79 @@ msgstr "Đã duyệt"
 msgid "Còn lại"
 msgstr "Còn lại"
 
+# Employee Delivery History translations
+msgid "Tra cứu lịch sử giao nhận"
+msgstr "Tra cứu lịch sử giao nhận"
+
+msgid "Nhập mã nhân viên hoặc tên nhân viên..."
+msgstr "Nhập mã nhân viên hoặc tên nhân viên..."
+
+msgid "Tìm kiếm"
+msgstr "Tìm kiếm"
+
+msgid "Ví dụ: \"NV001\" hoặc \"Nguyễn Văn A\""
+msgstr "Ví dụ: \"NV001\" hoặc \"Nguyễn Văn A\""
+
+msgid "Tìm thấy"
+msgstr "Tìm thấy"
+
+msgid "nhân viên - Vui lòng chọn:"
+msgstr "nhân viên - Vui lòng chọn:"
+
+msgid "Mã NV:"
+msgstr "Mã NV:"
+
+msgid "Bộ phận:"
+msgstr "Bộ phận:"
+
+msgid "Mã nhân viên:"
+msgstr "Mã nhân viên:"
+
+msgid "Họ tên:"
+msgstr "Họ tên:"
+
+msgid "Quản lý:"
+msgstr "Quản lý:"
+
+msgid "Tổng số:"
+msgstr "Tổng số:"
+
+msgid "lần nhận hàng"
+msgstr "lần nhận hàng"
+
+msgid "STT"
+msgstr "STT"
+
+msgid "Ngày phát hàng"
+msgstr "Ngày phát hàng"
+
+msgid "Mã sản phẩm"
+msgstr "Mã sản phẩm"
+
+msgid "Tên sản phẩm"
+msgstr "Tên sản phẩm"
+
+msgid "Số lượng"
+msgstr "Số lượng"
+
+msgid "Người yêu cầu"
+msgstr "Người yêu cầu"
+
+msgid "Chi tiết"
+msgstr "Chi tiết"
+
+msgid "Đầu"
+msgstr "Đầu"
+
+msgid "Trang"
+msgstr "Trang"
+
+msgid "Cuối"
+msgstr "Cuối"
+
+msgid "Nhân viên này chưa có lịch sử nhận hàng nào."
+msgstr "Nhân viên này chưa có lịch sử nhận hàng nào."
+
+msgid "Nhập mã nhân viên hoặc tên nhân viên để xem lịch sử giao nhận hàng hóa"
+msgstr "Nhập mã nhân viên hoặc tên nhân viên để xem lịch sử giao nhận hàng hóa"
+

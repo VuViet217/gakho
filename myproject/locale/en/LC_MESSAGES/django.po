@@ -768,3 +768,79 @@ msgstr "Approved"
 msgid "Còn lại"
 msgstr "Remaining"
 
+# Employee Delivery History translations
+msgid "Tra cứu lịch sử giao nhận"
+msgstr "Search Delivery History"
+
+msgid "Nhập mã nhân viên hoặc tên nhân viên..."
+msgstr "Enter employee code or name..."
+
+msgid "Tìm kiếm"
+msgstr "Search"
+
+msgid "Ví dụ: \"NV001\" hoặc \"Nguyễn Văn A\""
+msgstr "Example: \"EMP001\" or \"John Doe\""
+
+msgid "Tìm thấy"
+msgstr "Found"
+
+msgid "nhân viên - Vui lòng chọn:"
+msgstr "employees - Please select:"
+
+msgid "Mã NV:"
+msgstr "Emp Code:"
+
+msgid "Bộ phận:"
+msgstr "Department:"
+
+msgid "Mã nhân viên:"
+msgstr "Employee Code:"
+
+msgid "Họ tên:"
+msgstr "Full Name:"
+
+msgid "Quản lý:"
+msgstr "Manager:"
+
+msgid "Tổng số:"
+msgstr "Total:"
+
+msgid "lần nhận hàng"
+msgstr "deliveries"
+
+msgid "STT"
+msgstr "No."
+
+msgid "Ngày phát hàng"
+msgstr "Delivery Date"
+
+msgid "Mã sản phẩm"
+msgstr "Product Code"
+
+msgid "Tên sản phẩm"
+msgstr "Product Name"
+
+msgid "Số lượng"
+msgstr "Quantity"
+
+msgid "Người yêu cầu"
+msgstr "Requester"
+
+msgid "Chi tiết"
+msgstr "Details"
+
+msgid "Đầu"
+msgstr "First"
+
+msgid "Trang"
+msgstr "Page"
+
+msgid "Cuối"
+msgstr "Last"
+
+msgid "Nhân viên này chưa có lịch sử nhận hàng nào."
+msgstr "This employee has no delivery history yet."
+
+msgid "Nhập mã nhân viên hoặc tên nhân viên để xem lịch sử giao nhận hàng hóa"
+msgstr "Enter employee code or name to view delivery history"
+

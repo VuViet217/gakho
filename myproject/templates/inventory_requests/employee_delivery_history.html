@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load i18n %}
 
 {% block extra_css %}
 <style>
@@ -42,9 +43,9 @@
         <div class="col-12">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'inventory_requests:inventory_request_list' %}">Yêu cầu cấp phát</a></li>
-                    <li class="breadcrumb-item active">Lịch sử giao nhận</li>
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">{% trans "Dashboard" %}</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'inventory_requests:inventory_request_list' %}">{% trans "Yêu cầu cấp phát" %}</a></li>
+                    <li class="breadcrumb-item active">{% trans "Lịch sử giao nhận" %}</li>
                 </ol>
             </nav>
         </div>
@@ -69,7 +70,7 @@
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">
-                        <i class="fas fa-search mr-2"></i>Tra cứu lịch sử giao nhận
+                        <i class="fas fa-search mr-2"></i>{% trans "Tra cứu lịch sử giao nhận" %}
                     </h3>
                 </div>
                 <div class="card-body search-box">
@@ -80,19 +81,19 @@
                                     <input type="text" 
                                            name="search" 
                                            class="form-control form-control-lg" 
-                                           placeholder="Nhập mã nhân viên hoặc tên nhân viên..." 
+                                           placeholder="{% trans 'Nhập mã nhân viên hoặc tên nhân viên...' %}" 
                                            value="{{ search_query }}"
                                            autofocus>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <button type="submit" class="btn btn-primary btn-lg btn-block">
-                                    <i class="fas fa-search mr-2"></i>Tìm kiếm
+                                    <i class="fas fa-search mr-2"></i>{% trans "Tìm kiếm" %}
                                 </button>
                             </div>
                         </div>
                         <small class="form-text text-muted">
-                            <i class="fas fa-info-circle"></i> Ví dụ: "NV001" hoặc "Nguyễn Văn A"
+                            <i class="fas fa-info-circle"></i> {% trans "Ví dụ: \"NV001\" hoặc \"Nguyễn Văn A\"" %}
                         </small>
                     </form>
                 </div>
@@ -107,7 +108,7 @@
             <div class="card">
                 <div class="card-header bg-warning">
                     <h3 class="card-title">
-                        <i class="fas fa-users mr-2"></i>Tìm thấy {{ employees.count }} nhân viên - Vui lòng chọn:
+                        <i class="fas fa-users mr-2"></i>{% trans "Tìm thấy" %} {{ employees.count }} {% trans "nhân viên - Vui lòng chọn:" %}
                     </h3>
                 </div>
                 <div class="card-body">
@@ -121,10 +122,10 @@
                                         <i class="fas fa-user-circle mr-2"></i>{{ emp.full_name }}
                                     </h5>
                                     <p class="card-text mb-1">
-                                        <strong>Mã NV:</strong> {{ emp.employee_id }}
+                                        <strong>{% trans "Mã NV:" %}</strong> {{ emp.employee_id }}
                                     </p>
                                     <p class="card-text mb-0">
-                                        <strong>Bộ phận:</strong> {{ emp.department.name|default:"N/A" }}
+                                        <strong>{% trans "Bộ phận:" %}</strong> {{ emp.department.name|default:"N/A" }}
                                     </p>
                                 </div>
                             </div>
@@ -145,19 +146,19 @@
             <div class="employee-info">
                 <div class="row">
                     <div class="col-md-3">
-                        <strong><i class="fas fa-id-card mr-2"></i>Mã nhân viên:</strong>
+                        <strong><i class="fas fa-id-card mr-2"></i>{% trans "Mã nhân viên:" %}</strong>
                         <p class="mb-0">{{ employee.employee_id }}</p>
                     </div>
                     <div class="col-md-3">
-                        <strong><i class="fas fa-user mr-2"></i>Họ tên:</strong>
+                        <strong><i class="fas fa-user mr-2"></i>{% trans "Họ tên:" %}</strong>
                         <p class="mb-0">{{ employee.full_name }}</p>
                     </div>
                     <div class="col-md-3">
-                        <strong><i class="fas fa-building mr-2"></i>Bộ phận:</strong>
+                        <strong><i class="fas fa-building mr-2"></i>{% trans "Bộ phận:" %}</strong>
                         <p class="mb-0">{{ employee.department.name|default:"N/A" }}</p>
                     </div>
                     <div class="col-md-3">
-                        <strong><i class="fas fa-user-tie mr-2"></i>Quản lý:</strong>
+                        <strong><i class="fas fa-user-tie mr-2"></i>{% trans "Quản lý:" %}</strong>
                         <p class="mb-0">{{ employee.manager.get_full_name|default:"N/A" }}</p>
                     </div>
                 </div>
@@ -167,11 +168,11 @@
             <div class="card">
                 <div class="card-header bg-primary">
                     <h3 class="card-title">
-                        <i class="fas fa-history mr-2"></i>Lịch sử giao nhận
+                        <i class="fas fa-history mr-2"></i>{% trans "Lịch sử giao nhận" %}
                     </h3>
                     <div class="card-tools">
                         <span class="badge badge-light">
-                            Tổng số: {{ delivery_history.paginator.count }} lần nhận hàng
+                            {% trans "Tổng số:" %} {{ delivery_history.paginator.count }} {% trans "lần nhận hàng" %}
                         </span>
                     </div>
                 </div>
@@ -181,14 +182,14 @@
                         <table class="table table-striped table-hover history-table mb-0">
                             <thead class="thead-dark">
                                 <tr>
-                                    <th style="width: 50px;">STT</th>
-                                    <th style="width: 120px;">Mã yêu cầu</th>
-                                    <th style="width: 150px;">Ngày phát hàng</th>
-                                    <th style="width: 120px;">Mã sản phẩm</th>
-                                    <th>Tên sản phẩm</th>
-                                    <th style="width: 100px;" class="text-center">Số lượng</th>
-                                    <th style="width: 150px;">Người yêu cầu</th>
-                                    <th style="width: 100px;" class="text-center">Chi tiết</th>
+                                    <th style="width: 50px;">{% trans "STT" %}</th>
+                                    <th style="width: 120px;">{% trans "Mã yêu cầu" %}</th>
+                                    <th style="width: 150px;">{% trans "Ngày phát hàng" %}</th>
+                                    <th style="width: 120px;">{% trans "Mã sản phẩm" %}</th>
+                                    <th>{% trans "Tên sản phẩm" %}</th>
+                                    <th style="width: 100px;" class="text-center">{% trans "Số lượng" %}</th>
+                                    <th style="width: 150px;">{% trans "Người yêu cầu" %}</th>
+                                    <th style="width: 100px;" class="text-center">{% trans "Chi tiết" %}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -230,7 +231,7 @@
                             <ul class="pagination justify-content-center mb-0">
                                 {% if delivery_history.has_previous %}
                                 <li class="page-item">
-                                    <a class="page-link" href="?employee_id={{ employee.id }}&page=1">Đầu</a>
+                                    <a class="page-link" href="?employee_id={{ employee.id }}&page=1">{% trans "Đầu" %}</a>
                                 </li>
                                 <li class="page-item">
                                     <a class="page-link" href="?employee_id={{ employee.id }}&page={{ delivery_history.previous_page_number }}">
@@ -241,7 +242,7 @@
 
                                 <li class="page-item active">
                                     <span class="page-link">
-                                        Trang {{ delivery_history.number }} / {{ delivery_history.paginator.num_pages }}
+                                        {% trans "Trang" %} {{ delivery_history.number }} / {{ delivery_history.paginator.num_pages }}
                                     </span>
                                 </li>
 
@@ -252,7 +253,7 @@
                                     </a>
                                 </li>
                                 <li class="page-item">
-                                    <a class="page-link" href="?employee_id={{ employee.id }}&page={{ delivery_history.paginator.num_pages }}">Cuối</a>
+                                    <a class="page-link" href="?employee_id={{ employee.id }}&page={{ delivery_history.paginator.num_pages }}">{% trans "Cuối" %}</a>
                                 </li>
                                 {% endif %}
                             </ul>
@@ -263,7 +264,7 @@
                     {% else %}
                     <div class="p-4 text-center text-muted">
                         <i class="fas fa-inbox fa-3x mb-3"></i>
-                        <p class="mb-0">Nhân viên này chưa có lịch sử nhận hàng nào.</p>
+                        <p class="mb-0">{% trans "Nhân viên này chưa có lịch sử nhận hàng nào." %}</p>
                     </div>
                     {% endif %}
                 </div>
@@ -278,8 +279,8 @@
             <div class="card">
                 <div class="card-body text-center text-muted py-5">
                     <i class="fas fa-search fa-4x mb-3"></i>
-                    <h4>Tra cứu lịch sử giao nhận</h4>
-                    <p>Nhập mã nhân viên hoặc tên nhân viên để xem lịch sử giao nhận hàng hóa</p>
+                    <h4>{% trans "Tra cứu lịch sử giao nhận" %}</h4>
+                    <p>{% trans "Nhập mã nhân viên hoặc tên nhân viên để xem lịch sử giao nhận hàng hóa" %}</p>
                 </div>
             </div>
         </div>
