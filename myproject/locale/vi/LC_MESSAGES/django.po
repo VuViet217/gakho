@@ -352,3 +352,79 @@ msgstr "Đã lên lịch"
 msgid "Đã hoàn thành"
 msgstr "Đã hoàn thành"
 
+# Request detail and list pages
+msgid "Danh sách yêu cầu chờ phê duyệt"
+msgstr "Danh sách yêu cầu chờ phê duyệt"
+
+msgid "Danh sách các yêu cầu"
+msgstr "Danh sách các yêu cầu"
+
+msgid "Chi tiết yêu cầu cấp phát"
+msgstr "Chi tiết yêu cầu cấp phát"
+
+msgid "Chi tiết"
+msgstr "Chi tiết"
+
+msgid "Yêu cầu cấp phát"
+msgstr "Yêu cầu cấp phát"
+
+msgid "Thông tin yêu cầu"
+msgstr "Thông tin yêu cầu"
+
+msgid "Sửa"
+msgstr "Sửa"
+
+msgid "Gửi"
+msgstr "Gửi"
+
+msgid "Xóa"
+msgstr "Xóa"
+
+msgid "Lên lịch"
+msgstr "Lên lịch"
+
+msgid "In phiếu xuất kho"
+msgstr "In phiếu xuất kho"
+
+msgid "Thông tin lên lịch"
+msgstr "Thông tin lên lịch"
+
+msgid "Ngày giờ cấp phát"
+msgstr "Ngày giờ cấp phát"
+
+msgid "Phân bổ sản phẩm cho nhân viên"
+msgstr "Phân bổ sản phẩm cho nhân viên"
+
+msgid "STT"
+msgstr "STT"
+
+msgid "Chưa có phân bổ sản phẩm cho nhân viên"
+msgstr "Chưa có phân bổ sản phẩm cho nhân viên"
+
+msgid "Yêu cầu được tạo bởi"
+msgstr "Yêu cầu được tạo bởi"
+
+msgid "Yêu cầu được gửi đi"
+msgstr "Yêu cầu được gửi đi"
+
+msgid "Yêu cầu bị từ chối bởi"
+msgstr "Yêu cầu bị từ chối bởi"
+
+msgid "Lý do"
+msgstr "Lý do"
+
+msgid "Yêu cầu được phê duyệt bởi"
+msgstr "Yêu cầu được phê duyệt bởi"
+
+msgid "Yêu cầu được lên lịch bởi"
+msgstr "Yêu cầu được lên lịch bởi"
+
+msgid "Yêu cầu đã hoàn thành bởi"
+msgstr "Yêu cầu đã hoàn thành bởi"
+
+msgid "Lên lịch cấp phát"
+msgstr "Lên lịch cấp phát"
+
+msgid "Xác nhận"
+msgstr "Xác nhận"
+

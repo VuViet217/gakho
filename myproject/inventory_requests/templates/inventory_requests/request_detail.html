@@ -1,20 +1,21 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Chi tiết yêu cầu cấp phát #{{ request_obj.request_code }}{% endblock %}
+{% block title %}{% trans "Chi tiết yêu cầu cấp phát" %} #{{ request_obj.request_code }}{% endblock %}
 
 {% block content_header %}
 <section class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1>Chi tiết yêu cầu cấp phát #{{ request_obj.request_code }}</h1>
+                <h1>{% trans "Chi tiết yêu cầu cấp phát" %} #{{ request_obj.request_code }}</h1>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="{% url 'main_dashboard' %}">Trang chủ</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'inventory_requests:my_requests' %}">Yêu cầu cấp phát</a></li>
-                    <li class="breadcrumb-item active">Chi tiết</li>
+                    <li class="breadcrumb-item"><a href="{% url 'main_dashboard' %}">{% trans "Trang chủ" %}</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'inventory_requests:my_requests' %}">{% trans "Yêu cầu cấp phát" %}</a></li>
+                    <li class="breadcrumb-item active">{% trans "Chi tiết" %}</li>
                 </ol>
             </div>
         </div>
@@ -28,44 +29,44 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Thông tin yêu cầu</h3>
+                        <h3 class="card-title">{% trans "Thông tin yêu cầu" %}</h3>
                         <div class="card-tools">
                             {% if request_obj.status == 'draft' and request_obj.requester == user %}
                             <a href="{% url 'inventory_requests:inventory_request_edit' request_obj.id %}" class="btn btn-primary btn-sm">
-                                <i class="fas fa-edit"></i> Sửa
+                                <i class="fas fa-edit"></i> {% trans "Sửa" %}
                             </a>
                             <a href="{% url 'inventory_requests:inventory_request_submit' request_obj.id %}" class="btn btn-success btn-sm">
-                                <i class="fas fa-paper-plane"></i> Gửi
+                                <i class="fas fa-paper-plane"></i> {% trans "Gửi" %}
                             </a>
                             <a href="{% url 'inventory_requests:inventory_request_delete' request_obj.id %}" class="btn btn-danger btn-sm">
-                                <i class="fas fa-trash"></i> Xóa
+                                <i class="fas fa-trash"></i> {% trans "Xóa" %}
                             </a>
                             {% endif %}
                             
                             {% if request_obj.status == 'pending' and is_approver %}
                             <a href="{% url 'inventory_requests:inventory_request_approve' request_obj.id %}" class="btn btn-success btn-sm">
-                                <i class="fas fa-check"></i> Phê duyệt
+                                <i class="fas fa-check"></i> {% trans "Phê duyệt" %}
                             </a>
                             <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#rejectModal">
-                                <i class="fas fa-times"></i> Từ chối
+                                <i class="fas fa-times"></i> {% trans "Từ chối" %}
                             </button>
                             {% endif %}
                             
                             {% if request_obj.status == 'approved' and is_warehouse_manager %}
                             <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#scheduleModal">
-                                <i class="fas fa-calendar"></i> Lên lịch
+                                <i class="fas fa-calendar"></i> {% trans "Lên lịch" %}
                             </button>
                             {% endif %}
                             
                             {% if request_obj.status == 'scheduled' and is_warehouse_manager %}
                             <a href="{% url 'inventory_requests:inventory_request_complete' request_obj.id %}" class="btn btn-success btn-sm">
-                                <i class="fas fa-check-circle"></i> Hoàn thành
+                                <i class="fas fa-check-circle"></i> {% trans "Hoàn thành" %}
                             </a>
                             {% endif %}
                             
                             {% if request_obj.status == 'completed' and is_warehouse_manager %}
                             <a href="{% url 'inventory_requests:print_delivery_note' request_obj.id %}" class="btn btn-info btn-sm" target="_blank">
-                                <i class="fas fa-print"></i> In phiếu xuất kho
+                                <i class="fas fa-print"></i> {% trans "In phiếu xuất kho" %}
                             </a>
                             {% endif %}
                         </div>
@@ -76,14 +77,14 @@
                                 <div class="info-box">
                                     <span class="info-box-icon bg-info"><i class="far fa-clipboard"></i></span>
                                     <div class="info-box-content">
-                                        <span class="info-box-text">Tiêu đề</span>
+                                        <span class="info-box-text">{% trans "Tiêu đề" %}</span>
                                         <span class="info-box-number">{{ request_obj.title }}</span>
                                     </div>
                                 </div>
                                 <div class="info-box">
                                     <span class="info-box-icon bg-warning"><i class="far fa-calendar-alt"></i></span>
                                     <div class="info-box-content">
-                                        <span class="info-box-text">Ngày mong muốn nhận</span>
+                                        <span class="info-box-text">{% trans "Ngày mong muốn nhận" %}</span>
                                         <span class="info-box-number">{{ request_obj.expected_date|date:"d/m/Y" }}</span>
                                     </div>
                                 </div>
@@ -106,20 +107,20 @@
                                         {% endif %}
                                     </span>
                                     <div class="info-box-content">
-                                        <span class="info-box-text">Trạng thái</span>
+                                        <span class="info-box-text">{% trans "Trạng thái" %}</span>
                                         <span class="info-box-number">
                                             {% if request_obj.status == 'draft' %}
-                                            <span class="badge badge-secondary">Bản nháp</span>
+                                            <span class="badge badge-secondary">{% trans "Bản nháp" %}</span>
                                             {% elif request_obj.status == 'pending' %}
-                                            <span class="badge badge-info">Chờ phê duyệt</span>
+                                            <span class="badge badge-info">{% trans "Chờ phê duyệt" %}</span>
                                             {% elif request_obj.status == 'approved' %}
-                                            <span class="badge badge-success">Đã phê duyệt</span>
+                                            <span class="badge badge-success">{% trans "Đã phê duyệt" %}</span>
                                             {% elif request_obj.status == 'rejected' %}
-                                            <span class="badge badge-danger">Bị từ chối</span>
+                                            <span class="badge badge-danger">{% trans "Bị từ chối" %}</span>
                                             {% elif request_obj.status == 'scheduled' %}
-                                            <span class="badge badge-primary">Đã lên lịch</span>
+                                            <span class="badge badge-primary">{% trans "Đã lên lịch" %}</span>
                                             {% elif request_obj.status == 'completed' %}
-                                            <span class="badge badge-dark">Đã hoàn thành</span>
+                                            <span class="badge badge-dark">{% trans "Đã hoàn thành" %}</span>
                                             {% endif %}
                                         </span>
                                     </div>
@@ -127,7 +128,7 @@
                                 <div class="info-box">
                                     <span class="info-box-icon bg-primary"><i class="fas fa-user"></i></span>
                                     <div class="info-box-content">
-                                        <span class="info-box-text">Người tạo</span>
+                                        <span class="info-box-text">{% trans "Người tạo" %}</span>
                                         <span class="info-box-number">{{ request_obj.requester.get_full_name }}</span>
                                     </div>
                                 </div>
@@ -137,7 +138,7 @@
                         {% if request_obj.description %}
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title">Mô tả</h3>
+                                <h3 class="card-title">{% trans "Mô tả" %}</h3>
                             </div>
                             <div class="card-body">
                                 {{ request_obj.description|linebreaks }}
@@ -148,7 +149,7 @@
                         {% if request_obj.rejection_reason %}
                         <div class="card card-danger">
                             <div class="card-header">
-                                <h3 class="card-title">Lý do từ chối</h3>
+                                <h3 class="card-title">{% trans "Lý do từ chối" %}</h3>
                             </div>
                             <div class="card-body">
                                 {{ request_obj.rejection_reason|linebreaks }}
@@ -159,12 +160,12 @@
                         {% if request_obj.schedule_notes and request.status in 'scheduled,completed' %}
                         <div class="card card-primary">
                             <div class="card-header">
-                                <h3 class="card-title">Thông tin lên lịch</h3>
+                                <h3 class="card-title">{% trans "Thông tin lên lịch" %}</h3>
                             </div>
                             <div class="card-body">
-                                <p><strong>Ngày giờ cấp phát:</strong> {{ request_obj.scheduled_date|date:"d/m/Y H:i" }}</p>
+                                <p><strong>{% trans "Ngày giờ cấp phát" %}:</strong> {{ request_obj.scheduled_date|date:"d/m/Y H:i" }}</p>
                                 {% if request_obj.schedule_notes %}
-                                <p><strong>Ghi chú:</strong> {{ request_obj.schedule_notes|linebreaks }}</p>
+                                <p><strong>{% trans "Ghi chú" %}:</strong> {{ request_obj.schedule_notes|linebreaks }}</p>
                                 {% endif %}
                             </div>
                         </div>
@@ -177,17 +178,17 @@
                             <div class="col-md-12">
                                 <div class="card">
                                     <div class="card-header">
-                                        <h3 class="card-title">Phân bổ sản phẩm cho nhân viên</h3>
+                                        <h3 class="card-title">{% trans "Phân bổ sản phẩm cho nhân viên" %}</h3>
                                     </div>
                                     <div class="card-body p-0">
                                         <table class="table table-striped">
                                             <thead>
                                                 <tr>
-                                                    <th>STT</th>
-                                                    <th>Nhân viên</th>
-                                                    <th>Sản phẩm</th>
-                                                    <th>Số lượng</th>
-                                                    <th>Ghi chú</th>
+                                                    <th>{% trans "STT" %}</th>
+                                                    <th>{% trans "Nhân viên" %}</th>
+                                                    <th>{% trans "Sản phẩm" %}</th>
+                                                    <th>{% trans "Số lượng" %}</th>
+                                                    <th>{% trans "Ghi chú" %}</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -201,7 +202,7 @@
                                                 </tr>
                                                 {% empty %}
                                                 <tr>
-                                                    <td colspan="5" class="text-center">Chưa có phân bổ sản phẩm cho nhân viên</td>
+                                                    <td colspan="5" class="text-center">{% trans "Chưa có phân bổ sản phẩm cho nhân viên" %}</td>
                                                 </tr>
                                                 {% endfor %}
                                             </tbody>
@@ -223,7 +224,7 @@
                                         <i class="fas fa-pencil-alt bg-blue"></i>
                                         <div class="timeline-item">
                                             <span class="time"><i class="fas fa-clock"></i> {{ request_obj.created_at|date:"d/m/Y H:i" }}</span>
-                                            <h3 class="timeline-header">Yêu cầu được tạo bởi {{ request_obj.requester.get_full_name }}</h3>
+                                            <h3 class="timeline-header">{% trans "Yêu cầu được tạo bởi" %} {{ request_obj.requester.get_full_name }}</h3>
                                         </div>
                                     </div>
                                     
@@ -232,7 +233,7 @@
                                         <i class="fas fa-paper-plane bg-info"></i>
                                         <div class="timeline-item">
                                             <span class="time"><i class="fas fa-clock"></i> {{ request_obj.submitted_at|date:"d/m/Y H:i" }}</span>
-                                            <h3 class="timeline-header">Yêu cầu được gửi đi</h3>
+                                            <h3 class="timeline-header">{% trans "Yêu cầu được gửi đi" %}</h3>
                                         </div>
                                     </div>
                                     {% endif %}
@@ -243,10 +244,10 @@
                                         <i class="fas fa-times bg-danger"></i>
                                         <div class="timeline-item">
                                             <span class="time"><i class="fas fa-clock"></i> {{ request_obj.approval_date|date:"d/m/Y H:i" }}</span>
-                                            <h3 class="timeline-header">Yêu cầu bị từ chối bởi {{ request_obj.approver.get_full_name }}</h3>
+                                            <h3 class="timeline-header">{% trans "Yêu cầu bị từ chối bởi" %} {{ request_obj.approver.get_full_name }}</h3>
                                             {% if request_obj.rejection_reason %}
                                             <div class="timeline-body">
-                                                <strong>Lý do:</strong> {{ request_obj.rejection_reason }}
+                                                <strong>{% trans "Lý do" %}:</strong> {{ request_obj.rejection_reason }}
                                             </div>
                                             {% endif %}
                                         </div>
@@ -254,7 +255,7 @@
                                         <i class="fas fa-check bg-success"></i>
                                         <div class="timeline-item">
                                             <span class="time"><i class="fas fa-clock"></i> {{ request_obj.approval_date|date:"d/m/Y H:i" }}</span>
-                                            <h3 class="timeline-header">Yêu cầu được phê duyệt bởi {{ request_obj.approver.get_full_name }}</h3>
+                                            <h3 class="timeline-header">{% trans "Yêu cầu được phê duyệt bởi" %} {{ request_obj.approver.get_full_name }}</h3>
                                         </div>
                                         {% endif %}
                                     </div>
@@ -265,11 +266,11 @@
                                         <i class="fas fa-calendar-check bg-primary"></i>
                                         <div class="timeline-item">
                                             <span class="time"><i class="fas fa-clock"></i> {{ request_obj.scheduled_at|date:"d/m/Y H:i" }}</span>
-                                            <h3 class="timeline-header">Yêu cầu được lên lịch bởi {{ request_obj.warehouse_manager.get_full_name }}</h3>
+                                            <h3 class="timeline-header">{% trans "Yêu cầu được lên lịch bởi" %} {{ request_obj.warehouse_manager.get_full_name }}</h3>
                                             <div class="timeline-body">
-                                                <strong>Ngày giờ cấp phát:</strong> {{ request_obj.scheduled_date|date:"d/m/Y H:i" }}
+                                                <strong>{% trans "Ngày giờ cấp phát" %}:</strong> {{ request_obj.scheduled_date|date:"d/m/Y H:i" }}
                                                 {% if request_obj.schedule_notes %}
-                                                <br><strong>Ghi chú:</strong> {{ request_obj.schedule_notes }}
+                                                <br><strong>{% trans "Ghi chú" %}:</strong> {{ request_obj.schedule_notes }}
                                                 {% endif %}
                                             </div>
                                         </div>
@@ -281,7 +282,7 @@
                                         <i class="fas fa-check-double bg-dark"></i>
                                         <div class="timeline-item">
                                             <span class="time"><i class="fas fa-clock"></i> {{ request_obj.completed_date|date:"d/m/Y H:i" }}</span>
-                                            <h3 class="timeline-header">Yêu cầu đã hoàn thành bởi {{ request_obj.warehouse_manager.get_full_name }}</h3>
+                                            <h3 class="timeline-header">{% trans "Yêu cầu đã hoàn thành bởi" %} {{ request_obj.warehouse_manager.get_full_name }}</h3>
                                         </div>
                                     </div>
                                     {% endif %}
@@ -306,20 +307,20 @@
                 <form action="{% url 'inventory_requests:request_reject' request_obj.id %}" method="post">
                     {% csrf_token %}
                     <div class="modal-header">
-                        <h5 class="modal-title" id="rejectModalLabel">Từ chối yêu cầu</h5>
+                        <h5 class="modal-title" id="rejectModalLabel">{% trans "Từ chối yêu cầu" %}</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                            <label for="rejection_reason">Lý do từ chối</label>
+                            <label for="rejection_reason">{% trans "Lý do từ chối" %}</label>
                             <textarea class="form-control" id="rejection_reason" name="rejection_reason" rows="4" required></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
-                        <button type="submit" class="btn btn-danger">Từ chối</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">{% trans "Hủy" %}</button>
+                        <button type="submit" class="btn btn-danger">{% trans "Từ chối" %}</button>
                     </div>
                 </form>
             </div>
@@ -335,24 +336,24 @@
                 <form action="{% url 'inventory_requests:inventory_request_schedule' request_obj.id %}" method="post">
                     {% csrf_token %}
                     <div class="modal-header">
-                        <h5 class="modal-title" id="scheduleModalLabel">Lên lịch cấp phát</h5>
+                        <h5 class="modal-title" id="scheduleModalLabel">{% trans "Lên lịch cấp phát" %}</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                            <label for="scheduled_date">Ngày giờ cấp phát</label>
+                            <label for="scheduled_date">{% trans "Ngày giờ cấp phát" %}</label>
                             <input type="datetime-local" class="form-control" id="scheduled_date" name="scheduled_date" required>
                         </div>
                         <div class="form-group">
-                            <label for="schedule_notes">Ghi chú</label>
+                            <label for="schedule_notes">{% trans "Ghi chú" %}</label>
                             <textarea class="form-control" id="schedule_notes" name="schedule_notes" rows="3"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
-                        <button type="submit" class="btn btn-primary">Xác nhận</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">{% trans "Hủy" %}</button>
+                        <button type="submit" class="btn btn-primary">{% trans "Xác nhận" %}</button>
                     </div>
                 </form>
             </div>

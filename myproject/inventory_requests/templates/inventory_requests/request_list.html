@@ -1,19 +1,20 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Danh sách yêu cầu{% endblock %}
+{% block title %}{% trans "Danh sách yêu cầu" %}{% endblock %}
 
 {% block content_header %}
 <section class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1>Danh sách yêu cầu</h1>
+                <h1>{% trans "Danh sách yêu cầu" %}</h1>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="{% url 'main_dashboard' %}">Trang chủ</a></li>
-                    <li class="breadcrumb-item active">Danh sách yêu cầu</li>
+                    <li class="breadcrumb-item"><a href="{% url 'main_dashboard' %}">{% trans "Trang chủ" %}</a></li>
+                    <li class="breadcrumb-item active">{% trans "Danh sách yêu cầu" %}</li>
                 </ol>
             </div>
         </div>
@@ -27,10 +28,10 @@
     <div class="container-fluid">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Danh sách các yêu cầu</h3>
+                <h3 class="card-title">{% trans "Danh sách các yêu cầu" %}</h3>
                 <div class="card-tools">
                     <a href="{% url 'inventory_requests:inventory_request_create' %}" class="btn btn-primary btn-sm">
-                        <i class="fas fa-plus"></i> Tạo yêu cầu mới
+                        <i class="fas fa-plus"></i> {% trans "Tạo yêu cầu mới" %}
                     </a>
                 </div>
             </div>
@@ -38,13 +39,13 @@
                 <table class="table table-bordered table-hover datatable">
                     <thead>
                         <tr>
-                            <th>Mã yêu cầu</th>
-                            <th>Tiêu đề</th>
-                            <th>Người tạo</th>
-                            <th>Ngày mong muốn nhận</th>
-                            <th>Trạng thái</th>
-                            <th>Ngày tạo</th>
-                            <th>Thao tác</th>
+                            <th>{% trans "Mã yêu cầu" %}</th>
+                            <th>{% trans "Tiêu đề" %}</th>
+                            <th>{% trans "Người tạo" %}</th>
+                            <th>{% trans "Ngày mong muốn nhận" %}</th>
+                            <th>{% trans "Trạng thái" %}</th>
+                            <th>{% trans "Ngày tạo" %}</th>
+                            <th>{% trans "Thao tác" %}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -56,17 +57,17 @@
                             <td>{{ request.expected_date|date:"d/m/Y" }}</td>
                             <td>
                                 {% if request.status == 'draft' %}
-                                <span class="badge badge-secondary">Bản nháp</span>
+                                <span class="badge badge-secondary">{% trans "Bản nháp" %}</span>
                                 {% elif request.status == 'pending' %}
-                                <span class="badge badge-info">Chờ phê duyệt</span>
+                                <span class="badge badge-info">{% trans "Chờ phê duyệt" %}</span>
                                 {% elif request.status == 'approved' %}
-                                <span class="badge badge-success">Đã phê duyệt</span>
+                                <span class="badge badge-success">{% trans "Đã phê duyệt" %}</span>
                                 {% elif request.status == 'rejected' %}
-                                <span class="badge badge-danger">Bị từ chối</span>
+                                <span class="badge badge-danger">{% trans "Bị từ chối" %}</span>
                                 {% elif request.status == 'scheduled' %}
-                                <span class="badge badge-primary">Đã lên lịch</span>
+                                <span class="badge badge-primary">{% trans "Đã lên lịch" %}</span>
                                 {% elif request.status == 'completed' %}
-                                <span class="badge badge-dark">Đã hoàn thành</span>
+                                <span class="badge badge-dark">{% trans "Đã hoàn thành" %}</span>
                                 {% endif %}
                             </td>
                             <td>{{ request.created_at|date:"d/m/Y H:i" }}</td>

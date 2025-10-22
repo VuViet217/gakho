@@ -352,3 +352,79 @@ msgstr "Scheduled"
 msgid "Đã hoàn thành"
 msgstr "Completed"
 
+# Request detail and list pages
+msgid "Danh sách yêu cầu chờ phê duyệt"
+msgstr "Pending Approval Requests List"
+
+msgid "Danh sách các yêu cầu"
+msgstr "All Requests List"
+
+msgid "Chi tiết yêu cầu cấp phát"
+msgstr "Supply Request Details"
+
+msgid "Chi tiết"
+msgstr "Details"
+
+msgid "Yêu cầu cấp phát"
+msgstr "Supply Request"
+
+msgid "Thông tin yêu cầu"
+msgstr "Request Information"
+
+msgid "Sửa"
+msgstr "Edit"
+
+msgid "Gửi"
+msgstr "Submit"
+
+msgid "Xóa"
+msgstr "Delete"
+
+msgid "Lên lịch"
+msgstr "Schedule"
+
+msgid "In phiếu xuất kho"
+msgstr "Print Delivery Note"
+
+msgid "Thông tin lên lịch"
+msgstr "Schedule Information"
+
+msgid "Ngày giờ cấp phát"
+msgstr "Delivery Date & Time"
+
+msgid "Phân bổ sản phẩm cho nhân viên"
+msgstr "Product Allocation to Employees"
+
+msgid "STT"
+msgstr "No."
+
+msgid "Chưa có phân bổ sản phẩm cho nhân viên"
+msgstr "No product allocation to employees yet"
+
+msgid "Yêu cầu được tạo bởi"
+msgstr "Request created by"
+
+msgid "Yêu cầu được gửi đi"
+msgstr "Request submitted"
+
+msgid "Yêu cầu bị từ chối bởi"
+msgstr "Request rejected by"
+
+msgid "Lý do"
+msgstr "Reason"
+
+msgid "Yêu cầu được phê duyệt bởi"
+msgstr "Request approved by"
+
+msgid "Yêu cầu được lên lịch bởi"
+msgstr "Request scheduled by"
+
+msgid "Yêu cầu đã hoàn thành bởi"
+msgstr "Request completed by"
+
+msgid "Lên lịch cấp phát"
+msgstr "Schedule Delivery"
+
+msgid "Xác nhận"
+msgstr "Confirm"
+
