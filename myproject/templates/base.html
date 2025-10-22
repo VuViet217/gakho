@@ -16,6 +16,16 @@
   <!-- Theme style -->
   <link rel="stylesheet" href="/static/admin-lte/dist/css/adminlte.min.css">
   <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+  <style>
+    /* Vô hiệu hóa collapse cho menu yêu cầu cấp phát của nhân viên */
+    .disabled-collapse {
+      pointer-events: none !important;
+      cursor: default !important;
+    }
+    .disabled-collapse:hover {
+      background-color: transparent !important;
+    }
+  </style>
   {% block extra_css %}{% endblock %}
 </head>
 <body class="hold-transition sidebar-mini">
@@ -189,15 +199,17 @@
           {% endif %}
           
           <!-- Inventory Requests (Yêu cầu cấp phát) -->
-          <li class="nav-item has-treeview {% if menu.inventory_requests.open %}menu-open{% endif %}">
-            <a href="#" class="nav-link {% if menu.inventory_requests.active %}active{% endif %}">
+          <li class="nav-item has-treeview {% if menu.inventory_requests.open %}menu-open{% endif %} {% if request.user.role == 'staff' or request.user.role == 'viewer' %}menu-is-opening menu-open{% endif %}">
+            <a href="#" class="nav-link {% if menu.inventory_requests.active %}active{% endif %} {% if request.user.role == 'staff' or request.user.role == 'viewer' %}disabled-collapse{% endif %}">
               <i class="{{ menu.inventory_requests.icon }} nav-icon"></i>
               <p>
                 {{ menu.inventory_requests.name }}
+                {% if request.user.role != 'staff' and request.user.role != 'viewer' %}
                 <i class="right fas fa-angle-left"></i>
+                {% endif %}
               </p>
             </a>
-            <ul class="nav nav-treeview">
+            <ul class="nav nav-treeview" {% if request.user.role == 'staff' or request.user.role == 'viewer' %}style="display: block !important;"{% endif %}>
               {% for item in menu.inventory_requests.items %}
                 {% if not item.roles or request.user.role in item.roles or request.user.is_superuser %}
                 <li class="nav-item">
