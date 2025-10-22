@@ -47,3 +47,100 @@ msgstr "Remember me"
 
 msgid "Quên mật khẩu?"
 msgstr "Forgot password?"
+
+# Dashboard translations
+msgid "Dashboard"
+msgstr "Dashboard"
+
+msgid "Sản phẩm"
+msgstr "Products"
+
+msgid "Đơn đặt hàng (PO)"
+msgstr "Purchase Orders (PO)"
+
+msgid "Nhà cung cấp"
+msgstr "Suppliers"
+
+msgid "Sản phẩm sắp hết"
+msgstr "Low Stock Products"
+
+msgid "Thống kê nhập xuất kho theo tháng"
+msgstr "Monthly Inventory Statistics"
+
+msgid "Mục tiêu hoàn thành"
+msgstr "Completion Goals"
+
+msgid "Nhập kho từ PO (tháng này)"
+msgstr "PO Receipts (This Month)"
+
+msgid "Yêu cầu hoàn thành (tháng này)"
+msgstr "Completed Requests (This Month)"
+
+msgid "Sản phẩm tồn kho đủ"
+msgstr "Sufficient Stock Products"
+
+msgid "Tỷ lệ phê duyệt (tháng này)"
+msgstr "Approval Rate (This Month)"
+
+msgid "Nhập/Xuất: Tháng"
+msgstr "Import/Export: Month"
+
+msgid "Loại"
+msgstr "Type"
+
+msgid "Số lượng"
+msgstr "Quantity"
+
+msgid "Nhập kho"
+msgstr "Import"
+
+msgid "Xuất kho"
+msgstr "Export"
+
+msgid "PO gần đây"
+msgstr "Recent POs"
+
+msgid "Xem tất cả"
+msgstr "View All"
+
+msgid "Mã PO"
+msgstr "PO Code"
+
+msgid "Ngày tạo"
+msgstr "Created Date"
+
+msgid "Trạng thái"
+msgstr "Status"
+
+msgid "Nháp"
+msgstr "Draft"
+
+msgid "Chờ duyệt"
+msgstr "Pending"
+
+msgid "Đã duyệt"
+msgstr "Approved"
+
+msgid "Hoàn thành"
+msgstr "Completed"
+
+msgid "Đã hủy"
+msgstr "Cancelled"
+
+msgid "Chưa có đơn đặt hàng nào"
+msgstr "No purchase orders yet"
+
+msgid "Sản phẩm sắp hết hàng"
+msgstr "Low Stock Products"
+
+msgid "Tồn"
+msgstr "Stock"
+
+msgid "Tối thiểu"
+msgstr "Minimum"
+
+msgid "Chưa có sản phẩm nào sắp hết hàng"
+msgstr "No low stock products"
+
+msgid "Xem tất cả sản phẩm"
+msgstr "View All Products"

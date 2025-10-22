@@ -47,3 +47,100 @@ msgstr "Nhớ mật khẩu"
 
 msgid "Quên mật khẩu?"
 msgstr "Quên mật khẩu?"
+
+# Dashboard translations
+msgid "Dashboard"
+msgstr "Dashboard"
+
+msgid "Sản phẩm"
+msgstr "Sản phẩm"
+
+msgid "Đơn đặt hàng (PO)"
+msgstr "Đơn đặt hàng (PO)"
+
+msgid "Nhà cung cấp"
+msgstr "Nhà cung cấp"
+
+msgid "Sản phẩm sắp hết"
+msgstr "Sản phẩm sắp hết"
+
+msgid "Thống kê nhập xuất kho theo tháng"
+msgstr "Thống kê nhập xuất kho theo tháng"
+
+msgid "Mục tiêu hoàn thành"
+msgstr "Mục tiêu hoàn thành"
+
+msgid "Nhập kho từ PO (tháng này)"
+msgstr "Nhập kho từ PO (tháng này)"
+
+msgid "Yêu cầu hoàn thành (tháng này)"
+msgstr "Yêu cầu hoàn thành (tháng này)"
+
+msgid "Sản phẩm tồn kho đủ"
+msgstr "Sản phẩm tồn kho đủ"
+
+msgid "Tỷ lệ phê duyệt (tháng này)"
+msgstr "Tỷ lệ phê duyệt (tháng này)"
+
+msgid "Nhập/Xuất: Tháng"
+msgstr "Nhập/Xuất: Tháng"
+
+msgid "Loại"
+msgstr "Loại"
+
+msgid "Số lượng"
+msgstr "Số lượng"
+
+msgid "Nhập kho"
+msgstr "Nhập kho"
+
+msgid "Xuất kho"
+msgstr "Xuất kho"
+
+msgid "PO gần đây"
+msgstr "PO gần đây"
+
+msgid "Xem tất cả"
+msgstr "Xem tất cả"
+
+msgid "Mã PO"
+msgstr "Mã PO"
+
+msgid "Ngày tạo"
+msgstr "Ngày tạo"
+
+msgid "Trạng thái"
+msgstr "Trạng thái"
+
+msgid "Nháp"
+msgstr "Nháp"
+
+msgid "Chờ duyệt"
+msgstr "Chờ duyệt"
+
+msgid "Đã duyệt"
+msgstr "Đã duyệt"
+
+msgid "Hoàn thành"
+msgstr "Hoàn thành"
+
+msgid "Đã hủy"
+msgstr "Đã hủy"
+
+msgid "Chưa có đơn đặt hàng nào"
+msgstr "Chưa có đơn đặt hàng nào"
+
+msgid "Sản phẩm sắp hết hàng"
+msgstr "Sản phẩm sắp hết hàng"
+
+msgid "Tồn"
+msgstr "Tồn"
+
+msgid "Tối thiểu"
+msgstr "Tối thiểu"
+
+msgid "Chưa có sản phẩm nào sắp hết hàng"
+msgstr "Chưa có sản phẩm nào sắp hết hàng"
+
+msgid "Xem tất cả sản phẩm"
+msgstr "Xem tất cả sản phẩm"
