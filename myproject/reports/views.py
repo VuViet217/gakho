@@ -570,11 +570,11 @@ def audit_pdf(request, audit_id):
     from reportlab.lib.pagesizes import A4, landscape
     from reportlab.lib import colors
     from reportlab.lib.units import mm
-    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from reportlab.pdfbase import pdfmetrics
     from reportlab.pdfbase.ttfonts import TTFont
-    from reportlab.lib.enums import TA_CENTER
+    from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
     from io import BytesIO
     import os
     from django.conf import settings
@@ -582,93 +582,221 @@ def audit_pdf(request, audit_id):
     audit = get_object_or_404(InventoryAudit.objects.select_related('created_by'), id=audit_id)
     items = audit.items.select_related('product__category', 'product__unit').order_by('product__product_code')
     
-    # Đăng ký font
+    # Đăng ký font tiếng Việt
     arial_font_path = os.path.join(settings.BASE_DIR, 'static', 'fonts', 'Arial.ttf')
-    arial_bold_path = os.path.join(settings.BASE_DIR, 'static', 'fonts', 'Arial_Bold.ttf')
+    arial_bold_path = os.path.join(settings.BASE_DIR, 'static', 'fonts', 'Arial-Bold.ttf')
     
-    if os.path.exists(arial_font_path):
-        pdfmetrics.registerFont(TTFont('Arial', arial_font_path))
-    if os.path.exists(arial_bold_path):
-        pdfmetrics.registerFont(TTFont('Arial-Bold', arial_bold_path))
+    try:
+        if os.path.exists(arial_font_path):
+            pdfmetrics.registerFont(TTFont('ArialUnicode', arial_font_path))
+        if os.path.exists(arial_bold_path):
+            pdfmetrics.registerFont(TTFont('ArialUnicode-Bold', arial_bold_path))
+    except:
+        pass
     
     buffer = BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=landscape(A4), topMargin=15*mm, bottomMargin=15*mm)
+    doc = SimpleDocTemplate(
+        buffer, 
+        pagesize=landscape(A4), 
+        topMargin=10*mm, 
+        bottomMargin=20*mm,
+        leftMargin=10*mm,
+        rightMargin=10*mm
+    )
     elements = []
     
     styles = getSampleStyleSheet()
+    
+    # Style cho tiêu đề
     title_style = ParagraphStyle(
         'CustomTitle',
         parent=styles['Heading1'],
-        fontName='Arial-Bold' if os.path.exists(arial_bold_path) else 'Helvetica-Bold',
+        fontName='ArialUnicode-Bold',
         fontSize=16,
-        textColor=colors.HexColor('#2c3e50'),
-        spaceAfter=5*mm,
-        alignment=TA_CENTER
+        textColor=colors.HexColor('#1a237e'),
+        spaceAfter=3*mm,
+        alignment=TA_CENTER,
+        leading=20
     )
     
     subtitle_style = ParagraphStyle(
         'CustomSubtitle',
         parent=styles['Normal'],
-        fontName='Arial' if os.path.exists(arial_font_path) else 'Helvetica',
-        fontSize=11,
-        textColor=colors.HexColor('#7f8c8d'),
-        spaceAfter=8*mm,
-        alignment=TA_CENTER
+        fontName='ArialUnicode',
+        fontSize=12,
+        textColor=colors.HexColor('#424242'),
+        spaceAfter=2*mm,
+        alignment=TA_CENTER,
+        leading=16
     )
     
-    # Title
-    title = Paragraph(f"PHIẾU KIỂM KÊ KHO - {audit.audit_code}", title_style)
+    info_style = ParagraphStyle(
+        'InfoStyle',
+        parent=styles['Normal'],
+        fontName='ArialUnicode',
+        fontSize=10,
+        textColor=colors.HexColor('#212121'),
+        leading=14
+    )
+    
+    signature_style = ParagraphStyle(
+        'SignatureStyle',
+        parent=styles['Normal'],
+        fontName='ArialUnicode',
+        fontSize=10,
+        textColor=colors.HexColor('#212121'),
+        alignment=TA_CENTER,
+        leading=14,
+        spaceAfter=2*mm
+    )
+    
+    # Header công ty
+    company_header = Paragraph("CÔNG TY TNHH OLYMPUS VIỆT NAM", title_style)
+    elements.append(company_header)
+    
+    elements.append(Spacer(1, 2*mm))
+    
+    # Title chính
+    title = Paragraph(f"<b>BIÊN BẢN KIỂM KÊ KHO</b>", title_style)
     elements.append(title)
     
-    subtitle = Paragraph(f"{audit.title} - Ngày: {audit.audit_date.strftime('%d/%m/%Y')}", subtitle_style)
-    elements.append(subtitle)
+    # Thông tin audit
+    audit_info = Paragraph(
+        f"Mã số: <b>{audit.audit_code}</b> | Ngày kiểm kê: <b>{audit.audit_date.strftime('%d/%m/%Y')}</b>",
+        subtitle_style
+    )
+    elements.append(audit_info)
     
-    # Chi tiết
+    elements.append(Spacer(1, 3*mm))
+    
+    # Thông tin chi tiết
+    info_table_data = [
+        ['Tiêu đề:', audit.title, 'Người lập:', audit.created_by.get_full_name() or audit.created_by.username],
+        ['Trạng thái:', 
+         'Nháp' if audit.status == 'draft' else ('Đang kiểm' if audit.status == 'in_progress' else 'Hoàn thành'),
+         'Ngày tạo:', 
+         audit.created_at.strftime('%d/%m/%Y %H:%M')],
+    ]
+    
+    info_table = Table(info_table_data, colWidths=[30*mm, 90*mm, 30*mm, 90*mm])
+    info_table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (-1, -1), 'ArialUnicode'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('TEXTCOLOR', (0, 0), (0, -1), colors.HexColor('#424242')),
+        ('TEXTCOLOR', (2, 0), (2, -1), colors.HexColor('#424242')),
+        ('FONTNAME', (0, 0), (0, -1), 'ArialUnicode-Bold'),
+        ('FONTNAME', (2, 0), (2, -1), 'ArialUnicode-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+        ('TOPPADDING', (0, 0), (-1, -1), 4),
+    ]))
+    
+    elements.append(info_table)
+    elements.append(Spacer(1, 5*mm))
+    
+    # Bảng dữ liệu
     data = [['STT', 'Mã SP', 'Tên sản phẩm', 'Danh mục', 'ĐVT', 'SL Hệ thống', 'SL Thực tế', 'Chênh lệch', 'Ghi chú']]
     
+    total_system = 0
+    total_actual = 0
+    
     for idx, item in enumerate(items, 1):
-        actual = str(item.actual_quantity) if item.actual_quantity is not None else ''
-        diff = str(item.difference) if item.actual_quantity is not None else ''
+        actual = item.actual_quantity if item.actual_quantity is not None else None
+        diff = item.difference if item.actual_quantity is not None else None
+        
+        total_system += item.system_quantity
+        if actual is not None:
+            total_actual += actual
         
         data.append([
             str(idx),
             item.product.product_code[:15],
-            item.product.name[:25] + '...' if len(item.product.name) > 25 else item.product.name,
-            item.product.category.name[:15] if item.product.category else '-',
+            item.product.name[:30] + ('...' if len(item.product.name) > 30 else ''),
+            item.product.category.name[:12] if item.product.category else '-',
             item.product.unit.name[:8] if item.product.unit else '-',
             str(item.system_quantity),
-            actual,
-            diff,
-            item.notes[:20] if item.notes else '',
+            str(actual) if actual is not None else '',
+            str(diff) if diff is not None else '',
+            (item.notes[:15] + '...' if item.notes and len(item.notes) > 15 else (item.notes or '')),
         ])
     
-    col_widths = [12*mm, 22*mm, 55*mm, 28*mm, 18*mm, 25*mm, 25*mm, 25*mm, 35*mm]
+    # Tổng cộng
+    data.append([
+        '', '', '', '', 'TỔNG:',
+        str(total_system),
+        str(total_actual),
+        str(total_actual - total_system),
+        ''
+    ])
+    
+    col_widths = [12*mm, 22*mm, 55*mm, 25*mm, 15*mm, 25*mm, 25*mm, 25*mm, 36*mm]
     table = Table(data, colWidths=col_widths)
     
     table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#6B8DD6')),
+        # Header
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1565c0')),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
         ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
-        ('FONTNAME', (0, 0), (-1, 0), 'Arial-Bold' if os.path.exists(arial_bold_path) else 'Helvetica-Bold'),
+        ('FONTNAME', (0, 0), (-1, 0), 'ArialUnicode-Bold'),
         ('FONTSIZE', (0, 0), (-1, 0), 9),
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
-        ('TOPPADDING', (0, 0), (-1, 0), 8),
-        ('FONTNAME', (0, 1), (-1, -1), 'Arial' if os.path.exists(arial_font_path) else 'Helvetica'),
-        ('FONTSIZE', (0, 1), (-1, -1), 8),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 6),
+        ('TOPPADDING', (0, 0), (-1, 0), 6),
+        # Body
+        ('FONTNAME', (0, 1), (-1, -2), 'ArialUnicode'),
+        ('FONTSIZE', (0, 1), (-1, -2), 8),
         ('ALIGN', (0, 1), (0, -1), 'CENTER'),
         ('ALIGN', (5, 1), (-2, -1), 'CENTER'),
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f8f9fa')]),
-        ('BOTTOMPADDING', (0, 1), (-1, -1), 6),
-        ('TOPPADDING', (0, 1), (-1, -1), 6),
+        ('GRID', (0, 0), (-1, -2), 0.5, colors.grey),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -2), [colors.white, colors.HexColor('#f5f5f5')]),
+        ('BOTTOMPADDING', (0, 1), (-1, -2), 4),
+        ('TOPPADDING', (0, 1), (-1, -2), 4),
+        # Total row
+        ('BACKGROUND', (0, -1), (-1, -1), colors.HexColor('#e3f2fd')),
+        ('FONTNAME', (0, -1), (-1, -1), 'ArialUnicode-Bold'),
+        ('FONTSIZE', (0, -1), (-1, -1), 9),
+        ('ALIGN', (0, -1), (-1, -1), 'CENTER'),
+        ('GRID', (0, -1), (-1, -1), 1, colors.HexColor('#1565c0')),
+        ('BOTTOMPADDING', (0, -1), (-1, -1), 6),
+        ('TOPPADDING', (0, -1), (-1, -1), 6),
     ]))
     
     elements.append(table)
+    elements.append(Spacer(1, 10*mm))
+    
+    # Phần ký nhận
+    signature_data = [
+        ['', 'Người kiểm kê', '', 'Thủ kho', '', 'Trưởng phòng'],
+        ['', '(Ký, họ tên)', '', '(Ký, họ tên)', '', '(Ký, họ tên)'],
+    ]
+    
+    signature_table = Table(signature_data, colWidths=[10*mm, 70*mm, 10*mm, 70*mm, 10*mm, 70*mm])
+    signature_table.setStyle(TableStyle([
+        ('FONTNAME', (1, 0), (1, 0), 'ArialUnicode-Bold'),
+        ('FONTNAME', (3, 0), (3, 0), 'ArialUnicode-Bold'),
+        ('FONTNAME', (5, 0), (5, 0), 'ArialUnicode-Bold'),
+        ('FONTNAME', (1, 1), (1, 1), 'ArialUnicode'),
+        ('FONTNAME', (3, 1), (3, 1), 'ArialUnicode'),
+        ('FONTNAME', (5, 1), (5, 1), 'ArialUnicode'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('ALIGN', (1, 0), (1, 1), 'CENTER'),
+        ('ALIGN', (3, 0), (3, 1), 'CENTER'),
+        ('ALIGN', (5, 0), (5, 1), 'CENTER'),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 40),
+        ('TOPPADDING', (0, 0), (-1, 0), 10),
+    ]))
+    
+    elements.append(signature_table)
+    
+    # Ghi chú cuối
+    if audit.notes:
+        elements.append(Spacer(1, 3*mm))
+        note_text = Paragraph(f"<b>Ghi chú:</b> {audit.notes}", info_style)
+        elements.append(note_text)
+    
     doc.build(elements)
     
     buffer.seek(0)
     response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="Phieu_kiem_ke_{audit.audit_code}.pdf"'
+    response['Content-Disposition'] = f'inline; filename="Bien_ban_kiem_ke_{audit.audit_code}.pdf"'
     
     return response
 
