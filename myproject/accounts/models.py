@@ -59,6 +59,13 @@ class User(AbstractUser):
         verbose_name='Email người quản lý'
     )
     
+    # Tự động phê duyệt (cho cấp cao)
+    auto_approve = models.BooleanField(
+        default=False,
+        verbose_name='Tự động phê duyệt',
+        help_text='Yêu cầu của user này sẽ tự động được phê duyệt và chuyển thẳng đến kho xử lý'
+    )
+    
     class Meta:
         verbose_name = 'Người dùng'
         verbose_name_plural = 'Người dùng'
@@ -77,9 +84,10 @@ class User(AbstractUser):
                 'manager': 'SM (Senior Manager) không được có người quản lý.'
             })
         
-        # Các vai trò khác phải có người quản lý
-        if self.role != 'sm' and not self.manager and self.pk:
+        # Các vai trò khác phải có người quản lý (trừ khi có auto_approve)
+        if self.role != 'sm' and not self.manager and not self.auto_approve and self.pk:
             # Chỉ check khi update, không check khi tạo mới
+            # Nếu có auto_approve thì không bắt buộc có manager
             pass
     
     def save(self, *args, **kwargs):

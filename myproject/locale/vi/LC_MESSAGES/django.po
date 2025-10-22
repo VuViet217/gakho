@@ -695,3 +695,6 @@ msgstr "media files"
 msgid "Bạn có chắc chắn muốn tạo backup"
 msgstr "Bạn có chắc chắn muốn tạo backup"
 
+msgid "Yêu cầu của bạn sẽ được tự động phê duyệt và chuyển thẳng đến kho để xử lý mà không cần qua bước phê duyệt từ người quản lý."
+msgstr "Yêu cầu của bạn sẽ được tự động phê duyệt và chuyển thẳng đến kho để xử lý mà không cần qua bước phê duyệt từ người quản lý."
+

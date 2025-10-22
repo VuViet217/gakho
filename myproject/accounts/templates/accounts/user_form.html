@@ -59,12 +59,14 @@
                                             </div>
                                         {% endif %}
                                         
-                                        {% if user_form and perms.auth.change_user %}
-                                            <div class="custom-control custom-switch">
-                                                {{ form.is_active }}
-                                                <label class="custom-control-label" for="{{ form.is_active.id_for_label }}">
-                                                    Tài khoản hoạt động
-                                                </label>
+                                        {% if perms.auth.change_user %}
+                                            <div class="form-group">
+                                                <div class="custom-control custom-checkbox">
+                                                    <input type="checkbox" class="custom-control-input" id="id_is_active" name="is_active" {% if form.is_active.value %}checked{% endif %}>
+                                                    <label class="custom-control-label" for="id_is_active">
+                                                        Kích hoạt tài khoản
+                                                    </label>
+                                                </div>
                                             </div>
                                         {% endif %}
                                     </div>
@@ -79,24 +81,46 @@
                                     <div class="card-body">
                                         {{ form.role|as_crispy_field }}
                                         {{ form.department|as_crispy_field }}
+                                        
+                                        <!-- Auto Approve Checkbox -->
+                                        <div class="form-group">
+                                            <label class="d-block">
+                                                <strong>🔓 Tự động phê duyệt yêu cầu</strong>
+                                            </label>
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="id_auto_approve" name="auto_approve" {% if form.auto_approve.value %}checked{% endif %}>
+                                                <label class="custom-control-label" for="id_auto_approve">
+                                                    Bật tự động phê duyệt
+                                                </label>
+                                            </div>
+                                            <small class="form-text text-muted">
+                                                Yêu cầu cấp phát của user này sẽ tự động được phê duyệt và chuyển thẳng đến kho, 
+                                                không cần qua bước phê duyệt từ người quản lý. Dùng cho cấp cao (SM, Giám đốc, etc.)
+                                            </small>
+                                        </div>
+                                        
                                         <div id="manager-field" class="{% if form.instance.role == 'sm' %}d-none{% endif %}">
                                             {{ form.manager|as_crispy_field }}
                                         </div>
                                         
                                         {% if perms.auth.change_user %}
-                                            <div class="custom-control custom-switch mt-3">
-                                                {{ form.is_staff }}
-                                                <label class="custom-control-label" for="{{ form.is_staff.id_for_label }}">
-                                                    Quyền truy cập trang quản trị
-                                                </label>
+                                            <div class="form-group">
+                                                <div class="custom-control custom-checkbox">
+                                                    <input type="checkbox" class="custom-control-input" id="id_is_staff" name="is_staff" {% if form.is_staff.value %}checked{% endif %}>
+                                                    <label class="custom-control-label" for="id_is_staff">
+                                                        Quyền truy cập trang quản trị
+                                                    </label>
+                                                </div>
                                             </div>
                                             
                                             {% if request.user.is_superuser %}
-                                            <div class="custom-control custom-switch">
-                                                {{ form.is_superuser }}
-                                                <label class="custom-control-label" for="{{ form.is_superuser.id_for_label }}">
-                                                    Quyền superuser
-                                                </label>
+                                            <div class="form-group">
+                                                <div class="custom-control custom-checkbox">
+                                                    <input type="checkbox" class="custom-control-input" id="id_is_superuser" name="is_superuser" {% if form.is_superuser.value %}checked{% endif %}>
+                                                    <label class="custom-control-label" for="id_is_superuser">
+                                                        Quyền superuser
+                                                    </label>
+                                                </div>
                                             </div>
                                             {% endif %}
                                         {% endif %}

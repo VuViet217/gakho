@@ -119,30 +119,32 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="form-group" id="manager-group">
-                            <label for="{{ form.manager.id_for_label }}">{{ form.manager.label }}</label>
-                            {{ form.manager }}
-                            {% if form.manager.errors %}
-                            <div class="text-danger">{{ form.manager.errors }}</div>
-                            {% endif %}
+                        <div class="form-group">
+                            <label><strong>🔓 Tự động phê duyệt yêu cầu</strong></label>
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="id_auto_approve" name="auto_approve" {% if form.auto_approve.value %}checked{% endif %}>
+                                <label class="custom-control-label" for="id_auto_approve">
+                                    Bật tự động phê duyệt
+                                </label>
+                            </div>
                             <small class="form-text text-muted">
-                                Chọn người quản lý hoặc điền email người quản lý bên dưới
+                                Yêu cầu cấp phát sẽ tự động phê duyệt, chuyển thẳng đến kho. Dùng cho cấp cao.
                             </small>
+                            {% if form.auto_approve.errors %}
+                            <div class="text-danger">{{ form.auto_approve.errors }}</div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
                 
                 <div class="row">
                     <div class="col-md-6">
-                        <div class="form-group" id="manager-email-group">
-                            <label for="{{ form.manager_email.id_for_label }}">{{ form.manager_email.label }}</label>
-                            {{ form.manager_email }}
-                            {% if form.manager_email.errors %}
-                            <div class="text-danger">{{ form.manager_email.errors }}</div>
+                        <div class="form-group" id="manager-group">
+                            <label for="{{ form.manager.id_for_label }}">{{ form.manager.label }}</label>
+                            {{ form.manager }}
+                            {% if form.manager.errors %}
+                            <div class="text-danger">{{ form.manager.errors }}</div>
                             {% endif %}
-                            <small class="form-text text-muted">
-                                Nhập email người quản lý nếu không chọn từ danh sách trên
-                            </small>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -209,33 +211,15 @@ $(document).ready(function() {
     $('#id_role').on('change', function() {
         const role = $(this).val();
         const managerGroup = $('#manager-group');
-        const managerEmailGroup = $('#manager-email-group');
         const managerSelect = $('#id_manager');
 
         if (role === 'sm') {
             // SM không cần người quản lý
             managerSelect.val('').trigger('change');
             managerGroup.hide();
-            managerEmailGroup.hide();
         } else {
             // Các vai trò khác có thể chọn người quản lý
             managerGroup.show();
-            managerEmailGroup.show();
-        }
-    });
-
-    // Khi thay đổi manager hoặc manager_email
-    $('#id_manager, #id_manager_email').on('change', function() {
-        const manager = $('#id_manager').val();
-        const managerEmail = $('#id_manager_email').val();
-        
-        // Hiển thị thông báo nếu cả hai đều được điền
-        if (manager && managerEmail) {
-            if (!$('#manager-warning').length) {
-                $('#manager-group').append('<div id="manager-warning" class="text-warning mt-1">Bạn đã chọn người quản lý và điền email. Chỉ cần chọn một trong hai.</div>');
-            }
-        } else {
-            $('#manager-warning').remove();
         }
     });
 

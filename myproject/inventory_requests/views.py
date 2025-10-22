@@ -181,6 +181,35 @@ def inventory_request_create(request):
                 if 'save_draft' in request.POST:
                     return redirect('inventory_requests:my_requests')
                 else:
+                    # Kiểm tra nếu user có auto_approve = True
+                    if request.user.auto_approve:
+                        # Tự động phê duyệt và chuyển thẳng sang trạng thái chờ kho xử lý
+                        request_obj.status = InventoryRequest.STATUS_APPROVED
+                        request_obj.approver = request.user  # Người phê duyệt chính là người tạo
+                        request_obj.approved_at = timezone.now()
+                        request_obj.approved_notes = 'Tự động phê duyệt (User cấp cao)'
+                        request_obj.save()
+                        
+                        # Lấy danh sách employee_products kèm lịch sử
+                        employee_products_with_history = get_employee_products_with_history(request_obj)
+                        
+                        # Gửi email thông báo cho người tạo yêu cầu
+                        try:
+                            send_template_email(
+                                recipient_list=[request.user.email],
+                                template_code='request_created',
+                                context_data={
+                                    'request': request_obj,
+                                    'user': request.user,
+                                    'employee_products_with_history': employee_products_with_history,
+                                }
+                            )
+                        except Exception as e:
+                            logger.error(f"Không thể gửi email thông báo: {str(e)}")
+                        
+                        messages.success(request, 'Yêu cầu cấp phát đã được tự động phê duyệt và chuyển đến kho để xử lý.')
+                        return redirect('inventory_requests:my_requests')
+                    
                     # Kiểm tra xem người dùng đã có người quản lý chưa
                     if not request.user.manager:
                         messages.error(request, 'Bạn chưa được gán người quản lý. Vui lòng liên hệ quản trị viên để được gán người quản lý trước khi gửi yêu cầu.')

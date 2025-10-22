@@ -32,16 +32,9 @@ class CustomAuthenticationForm(AuthenticationForm):
 class UserRegistrationForm(UserCreationForm):
     """Form đăng ký tài khoản mới"""
     
-    # Thêm trường cho manager_email
-    manager_email = forms.EmailField(
-        required=False,
-        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email người quản lý'}),
-        label='Email người quản lý'
-    )
-    
     class Meta:
         model = User
-        fields = ('username', 'first_name', 'last_name', 'email', 'role', 'department', 'phone', 'manager', 'manager_email', 'profile_image', 'is_staff', 'is_superuser', 'is_active')
+        fields = ('username', 'first_name', 'last_name', 'email', 'role', 'department', 'phone', 'manager', 'auto_approve', 'profile_image', 'is_staff', 'is_superuser', 'is_active')
         widgets = {
             'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Tên đăng nhập'}),
             'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Tên'}),
@@ -51,6 +44,7 @@ class UserRegistrationForm(UserCreationForm):
             'department': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Bộ phận'}),
             'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Số điện thoại'}),
             'manager': forms.Select(attrs={'class': 'form-control select2'}),
+            'auto_approve': forms.CheckboxInput(attrs={'class': 'custom-control-input'}),
             'profile_image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
             'is_staff': forms.CheckboxInput(attrs={'class': 'custom-control-input'}),
             'is_superuser': forms.CheckboxInput(attrs={'class': 'custom-control-input'}),
@@ -65,6 +59,7 @@ class UserRegistrationForm(UserCreationForm):
             'department': 'Bộ phận',
             'phone': 'Số điện thoại',
             'manager': 'Người quản lý',
+            'auto_approve': 'Tự động phê duyệt',
             'profile_image': 'Ảnh đại diện',
             'is_staff': 'Quyền truy cập trang quản trị',
             'is_superuser': 'Quyền superuser',
@@ -93,6 +88,7 @@ class UserRegistrationForm(UserCreationForm):
         
         # Các trường required
         self.fields['manager'].required = False
+        self.fields['manager'].help_text = ''  # Xóa help text
         self.fields['email'].required = True
         self.fields['first_name'].required = True
         self.fields['last_name'].required = True
@@ -134,16 +130,9 @@ class UserUpdateForm(UserChangeForm):
     """Form cập nhật thông tin người dùng (dành cho admin)"""
     password = None
     
-    # Thêm trường cho manager_email
-    manager_email = forms.EmailField(
-        required=False,
-        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email người quản lý'}),
-        label='Email người quản lý'
-    )
-    
     class Meta:
         model = User
-        fields = ('username', 'first_name', 'last_name', 'email', 'role', 'department', 'phone', 'manager', 'manager_email', 'profile_image', 'is_staff', 'is_superuser', 'is_active')
+        fields = ('username', 'first_name', 'last_name', 'email', 'role', 'department', 'phone', 'manager', 'auto_approve', 'profile_image', 'is_staff', 'is_superuser', 'is_active')
         widgets = {
             'username': forms.TextInput(attrs={'class': 'form-control', 'readonly': True}),
             'first_name': forms.TextInput(attrs={'class': 'form-control'}),
@@ -153,6 +142,7 @@ class UserUpdateForm(UserChangeForm):
             'department': forms.TextInput(attrs={'class': 'form-control'}),
             'phone': forms.TextInput(attrs={'class': 'form-control'}),
             'manager': forms.Select(attrs={'class': 'form-control select2'}),
+            'auto_approve': forms.CheckboxInput(attrs={'class': 'custom-control-input'}),
             'profile_image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
             'is_staff': forms.CheckboxInput(attrs={'class': 'custom-control-input'}),
             'is_superuser': forms.CheckboxInput(attrs={'class': 'custom-control-input'}),
@@ -167,6 +157,7 @@ class UserUpdateForm(UserChangeForm):
             'department': 'Bộ phận',
             'phone': 'Số điện thoại',
             'manager': 'Người quản lý',
+            'auto_approve': 'Tự động phê duyệt',
             'profile_image': 'Ảnh đại diện',
             'is_staff': 'Quyền truy cập trang quản trị',
             'is_superuser': 'Quyền superuser',
@@ -184,12 +175,10 @@ class UserUpdateForm(UserChangeForm):
         
         if self.instance and self.instance.pk:
             manager_queryset = manager_queryset.exclude(pk=self.instance.pk)
-            # Nếu đã có manager_email, điền vào trường này
-            if self.instance.manager_email:
-                self.fields['manager_email'].initial = self.instance.manager_email
         
         self.fields['manager'].queryset = manager_queryset
         self.fields['manager'].required = False
+        self.fields['manager'].help_text = ''  # Xóa help text
         self.fields['email'].required = True
         self.fields['first_name'].required = True
         self.fields['last_name'].required = True

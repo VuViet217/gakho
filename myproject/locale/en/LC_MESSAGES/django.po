@@ -695,3 +695,6 @@ msgstr "media files"
 msgid "Bạn có chắc chắn muốn tạo backup"
 msgstr "Are you sure you want to create backup"
 
+msgid "Yêu cầu của bạn sẽ được tự động phê duyệt và chuyển thẳng đến kho để xử lý mà không cần qua bước phê duyệt từ người quản lý."
+msgstr "Your request will be automatically approved and sent directly to the warehouse for processing without requiring manager approval."
+
