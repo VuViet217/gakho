@@ -27,6 +27,53 @@ from system_settings.template_email_service import send_template_email
 
 logger = logging.getLogger(__name__)
 
+def get_approval_email_context(request_obj, request, employee_products_with_history=None):
+    """
+    Xây dựng context cho email phê duyệt yêu cầu với các link phê duyệt, từ chối, xem chi tiết.
+    
+    Args:
+        request_obj: InventoryRequest instance
+        request: Django request object (để build absolute URL)
+        employee_products_with_history: Dữ liệu lịch sử nhân viên-sản phẩm
+    
+    Returns:
+        dict: Context data cho email template
+    """
+    from django.contrib.sites.shortcuts import get_current_site
+    
+    # Build absolute URLs
+    site = get_current_site(request)
+    protocol = 'https' if request.is_secure() else 'http'
+    domain = site.domain
+    
+    request_detail_url = f"{protocol}://{domain}{reverse('inventory_requests:inventory_request_detail', args=[request_obj.id])}"
+    approve_url = f"{protocol}://{domain}{reverse('inventory_requests:inventory_request_approve', args=[request_obj.id])}"
+    reject_url = f"{protocol}://{domain}{reverse('inventory_requests:request_reject', args=[request_obj.id])}"
+    
+    # Người nhận (quản lý) và người yêu cầu
+    manager = request.user.manager if hasattr(request.user, 'manager') else None
+    requester = request_obj.requester if hasattr(request_obj, 'requester') else request.user
+    
+    context = {
+        'request': request_obj,
+        'request_id': request_obj.id,
+        'approver_name': manager.get_full_name() if manager else 'Quản lý',
+        'requester_name': requester.get_full_name() if requester else 'Nhân viên',
+        'requester_email': requester.email if requester else '',
+        'created_at': request_obj.created_at.strftime('%d/%m/%Y %H:%M') if request_obj.created_at else '',
+        'requested_date': request_obj.expected_date.strftime('%d/%m/%Y') if request_obj.expected_date else '',
+        'request_url': request_detail_url,
+        'approve_url': approve_url,
+        'reject_url': reject_url,
+        'user': request.user,
+        'manager': manager,
+    }
+    
+    if employee_products_with_history:
+        context['employee_products_with_history'] = employee_products_with_history
+    
+    return context
+
 from .models import InventoryRequest, RequestEmployee, RequestItem, EmployeeProductRequest
 from .forms import (
     InventoryRequestForm, RequestEmployeeFormSet, RequestItemFormSet,
@@ -280,15 +327,15 @@ def inventory_request_create(request):
                     
                     # Gửi email cho người quản lý để phê duyệt (không làm gián đoạn nếu lỗi)
                     try:
+                        approval_context = get_approval_email_context(
+                            request_obj, 
+                            request, 
+                            employee_products_with_history
+                        )
                         send_template_email(
                             recipient_list=[request.user.manager.email],
                             template_code='pending_approval',
-                            context_data={
-                                'request': request_obj,
-                                'user': request.user,
-                                'manager': request.user.manager,
-                                'employee_products_with_history': employee_products_with_history,
-                            }
+                            context_data=approval_context
                         )
                     except Exception as e:
                         logger.error(f"Không thể gửi email cho người quản lý: {str(e)}")
@@ -399,16 +446,19 @@ def inventory_request_edit(request, request_id):
                 )
                 
                 # Gửi email cho người quản lý để phê duyệt
-                send_template_email(
-                    recipient_list=[request.user.manager.email],
-                    template_code='pending_approval',
-                    context_data={
-                        'request': request_obj,
-                        'user': request.user,
-                        'manager': request.user.manager,
-                        'employee_products_with_history': employee_products_with_history,
-                    }
-                )
+                try:
+                    approval_context = get_approval_email_context(
+                        request_obj, 
+                        request, 
+                        employee_products_with_history
+                    )
+                    send_template_email(
+                        recipient_list=[request.user.manager.email],
+                        template_code='pending_approval',
+                        context_data=approval_context
+                    )
+                except Exception as e:
+                    logger.error(f"Không thể gửi email cho người quản lý: {str(e)}")
                 
                 messages.success(request, f'Yêu cầu cấp phát đã được gửi đến người quản lý {request.user.manager.get_full_name()} để phê duyệt.')
                 return redirect('inventory_requests:my_requests')
@@ -583,16 +633,19 @@ def inventory_request_submit(request, request_id):
     )
     
     # Gửi email cho người quản lý để phê duyệt
-    send_template_email(
-        recipient_list=[request.user.manager.email],
-        template_code='pending_approval',
-        context_data={
-            'request': request_obj,
-            'user': request.user,
-            'manager': request.user.manager,
-            'employee_products_with_history': employee_products_with_history,
-        }
-    )
+    try:
+        approval_context = get_approval_email_context(
+            request_obj, 
+            request, 
+            employee_products_with_history
+        )
+        send_template_email(
+            recipient_list=[request.user.manager.email],
+            template_code='pending_approval',
+            context_data=approval_context
+        )
+    except Exception as e:
+        logger.error(f"Không thể gửi email cho người quản lý: {str(e)}")
     
     messages.success(request, f'Yêu cầu cấp phát đã được gửi đến người quản lý {request.user.manager.get_full_name()} để phê duyệt.')
     return redirect('inventory_requests:inventory_request_detail', request_id=request_obj.id)
