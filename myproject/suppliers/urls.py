@@ -9,6 +9,11 @@ urlpatterns = [
     path('suppliers/<int:pk>/update/', views.supplier_update, name='supplier_update'),
     path('suppliers/<int:pk>/delete/', views.supplier_delete, name='supplier_delete'),
     
+    # Supplier Import/Export URLs
+    path('suppliers/export/', views.supplier_export_excel, name='supplier_export_excel'),
+    path('suppliers/import/', views.supplier_import_excel, name='supplier_import_excel'),
+    path('suppliers/template/', views.supplier_download_template, name='supplier_download_template'),
+    
     # Purchase Order URLs
     path('purchase-orders/', views.po_list, name='po_list'),
     path('purchase-orders/create/', views.po_create, name='po_create'),
