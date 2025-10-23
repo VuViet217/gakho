@@ -22,6 +22,10 @@ from django.conf.urls.i18n import i18n_patterns
 from django.views.generic import RedirectView
 from accounts.custom_views import LogoutView
 
+# Custom error handlers
+handler404 = 'myproject.views.custom_404'
+handler500 = 'myproject.views.custom_500'
+
 urlpatterns = [
     path('i18n/', include('django.conf.urls.i18n')),  # URL cho chuyển đổi ngôn ngữ
 ]
