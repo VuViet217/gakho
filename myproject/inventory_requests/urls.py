@@ -26,4 +26,7 @@ urlpatterns = [
     
     # Lịch sử giao nhận
     path('employee-delivery-history/', views.employee_delivery_history, name='employee_delivery_history'),
+    
+    # API endpoints
+    path('api/products/', views.product_list_api, name='product_list_api'),
 ]

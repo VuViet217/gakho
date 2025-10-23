@@ -1350,3 +1350,28 @@ def employee_delivery_history(request):
     }
     
     return render(request, 'inventory_requests/employee_delivery_history.html', context)
+
+
+@login_required
+def product_list_api(request):
+    """API endpoint để lấy danh sách sản phẩm cho modal"""
+    from inventory.models import Product
+    
+    products = Product.objects.select_related('category', 'unit').all().order_by('product_code')
+    
+    products_data = []
+    for product in products:
+        products_data.append({
+            'id': product.id,
+            'product_code': product.product_code,
+            'name': product.name,
+            'category': product.category.name if product.category else None,
+            'unit': product.unit.name if product.unit else None,
+            'current_quantity': product.current_quantity,
+            'min_stock': product.min_stock if hasattr(product, 'min_stock') else 0,
+        })
+    
+    return JsonResponse({
+        'success': True,
+        'products': products_data
+    })

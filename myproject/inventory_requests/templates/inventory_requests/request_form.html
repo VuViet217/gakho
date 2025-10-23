@@ -109,6 +109,9 @@
                         <div class="card-header">
                             <h3 class="card-title">{% trans "Danh sách cấp phát" %}</h3>
                             <div class="card-tools">
+                                <button type="button" class="btn btn-info btn-sm mr-2" id="viewProductListBtn" data-toggle="modal" data-target="#productListModal">
+                                    <i class="fas fa-list"></i> {% trans "Xem danh sách sản phẩm" %}
+                                </button>
                                 <button type="button" class="btn btn-primary btn-sm" id="addEmployeeProductBtn">
                                     <i class="fas fa-plus"></i> {% trans "Thêm phân bổ" %}
                                 </button>
@@ -281,6 +284,69 @@
     </tr>
 </script>
 {% endif %}
+
+<!-- Modal danh sách sản phẩm -->
+<div class="modal fade" id="productListModal" tabindex="-1" role="dialog" aria-labelledby="productListModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-info">
+                <h5 class="modal-title" id="productListModalLabel">
+                    <i class="fas fa-box-open mr-2"></i>{% trans "Danh sách sản phẩm trong kho" %}
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="productSearchInput" placeholder="{% trans 'Tìm kiếm theo mã hoặc tên sản phẩm...' %}">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button" id="clearSearchBtn">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="productListLoading" class="text-center py-5">
+                    <i class="fas fa-spinner fa-spin fa-3x text-info"></i>
+                    <p class="mt-3">{% trans "Đang tải dữ liệu..." %}</p>
+                </div>
+                
+                <div id="productListContent" style="display: none;">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover table-sm">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th style="width: 5%">#</th>
+                                    <th style="width: 15%">{% trans "Mã sản phẩm" %}</th>
+                                    <th style="width: 35%">{% trans "Tên sản phẩm" %}</th>
+                                    <th style="width: 15%">{% trans "Danh mục" %}</th>
+                                    <th style="width: 10%">{% trans "Đơn vị" %}</th>
+                                    <th style="width: 12%" class="text-center">{% trans "Số lượng tồn" %}</th>
+                                    <th style="width: 8%" class="text-center">{% trans "Trạng thái" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody id="productListTableBody">
+                                <!-- Data will be loaded here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div id="productListEmpty" style="display: none;" class="alert alert-warning text-center">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        {% trans "Không tìm thấy sản phẩm nào." %}
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <i class="fas fa-times mr-1"></i>{% trans "Đóng" %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
@@ -471,6 +537,96 @@
             }
             
             return isValid;
+        });
+        
+        // Load product list modal
+        let productsData = [];
+        
+        $('#productListModal').on('show.bs.modal', function () {
+            if (productsData.length === 0) {
+                loadProductList();
+            }
+        });
+        
+        function loadProductList() {
+            $('#productListLoading').show();
+            $('#productListContent').hide();
+            
+            $.ajax({
+                url: '{% url "inventory_requests:product_list_api" %}',
+                method: 'GET',
+                success: function(data) {
+                    productsData = data.products;
+                    renderProductList(productsData);
+                    $('#productListLoading').hide();
+                    $('#productListContent').show();
+                },
+                error: function() {
+                    $('#productListLoading').html('<div class="alert alert-danger"><i class="fas fa-exclamation-circle mr-2"></i>{% trans "Lỗi khi tải dữ liệu. Vui lòng thử lại." %}</div>');
+                }
+            });
+        }
+        
+        function renderProductList(products) {
+            let tbody = $('#productListTableBody');
+            tbody.empty();
+            
+            if (products.length === 0) {
+                $('#productListEmpty').show();
+                return;
+            }
+            
+            $('#productListEmpty').hide();
+            
+            products.forEach(function(product, index) {
+                let stockClass = '';
+                let stockBadge = '';
+                
+                if (product.current_quantity <= 0) {
+                    stockClass = 'table-danger';
+                    stockBadge = '<span class="badge badge-danger">Hết hàng</span>';
+                } else if (product.current_quantity <= product.min_stock) {
+                    stockClass = 'table-warning';
+                    stockBadge = '<span class="badge badge-warning">Sắp hết</span>';
+                } else {
+                    stockBadge = '<span class="badge badge-success">Còn hàng</span>';
+                }
+                
+                let row = `
+                    <tr class="${stockClass}">
+                        <td class="text-center">${index + 1}</td>
+                        <td><strong>${product.product_code}</strong></td>
+                        <td>${product.name}</td>
+                        <td>${product.category || '-'}</td>
+                        <td class="text-center">${product.unit || '-'}</td>
+                        <td class="text-center"><strong>${product.current_quantity.toLocaleString()}</strong></td>
+                        <td class="text-center">${stockBadge}</td>
+                    </tr>
+                `;
+                tbody.append(row);
+            });
+        }
+        
+        // Search functionality
+        $('#productSearchInput').on('keyup', function() {
+            let searchTerm = $(this).val().toLowerCase();
+            
+            if (searchTerm === '') {
+                renderProductList(productsData);
+                return;
+            }
+            
+            let filtered = productsData.filter(function(product) {
+                return product.product_code.toLowerCase().includes(searchTerm) ||
+                       product.name.toLowerCase().includes(searchTerm);
+            });
+            
+            renderProductList(filtered);
+        });
+        
+        $('#clearSearchBtn').click(function() {
+            $('#productSearchInput').val('');
+            renderProductList(productsData);
         });
     });
 </script>
