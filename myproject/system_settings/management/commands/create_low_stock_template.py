@@ -33,7 +33,7 @@ DEFAULT_HTML = '''
                                             Cảnh báo tồn kho thấp
                                         </h1>
                                         <p style="margin: 8px 0 0 0; color: rgba(255,255,255,0.9); font-size: 14px;">
-                                            Hệ thống quản lý kho OVNC
+                                            Hệ thống quản lý kho GA
                                         </p>
                                     </td>
                                 </tr>
@@ -142,7 +142,7 @@ DEFAULT_HTML = '''
                             </p>
                             <p style="margin: 0; color: #333333; font-size: 15px; line-height: 1.6;">
                                 Trân trọng,<br/>
-                                <strong style="color: #0d6efd;">Hệ thống quản lý kho OVNC</strong>
+                                <strong style="color: #0d6efd;">Hệ thống quản lý kho GA</strong>
                             </p>
                         </td>
                     </tr>
@@ -158,7 +158,7 @@ DEFAULT_HTML = '''
                                         </p>
                                         <p style="margin: 0; color: #adb5bd; font-size: 11px; line-height: 1.6;">
                                             Đây là email tự động từ hệ thống quản lý kho. Vui lòng không trả lời email này.<br/>
-                                            © 2025 OVNC Inventory Management System. All rights reserved.
+                                            © 2025 GA Inventory Management System. All rights reserved.
                                         </p>
                                     </td>
                                 </tr>
@@ -185,7 +185,7 @@ class Command(BaseCommand):
             defaults={
                 'type': 'low_stock_alert',
                 'name': 'Cảnh báo tồn kho thấp',
-                'subject': '[OVNC] ⚠️ Cảnh báo tồn kho thấp - {{ count }} sản phẩm cần nhập hàng',
+                'subject': '[GA] ⚠️ Cảnh báo tồn kho thấp - {{ count }} sản phẩm cần nhập hàng',
                 'content': DEFAULT_HTML,
                 'description': 'Mẫu email tự động gửi cảnh báo khi có sản phẩm đạt ngưỡng tồn kho tối thiểu. Hệ thống sẽ gửi danh sách các sản phẩm cần nhập hàng đến người quản lý kho và các bên liên quan.',
                 'is_html': True,

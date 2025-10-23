@@ -158,7 +158,7 @@ class Command(BaseCommand):
                         <td style="background-color: #f5f5f5; padding: 20px; text-align: center; border-top: 1px solid #dddddd;">
                             <p style="margin: 5px 0; color: #666666; font-size: 13px;"><strong>Hệ thống Quản lý Kho</strong></p>
                             <p style="margin: 5px 0; color: #666666; font-size: 12px;">Email này được gửi tự động, vui lòng không trả lời.</p>
-                            <p style="margin: 5px 0; color: #666666; font-size: 12px;">&copy; 2025 OVNC Inventory Management System</p>
+                            <p style="margin: 5px 0; color: #666666; font-size: 12px;">&copy; 2025 GA Inventory Management System</p>
                         </td>
                     </tr>
                 </table>

@@ -324,10 +324,10 @@ class Command(BaseCommand):
         </div>
         
         <div class="footer">
-            <p><strong>Email tự động từ hệ thống OVNC Inventory Management</strong></p>
+            <p><strong>Email tự động từ hệ thống GA Inventory Management</strong></p>
             <p>Nếu có bất kỳ thắc mắc nào, vui lòng liên hệ bộ phận kho hoặc người phê duyệt</p>
             <p style="margin-top: 15px; color: #9ca3af; font-size: 12px;">
-                © 2025 OVNC Corporation. All rights reserved.
+                © 2025 GA Corporation. All rights reserved.
             </p>
         </div>
     </div>

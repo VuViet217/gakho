@@ -9,7 +9,7 @@ class Command(BaseCommand):
         try:
             template = EmailTemplate.objects.get(code='pending_approval')
             
-            template.subject = 'OVNC Inventory - Yêu cầu cấp phát #{{request.id}} chờ phê duyệt'
+            template.subject = 'GA Inventory - Yêu cầu cấp phát #{{request.id}} chờ phê duyệt'
             
             template.content = '''<!DOCTYPE html>
 <html>
@@ -139,7 +139,7 @@ class Command(BaseCommand):
                         <td style="background-color: #f8f9fa; padding: 20px; text-align: center; border-top: 3px solid #667eea;">
                             <p style="margin: 0; font-size: 12px; color: #6c757d;">Hệ thống Quản lý Kho</p>
                             <p style="margin: 5px 0 0 0; font-size: 11px; color: #adb5bd;">Email này được gửi tự động, vui lòng không trả lời.</p>
-                            <p style="margin: 10px 0 0 0; font-size: 11px; color: #adb5bd;">&copy; 2025 OVNC Inventory Management System</p>
+                            <p style="margin: 10px 0 0 0; font-size: 11px; color: #adb5bd;">&copy; 2025 GA Inventory Management System</p>
                         </td>
                     </tr>
                 </table>

@@ -1,10 +1,10 @@
-# English translations for OVNC Inventory
+# English translations for GA Inventory
 # Copyright (C) 2025
-# This file is distributed under the same license as the OVNC Inventory package.
+# This file is distributed under the same license as the GA Inventory package.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: OVNC Inventory 1.0\n"
+"Project-Id-Version: GA Inventory 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-22 08:00+0700\n"
 "PO-Revision-Date: 2025-10-22 08:00+0700\n"
@@ -702,8 +702,8 @@ msgstr "Your request will be automatically approved and sent directly to the war
 msgid "Xin chào"
 msgstr "Hello"
 
-msgid "Chào mừng bạn đến với hệ thống quản lý kho OVNC. Hãy theo dõi các yêu cầu cấp phát của bạn tại đây."
-msgstr "Welcome to OVNC Warehouse Management System. Track your allocation requests here."
+msgid "Chào mừng bạn đến với hệ thống quản lý kho GA. Hãy theo dõi các yêu cầu cấp phát của bạn tại đây."
+msgstr "Welcome to GA Warehouse Management System. Track your allocation requests here."
 
 msgid "Tạo yêu cầu mới"
 msgstr "Create New Request"

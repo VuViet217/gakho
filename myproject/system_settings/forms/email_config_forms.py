@@ -43,12 +43,12 @@ class TestEmailForm(forms.Form):
     subject = forms.CharField(
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Tiêu đề email'}),
         required=True,
-        initial='Test Email từ OVNC Inventory',
+        initial='Test Email từ GA Inventory',
         label='Tiêu đề'
     )
     message = forms.CharField(
         widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Nội dung email'}),
         required=True,
-        initial='Đây là email test từ hệ thống OVNC Inventory. Nếu bạn nhận được email này, cấu hình SMTP đã hoạt động.',
+        initial='Đây là email test từ hệ thống GA Inventory. Nếu bạn nhận được email này, cấu hình SMTP đã hoạt động.',
         label='Nội dung'
     )

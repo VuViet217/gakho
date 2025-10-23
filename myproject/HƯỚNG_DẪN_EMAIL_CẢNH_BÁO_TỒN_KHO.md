@@ -88,9 +88,9 @@ Tìm và thay đổi các giá trị màu trong mẫu:
 ### Thay đổi logo/tên công ty
 Tìm dòng:
 ```html
-<strong style="color: #0d6efd;">Hệ thống quản lý kho OVNC</strong>
+<strong style="color: #0d6efd;">Hệ thống quản lý kho GA</strong>
 ```
-Thay "OVNC" bằng tên công ty của bạn.
+Thay "GA" bằng tên công ty của bạn.
 
 ### Thêm/bớt cột trong bảng
 Chỉnh sửa phần `<th>` (header) và `<td>` (data) trong bảng sản phẩm.

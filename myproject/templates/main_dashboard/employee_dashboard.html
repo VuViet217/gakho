@@ -103,7 +103,7 @@
         <div class="row align-items-center">
             <div class="col-md-8">
                 <h2><i class="fas fa-hand-sparkles mr-2"></i>{% trans "Xin chào" %}, {{ user.get_full_name|default:user.username }}!</h2>
-                <p class="mb-0">{% trans "Chào mừng bạn đến với hệ thống quản lý kho OVNC. Hãy theo dõi các yêu cầu cấp phát của bạn tại đây." %}</p>
+                <p class="mb-0">{% trans "Chào mừng bạn đến với hệ thống quản lý kho GA. Hãy theo dõi các yêu cầu cấp phát của bạn tại đây." %}</p>
             </div>
             <div class="col-md-4 text-right">
                 <a href="{% url 'inventory_requests:inventory_request_create' %}" class="btn btn-light btn-lg">

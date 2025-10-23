@@ -15,7 +15,7 @@ class Command(BaseCommand):
                 'code': 'request_created',
                 'type': 'request_created',
                 'name': 'Thông báo yêu cầu mới',
-                'subject': 'OVNC Inventory - Yêu cầu cấp phát mới #{{request_id}}',
+                'subject': 'GA Inventory - Yêu cầu cấp phát mới #{{request_id}}',
                 'content': '''
                 <!DOCTYPE html>
                 <html>
@@ -86,7 +86,7 @@ class Command(BaseCommand):
                         <div class="content">
                             <p>Xin chào {{recipient_name}},</p>
                             
-                            <p>Hệ thống OVNC Inventory đã nhận được yêu cầu cấp phát vật tư mới với các thông tin như sau:</p>
+                            <p>Hệ thống GA Inventory đã nhận được yêu cầu cấp phát vật tư mới với các thông tin như sau:</p>
                             
                             <table>
                                 <tr>
@@ -120,7 +120,7 @@ class Command(BaseCommand):
                             <p>Đây là email tự động, vui lòng không trả lời.</p>
                         </div>
                         <div class="footer">
-                            <p>© 2024 OVNC Inventory System</p>
+                            <p>© 2024 GA Inventory System</p>
                         </div>
                     </div>
                 </body>
@@ -134,7 +134,7 @@ class Command(BaseCommand):
                 'code': 'pending_approval',
                 'type': 'pending_approval',
                 'name': 'Thông báo yêu cầu chờ phê duyệt',
-                'subject': 'OVNC Inventory - Yêu cầu cấp phát #{{request_id}} chờ phê duyệt',
+                'subject': 'GA Inventory - Yêu cầu cấp phát #{{request_id}} chờ phê duyệt',
                 'content': '''
                 <!DOCTYPE html>
                 <html>
@@ -256,7 +256,7 @@ class Command(BaseCommand):
                             <p>Đây là email tự động, vui lòng không trả lời.</p>
                         </div>
                         <div class="footer">
-                            <p>© 2024 OVNC Inventory System</p>
+                            <p>© 2024 GA Inventory System</p>
                         </div>
                     </div>
                 </body>
@@ -270,7 +270,7 @@ class Command(BaseCommand):
                 'code': 'request_approved',
                 'type': 'request_approved',
                 'name': 'Thông báo yêu cầu được phê duyệt',
-                'subject': 'OVNC Inventory - Yêu cầu cấp phát #{{request_id}} đã được phê duyệt',
+                'subject': 'GA Inventory - Yêu cầu cấp phát #{{request_id}} đã được phê duyệt',
                 'content': '''
                 <!DOCTYPE html>
                 <html>
@@ -379,7 +379,7 @@ class Command(BaseCommand):
                             <p>Đây là email tự động, vui lòng không trả lời.</p>
                         </div>
                         <div class="footer">
-                            <p>© 2024 OVNC Inventory System</p>
+                            <p>© 2024 GA Inventory System</p>
                         </div>
                     </div>
                 </body>
@@ -393,7 +393,7 @@ class Command(BaseCommand):
                 'code': 'request_rejected',
                 'type': 'request_rejected',
                 'name': 'Thông báo yêu cầu bị từ chối',
-                'subject': 'OVNC Inventory - Yêu cầu cấp phát #{{request_id}} đã bị từ chối',
+                'subject': 'GA Inventory - Yêu cầu cấp phát #{{request_id}} đã bị từ chối',
                 'content': '''
                 <!DOCTYPE html>
                 <html>
@@ -507,7 +507,7 @@ class Command(BaseCommand):
                             <p>Đây là email tự động, vui lòng không trả lời.</p>
                         </div>
                         <div class="footer">
-                            <p>© 2024 OVNC Inventory System</p>
+                            <p>© 2024 GA Inventory System</p>
                         </div>
                     </div>
                 </body>
@@ -521,7 +521,7 @@ class Command(BaseCommand):
                 'code': 'warehouse_scheduled',
                 'type': 'warehouse_scheduled',
                 'name': 'Thông báo kho đã lên lịch cấp phát',
-                'subject': 'OVNC Inventory - Lịch cấp phát cho yêu cầu #{{request_id}} đã được xác nhận',
+                'subject': 'GA Inventory - Lịch cấp phát cho yêu cầu #{{request_id}} đã được xác nhận',
                 'content': '''
                 <!DOCTYPE html>
                 <html>
@@ -639,7 +639,7 @@ class Command(BaseCommand):
                             <p>Đây là email tự động, vui lòng không trả lời.</p>
                         </div>
                         <div class="footer">
-                            <p>© 2024 OVNC Inventory System</p>
+                            <p>© 2024 GA Inventory System</p>
                         </div>
                     </div>
                 </body>
@@ -653,7 +653,7 @@ class Command(BaseCommand):
                 'code': 'request_completed',
                 'type': 'request_completed',
                 'name': 'Thông báo yêu cầu đã hoàn thành',
-                'subject': 'OVNC Inventory - Yêu cầu cấp phát #{{request_id}} đã hoàn thành',
+                'subject': 'GA Inventory - Yêu cầu cấp phát #{{request_id}} đã hoàn thành',
                 'content': '''
                 <!DOCTYPE html>
                 <html>
@@ -761,7 +761,7 @@ class Command(BaseCommand):
                                 </table>
                             </div>
                             
-                            <p>Cảm ơn bạn đã sử dụng hệ thống OVNC Inventory. Nếu bạn có bất kỳ thắc mắc nào về vật tư đã nhận, vui lòng liên hệ với phòng quản lý thiết bị.</p>
+                            <p>Cảm ơn bạn đã sử dụng hệ thống GA Inventory. Nếu bạn có bất kỳ thắc mắc nào về vật tư đã nhận, vui lòng liên hệ với phòng quản lý thiết bị.</p>
                             
                             <p style="text-align: center;">
                                 <a href="{{request_url}}" class="button">Xem chi tiết yêu cầu</a>
@@ -770,7 +770,7 @@ class Command(BaseCommand):
                             <p>Đây là email tự động, vui lòng không trả lời.</p>
                         </div>
                         <div class="footer">
-                            <p>© 2024 OVNC Inventory System</p>
+                            <p>© 2024 GA Inventory System</p>
                         </div>
                     </div>
                 </body>

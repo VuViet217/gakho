@@ -287,7 +287,7 @@ class Command(BaseCommand):
         <div class="footer">
             <p><strong>Hệ thống Quản lý Kho</strong></p>
             <p>Email này được gửi tự động, vui lòng không trả lời.</p>
-            <p style="color: #999; font-size: 12px;">(c) 2025 OVNC Inventory Management System</p>
+            <p style="color: #999; font-size: 12px;">(c) 2025 GA Inventory Management System</p>
         </div>
     </div>
 </body>
@@ -613,7 +613,7 @@ class Command(BaseCommand):
         <div class="footer">
             <p><strong>Hệ thống Quản lý Kho</strong></p>
             <p>Email này được gửi tự động, vui lòng không trả lời.</p>
-            <p style="color: #999; font-size: 12px;">(c) 2025 OVNC Inventory Management System</p>
+            <p style="color: #999; font-size: 12px;">(c) 2025 GA Inventory Management System</p>
         </div>
     </div>
 </body>

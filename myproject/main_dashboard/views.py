@@ -26,7 +26,7 @@ class MainDashboardView(TemplateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'OVNC - Trang chủ'
+        context['title'] = 'GA - Trang chủ'
         user = self.request.user
         
         # Nếu là nhân viên, hiển thị thông tin cá nhân

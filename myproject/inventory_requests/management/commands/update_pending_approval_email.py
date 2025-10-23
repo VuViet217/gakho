@@ -170,7 +170,7 @@ class Command(BaseCommand):
                                 Email này được gửi từ động, vui lòng không trả lời.
                             </p>
                             <p style="margin: 10px 0 0 0; font-size: 11px; color: #999999;">
-                                © 2025 OVNC Inventory Management System
+                                © 2025 GA Inventory Management System
                             </p>
                         </td>
                     </tr>

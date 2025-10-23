@@ -282,10 +282,10 @@ class Command(BaseCommand):
         </div>
 
         <div class="footer">
-            <p><strong>OVNC Inventory Management System</strong></p>
+            <p><strong>GA Inventory Management System</strong></p>
             <p>Email này được gửi tự động, vui lòng không trả lời.</p>
             <p>Liên hệ bộ phận kho: warehouse@ovnc.com | Hotline: 1900 xxxx</p>
-            <p>&copy; 2025 OVNC. All rights reserved.</p>
+            <p>&copy; 2025 GA. All rights reserved.</p>
         </div>
     </div>
 </body>

@@ -287,10 +287,10 @@ class Command(BaseCommand):
         </div>
 
         <div class="footer">
-            <p><strong>OVNC Inventory Management System</strong></p>
+            <p><strong>GA Inventory Management System</strong></p>
             <p>Email này được gửi tự động, vui lòng không trả lời.</p>
             <p>Vui lòng xử lý yêu cầu xuất kho sớm nhất có thể.</p>
-            <p>&copy; 2025 OVNC. All rights reserved.</p>
+            <p>&copy; 2025 GA. All rights reserved.</p>
         </div>
     </div>
 </body>
