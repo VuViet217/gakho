@@ -223,11 +223,19 @@ def inventory_request_create(request):
                     item_formset.save()
                     employee_product_formset.save()
                 
-                messages.success(request, 'Yêu cầu cấp phát đã được tạo thành công.')
-                
                 if 'save_draft' in request.POST:
+                    messages.success(request, 'Yêu cầu cấp phát đã được lưu nháp.')
                     return redirect('inventory_requests:my_requests')
                 else:
+                    # Kiểm tra xem người dùng đã có người quản lý chưa trước khi submit
+                    if not request.user.manager:
+                        messages.warning(request, 'Yêu cầu của bạn đã được lưu nháp. Vui lòng vào Thông tin cá nhân và thêm Người quản lý trước khi gửi yêu cầu.')
+                        return redirect('inventory_requests:inventory_request_edit', request_id=request_obj.id)
+                    
+                    if not request.user.manager.email:
+                        messages.warning(request, 'Yêu cầu của bạn đã được lưu nháp. Người quản lý chưa có email. Vui lòng liên hệ quản trị viên để cập nhật email cho người quản lý.')
+                        return redirect('inventory_requests:inventory_request_edit', request_id=request_obj.id)
+                    
                     # Kiểm tra nếu user có auto_approve = True
                     if request.user.auto_approve:
                         # Tự động phê duyệt và chuyển thẳng sang trạng thái chờ kho xử lý
@@ -295,15 +303,6 @@ def inventory_request_create(request):
                         
                         messages.success(request, 'Yêu cầu cấp phát đã được tự động phê duyệt và chuyển đến kho để xử lý.')
                         return redirect('inventory_requests:my_requests')
-                    
-                    # Kiểm tra xem người dùng đã có người quản lý chưa
-                    if not request.user.manager:
-                        messages.error(request, 'Bạn chưa được gán người quản lý. Vui lòng liên hệ quản trị viên để được gán người quản lý trước khi gửi yêu cầu.')
-                        return redirect('inventory_requests:inventory_request_edit', request_id=request_obj.id)
-                    
-                    if not request.user.manager.email:
-                        messages.error(request, 'Người quản lý của bạn chưa có email. Vui lòng liên hệ quản trị viên để cập nhật email cho người quản lý.')
-                        return redirect('inventory_requests:inventory_request_edit', request_id=request_obj.id)
                     
                     # Chuyển trạng thái thành chờ phê duyệt và gửi email
                     request_obj.mark_as_pending()
@@ -421,11 +420,11 @@ def inventory_request_edit(request, request_id):
             else:
                 # Kiểm tra xem người dùng đã có người quản lý chưa
                 if not request.user.manager:
-                    messages.error(request, 'Bạn chưa được gán người quản lý. Vui lòng liên hệ quản trị viên để được gán người quản lý trước khi gửi yêu cầu.')
+                    messages.warning(request, 'Yêu cầu đã được lưu. Vui lòng vào Thông tin cá nhân và thêm Người quản lý trước khi gửi yêu cầu.')
                     return redirect('inventory_requests:inventory_request_edit', request_id=request_obj.id)
                 
                 if not request.user.manager.email:
-                    messages.error(request, 'Người quản lý của bạn chưa có email. Vui lòng liên hệ quản trị viên để cập nhật email cho người quản lý.')
+                    messages.warning(request, 'Người quản lý của bạn chưa có email. Vui lòng liên hệ quản trị viên để cập nhật email cho người quản lý.')
                     return redirect('inventory_requests:inventory_request_edit', request_id=request_obj.id)
                 
                 # Chuyển trạng thái thành chờ phê duyệt và gửi email
@@ -603,11 +602,11 @@ def inventory_request_submit(request, request_id):
     
     # Kiểm tra xem người dùng đã có người quản lý chưa
     if not request.user.manager:
-        messages.error(request, 'Bạn chưa được gán người quản lý. Vui lòng liên hệ quản trị viên để được gán người quản lý trước khi gửi yêu cầu.')
+        messages.warning(request, 'Vui lòng vào Thông tin cá nhân và thêm Người quản lý trước khi gửi yêu cầu.')
         return redirect('inventory_requests:inventory_request_edit', request_id=request_obj.id)
     
     if not request.user.manager.email:
-        messages.error(request, 'Người quản lý của bạn chưa có email. Vui lòng liên hệ quản trị viên để cập nhật email cho người quản lý.')
+        messages.warning(request, 'Người quản lý của bạn chưa có email. Vui lòng liên hệ quản trị viên để cập nhật email cho người quản lý.')
         return redirect('inventory_requests:inventory_request_edit', request_id=request_obj.id)
     
     # Kiểm tra xem yêu cầu có ít nhất một phân bổ sản phẩm cho nhân viên không
