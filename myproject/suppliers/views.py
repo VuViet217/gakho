@@ -300,10 +300,8 @@ def supplier_export_excel(request):
         'Tên liên hệ',
         'Điện thoại',
         'Email',
-        'Website',
-        'Mã số thuế',
-        'Ghi chú',
-        'Trạng thái'
+        'Ngày tạo',
+        'Ngày cập nhật'
     ]
     
     for col_num, header in enumerate(headers, 1):
@@ -321,10 +319,8 @@ def supplier_export_excel(request):
     ws.column_dimensions['D'].width = 20  # Tên liên hệ
     ws.column_dimensions['E'].width = 15  # Điện thoại
     ws.column_dimensions['F'].width = 25  # Email
-    ws.column_dimensions['G'].width = 20  # Website
-    ws.column_dimensions['H'].width = 15  # MST
-    ws.column_dimensions['I'].width = 30  # Ghi chú
-    ws.column_dimensions['J'].width = 12  # Trạng thái
+    ws.column_dimensions['G'].width = 20  # Ngày tạo
+    ws.column_dimensions['H'].width = 20  # Ngày cập nhật
     
     # Lấy dữ liệu
     suppliers = Supplier.objects.all().order_by('code')
@@ -341,10 +337,8 @@ def supplier_export_excel(request):
             supplier.contact_name or '',
             supplier.contact_phone or '',
             supplier.contact_email or '',
-            supplier.website or '',
-            supplier.tax_code or '',
-            supplier.notes or '',
-            'Hoạt động' if supplier.is_active else 'Ngừng'
+            supplier.created_at.strftime('%d/%m/%Y %H:%M') if supplier.created_at else '',
+            supplier.updated_at.strftime('%d/%m/%Y %H:%M') if supplier.updated_at else ''
         ]
         
         for col_num, value in enumerate(row_data, 1):

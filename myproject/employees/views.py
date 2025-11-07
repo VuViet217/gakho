@@ -249,20 +249,24 @@ def import_employees(request):
 
 @login_required
 def export_employees(request):
+    from django.http import HttpResponse
     format_param = request.GET.get('format', 'xlsx')
     
     resource = EmployeeResource()
     dataset = resource.export()
     
     if format_param == 'csv':
-        file_format = base_formats.CSV()
-        response = file_format.export_response(dataset, 'danh_sach_nhan_vien')
+        response = HttpResponse(dataset.csv, content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="danh_sach_nhan_vien.csv"'
     elif format_param == 'xls':
-        file_format = base_formats.XLS()
-        response = file_format.export_response(dataset, 'danh_sach_nhan_vien')
+        response = HttpResponse(dataset.xls, content_type='application/vnd.ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="danh_sach_nhan_vien.xls"'
     else:  # Default: xlsx
-        file_format = base_formats.XLSX()
-        response = file_format.export_response(dataset, 'danh_sach_nhan_vien')
+        response = HttpResponse(
+            dataset.xlsx, 
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = 'attachment; filename="danh_sach_nhan_vien.xlsx"'
     
     return response
 
@@ -302,19 +306,23 @@ def import_departments(request):
 
 @login_required
 def export_departments(request):
+    from django.http import HttpResponse
     format_param = request.GET.get('format', 'xlsx')
     
     resource = DepartmentResource()
     dataset = resource.export()
     
     if format_param == 'csv':
-        file_format = base_formats.CSV()
-        response = file_format.export_response(dataset, 'danh_sach_bo_phan')
+        response = HttpResponse(dataset.csv, content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="danh_sach_bo_phan.csv"'
     elif format_param == 'xls':
-        file_format = base_formats.XLS()
-        response = file_format.export_response(dataset, 'danh_sach_bo_phan')
+        response = HttpResponse(dataset.xls, content_type='application/vnd.ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="danh_sach_bo_phan.xls"'
     else:  # Default: xlsx
-        file_format = base_formats.XLSX()
-        response = file_format.export_response(dataset, 'danh_sach_bo_phan')
+        response = HttpResponse(
+            dataset.xlsx, 
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = 'attachment; filename="danh_sach_bo_phan.xlsx"'
     
     return response

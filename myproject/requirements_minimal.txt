@@ -1,0 +1,44 @@
+# Core Django
+Django==5.1
+asgiref==3.8.1
+sqlparse==0.5.3
+tzdata==2025.2
+
+# Database
+mysqlclient==2.2.7
+
+# Django Extensions
+django-adminlte3==0.1.6
+django-crispy-forms==2.4
+crispy-bootstrap4==2025.6
+django-import-export==4.3.10
+django-summernote==0.8.20.0
+
+# Import/Export support
+openpyxl==3.1.5
+xlrd==2.0.1
+xlwt==1.3.0
+tablib==3.7.0
+et_xmlfile==2.0.0
+
+# Image handling
+Pillow==11.3.0
+
+# HTML/CSS parsing (for summernote)
+beautifulsoup4==4.13.3
+soupsieve==2.6
+bleach==6.2.0
+webencodings==0.5.1
+
+# Utilities
+python-dateutil==2.9.0.post0
+pytz==2025.1
+Unidecode==1.3.8
+diff-match-patch==20241021
+
+# HTTP and requests
+requests==2.32.3
+urllib3==2.3.0
+certifi==2025.1.31
+charset-normalizer==3.4.1
+idna==3.10
