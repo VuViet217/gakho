@@ -49,3 +49,10 @@ urlpatterns += i18n_patterns(
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    
+    # Test error pages in development
+    from myproject.views import custom_404, custom_500
+    urlpatterns += [
+        path('test-404/', lambda request: custom_404(request, None), name='test_404'),
+        path('test-500/', custom_500, name='test_500'),
+    ]
